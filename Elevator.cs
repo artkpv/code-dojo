@@ -56,8 +56,12 @@ namespace Elevator
 			get
 			{
 				lock (_altitudeMetersLock)
+				lock (_stateLock)
 				{
-					return (int) Math.Round(_altitudeMeters / _floorHeightMeters) + 1;
+					if(_state == EState.MovingDown)
+						return (int) Math.Ceiling(_altitudeMeters / _floorHeightMeters) + 1;
+					else
+						return (int) Math.Floor(_altitudeMeters / _floorHeightMeters) + 1;
 				}
 			}
 		}
@@ -66,7 +70,7 @@ namespace Elevator
 		{
 			_cancellationToakenSource.Cancel();
 		}
-
+		/*
 		private void PrintState()
 		{
 			var message = new StringBuilder();
@@ -84,27 +88,15 @@ namespace Elevator
 			Console.Write(message);
 			Console.SetCursorPosition(left != 0 ? left : message.Length + 1, top);
 		}
-
-		public void PressFloorButton(int floor)
-		{
-			if (floor < 1 || _floors < floor)
-				throw new ArgumentException();
-			lock (_nextFloorLock)
-			{
-				if (!_nextFloors.Contains(floor))
-					_nextFloors.Add(floor);
-			}
-			Thread.Sleep(MillisecondsTimeout); // wait for Run to hook up
-		}
+		*/
 
 		private void Run()
 		{
 			double? nextAltitude = null;
-			DateTime? start = null;
+			DateTime? passedCheck = null;
 			while (true)
 			{
 				Thread.Sleep(MillisecondsTimeout);
-				PrintState();
 
 				if (_cancellationToakenSource.IsCancellationRequested)
 					break;
@@ -117,28 +109,34 @@ namespace Elevator
 						nextAltitude = GetNextFloorAltitude();
 						if (nextAltitude != null && nextAltitude.Value != _altitudeMeters)
 						{
-							Thread.Sleep(_doorSpeedSeconds * MillisecondsTimeout); // wait for doors closing
+							Thread.Sleep(_doorSpeedSeconds * MillisecondsInSecond); // wait for doors closing
 							OnDoorsClosed();
 							_state = nextAltitude.Value > _altitudeMeters ? EState.MovingUp : EState.MovingDown;
-							start = DateTime.Now;
+							var now = DateTime.Now;
+							passedCheck = now;
 						}
 					}
 					else
 					{
-						Debug.Assert(start != null);
+						Debug.Assert(passedCheck != null);
 						Debug.Assert(nextAltitude != null);
 						Debug.Assert(nextAltitude.Value != _altitudeMeters);
-						var passed = DateTime.Now - start.Value;
+						var now = DateTime.Now;
+						var passed = now - passedCheck.Value;
+						passedCheck = now;
 						var movedMeters = _speedMetersPerSeconds * passed.TotalSeconds;
+						int previousFloor = Floor;
 						// reached the floor or moved some 
 						_altitudeMeters =
 							_state == EState.MovingUp
 								? Math.Min(_altitudeMeters + movedMeters, nextAltitude.Value)
 								: Math.Max(_altitudeMeters - movedMeters, nextAltitude.Value);
+						
+						if (Floor != previousFloor)
+							OnReachedFloor();
 
 						if (_altitudeMeters == nextAltitude.Value) // reached the floor
 						{
-							OnReachedFloor();
 							Thread.Sleep(_doorSpeedSeconds * MillisecondsInSecond); // wait for doors
 							OnDoorsOpened();
 							_state = EState.Stopped;
@@ -150,16 +148,17 @@ namespace Elevator
 
 		private void OnDoorsClosed()
 		{
-			Console.WriteLine("\nDoors closed");
+			Console.WriteLine($"{DateTime.Now:T} Doors closed");
 		}
 
 		private void OnDoorsOpened()
 		{
-			Console.WriteLine("\nDoor opened");
+			Console.WriteLine($"{DateTime.Now:T} Doors opened");
 		}
 
 		private void OnReachedFloor()
 		{
+			Console.WriteLine($"{DateTime.Now:T} Reached {Floor} floor");
 		}
 
 		/// <summary>
@@ -198,7 +197,26 @@ namespace Elevator
 
 		public void PressElevatorButton(int floor)
 		{
-			throw new NotImplementedException();
+			if (floor < 1 || _floors < floor)
+				throw new ArgumentException();
+			lock (_nextFloorLock)
+			{
+				if (!_nextFloors.Contains(floor))
+					_nextFloors.Add(floor);
+			}
+			Thread.Sleep(MillisecondsTimeout); // wait for Run to hook up
+		}
+
+		public void PressFloorButton(int floor)
+		{
+			if (floor < 1 || _floors < floor)
+				throw new ArgumentException();
+			lock (_nextFloorLock)
+			{
+				if (!_nextFloors.Contains(floor))
+					_nextFloors.Add(floor);
+			}
+			Thread.Sleep(MillisecondsTimeout); // wait for Run to hook up
 		}
 
 		private enum EState
