@@ -31,7 +31,7 @@ namespace Elevator
 		private double _metersAltitude; // starts at first floor
 		private readonly int _secondsDoorSpeed;
 		private readonly Task _elevatorTask;
-		private EState _state = EState.Stopped;
+		private EElevatorState _elevatorState = EElevatorState.Stopped;
 
 		public Elevator(double secondsPerMetersSpeed = SpeedDefault,
 		                double metersFloorHeight = MetersFloorHeightDefault,
@@ -56,6 +56,9 @@ namespace Elevator
 			_elevatorTask.Start();
 		}
 
+		/// <summary>
+		/// Floor where elevator is now
+		/// </summary>
 		public int Floor
 		{
 			get
@@ -63,7 +66,7 @@ namespace Elevator
 				lock (_altitudeMetersLock)
 				lock (_stateLock)
 				{
-					if(_state == EState.MovingDown)
+					if(_elevatorState == EElevatorState.MovingDown)
 						return (int) Math.Ceiling(_metersAltitude / _metersFloorHeight) + 1;
 					else
 						return (int) Math.Floor(_metersAltitude / _metersFloorHeight) + 1;
@@ -98,7 +101,7 @@ namespace Elevator
 				{
 					PrintFancyState();
 					
-					if (_state == EState.Stopped)
+					if (_elevatorState == EElevatorState.Stopped)
 					{
 						// check if needs to move to other floor:
 						nextAltitude = GetNextFloorAltitude();
@@ -106,7 +109,7 @@ namespace Elevator
 						{
 							Thread.Sleep(_secondsDoorSpeed * MillisecondsInSecond); // wait for doors closing
 							OnDoorsClosed();
-							_state = nextAltitude.Value > _metersAltitude ? EState.MovingUp : EState.MovingDown;
+							_elevatorState = nextAltitude.Value > _metersAltitude ? EElevatorState.MovingUp : EElevatorState.MovingDown;
 							var now = DateTime.Now;
 							passedCheck = now;
 						}
@@ -124,7 +127,7 @@ namespace Elevator
 						int previousFloor = Floor;
 						// reached the floor or moved some 
 						_metersAltitude =
-							_state == EState.MovingUp
+							_elevatorState == EElevatorState.MovingUp
 								? Math.Min(_metersAltitude + movedMeters, nextAltitude.Value)
 								: Math.Max(_metersAltitude - movedMeters, nextAltitude.Value);
 
@@ -138,7 +141,7 @@ namespace Elevator
 						{
 							Thread.Sleep(_secondsDoorSpeed * MillisecondsInSecond); // wait for doors
 							OnDoorsOpened();
-							_state = EState.Stopped;
+							_elevatorState = EElevatorState.Stopped;
 						}
 					}
 				}
@@ -151,9 +154,9 @@ namespace Elevator
 			lock (_stateLock)
 			{
 				message.Append(
-				               _state == EState.MovingUp
+				               _elevatorState == EElevatorState.MovingUp
 					               ? "Up.."
-					               : _state == EState.MovingDown
+					               : _elevatorState == EElevatorState.MovingDown
 						               ? "Down.."
 						               : "Stopped..");
 			}
@@ -199,6 +202,9 @@ namespace Elevator
 			return nextAltitude;
 		}
 
+		/// <summary>
+		/// Send a command to an elevator
+		/// </summary>
 		public void HandleCommand(Command c)
 		{
 			if (c.Floor < 1 || _floors < c.Floor)
@@ -211,7 +217,7 @@ namespace Elevator
 			Thread.Sleep(MillisecondsTimeout); // wait for Run to hook up
 		}
 
-		private enum EState
+		private enum EElevatorState
 		{
 			MovingUp,
 			MovingDown,
@@ -219,6 +225,9 @@ namespace Elevator
 		}
 	}
 
+	/// <summary>
+	/// Commands to elevator
+	/// </summary>
 	public struct Command
 	{
 		public readonly bool IsInElevator;
