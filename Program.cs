@@ -42,7 +42,6 @@ namespace Elevator
 	        double speed = double.Parse(Console.ReadLine());
 			Console.WriteLine("Doors speed (0 seconds):");
 	        int doorSpeed = int.Parse(Console.ReadLine());
-			Console.WriteLine("Output: floor, state (D - moving down, U - up)");
 			Console.WriteLine("Input: 'eX' - press X button in the elevator");
 			Console.WriteLine("       'bX' - press elevator call from building at X floor");
 	        using (var e = new Elevator(speed, height, floors, doorSpeed))
@@ -50,10 +49,8 @@ namespace Elevator
 		        while (true)
 		        {
 			        var input = Console.ReadLine();
-					if(input.StartsWith("e"))
-						e.PressFloorButton(int.Parse(input.Substring(1)));
-					if(input.StartsWith("b"))
-						e.PressElevatorButton(int.Parse(input.Substring(1)));
+			        var command = new Command(input.StartsWith("e"), int.Parse(input.Substring(1)));	
+			        e.HandleCommand(command);
 		        }
 	        }
         }

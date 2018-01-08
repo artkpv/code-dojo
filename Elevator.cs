@@ -20,8 +20,8 @@ namespace Elevator
 		private readonly CancellationTokenSource _cancellationToakenSource;
 		private readonly double _metersFloorHeight;
 		private readonly int _floors;
-		private readonly object _nextFloorLock = new object();
-		private readonly List<int> _nextFloors = new List<int>();
+		private readonly object _nextFloorCommandsLock = new object();
+		private readonly Queue<Command> _nextFloorsCommands = new Queue<Command>();
 		private readonly double _secondsPerMetersSpeed;
 		private readonly object _stateLock = new object();
 		private double _metersAltitude; // starts at first floor
@@ -85,6 +85,7 @@ namespace Elevator
 				lock (_stateLock)
 				lock (_altitudeMetersLock)
 				{
+					PrintFancyState();
 					if (_state == EState.Stopped)
 					{
 						nextAltitude = GetNextFloorAltitude();
@@ -127,19 +128,40 @@ namespace Elevator
 			}
 		}
 
+		private void PrintFancyState()
+		{
+			var message = new StringBuilder();
+			lock (_stateLock)
+			{
+				message.Append(
+				               _state == EState.MovingUp
+					               ? "Up.."
+					               : _state == EState.MovingDown
+						               ? "Down.."
+						               : "Stopped..");
+			}
+			message.Append(" ");
+
+			var left = Console.CursorLeft;
+			var top = Console.CursorTop;
+			Console.SetCursorPosition(0, top);
+			Console.Write(message);
+			Console.SetCursorPosition(left != 0 ? left : message.Length + 1, top);
+		}
+
 		private void OnDoorsClosed()
 		{
-			Console.WriteLine($"{DateTime.Now:T} Doors closed");
+			Console.WriteLine($"\r{DateTime.Now:T} Doors closed");
 		}
 
 		private void OnDoorsOpened()
 		{
-			Console.WriteLine($"{DateTime.Now:T} Doors opened");
+			Console.WriteLine($"\r{DateTime.Now:T} Doors opened");
 		}
 
 		private void OnReachedFloor()
 		{
-			Console.WriteLine($"{DateTime.Now:T} Reached {Floor} floor");
+			Console.WriteLine($"\r{DateTime.Now:T} Reached {Floor} floor");
 		}
 
 		/// <summary>
@@ -148,14 +170,13 @@ namespace Elevator
 		private double? GetNextFloorAltitude()
 		{
 			double? nextAltitude = null;
-			lock (_nextFloorLock)
+			lock (_nextFloorCommandsLock)
 			{
-				if (_nextFloors.Any())
+				// simple strategy: FIFO
+				if (_nextFloorsCommands.Any())
 				{
-					// simple strategy: FIFO
-					var floor = _nextFloors[0];
-					_nextFloors.RemoveAt(0);
-					nextAltitude = (floor - 1) * _metersFloorHeight;
+					var c = _nextFloorsCommands.Dequeue();
+					nextAltitude = (c.Floor - 1) * _metersFloorHeight;
 				}
 			}
 			return nextAltitude;
@@ -175,26 +196,14 @@ namespace Elevator
 			}
 		}
 
-		public void PressElevatorButton(int floor)
+		public void HandleCommand(Command c)
 		{
-			if (floor < 1 || _floors < floor)
+			if (c.Floor < 1 || _floors < c.Floor)
 				throw new ArgumentException();
-			lock (_nextFloorLock)
+			lock (_nextFloorCommandsLock)
 			{
-				if (!_nextFloors.Contains(floor))
-					_nextFloors.Add(floor);
-			}
-			Thread.Sleep(MillisecondsTimeout); // wait for Run to hook up
-		}
-
-		public void PressFloorButton(int floor)
-		{
-			if (floor < 1 || _floors < floor)
-				throw new ArgumentException();
-			lock (_nextFloorLock)
-			{
-				if (!_nextFloors.Contains(floor))
-					_nextFloors.Add(floor);
+				if (!_nextFloorsCommands.Contains(c))
+					_nextFloorsCommands.Enqueue(c);
 			}
 			Thread.Sleep(MillisecondsTimeout); // wait for Run to hook up
 		}
@@ -204,6 +213,18 @@ namespace Elevator
 			MovingUp,
 			MovingDown,
 			Stopped
+		}
+	}
+
+	public struct Command
+	{
+		public readonly bool IsInElevator;
+		public readonly int Floor;
+
+		public Command(bool isInElevator, int floor)
+		{
+			IsInElevator = isInElevator;
+			Floor = floor;
 		}
 	}
 }

@@ -16,11 +16,11 @@ namespace Elevator
 		{
 			using (var e = new Elevator(0.5, 3, 10))
 			{
-				e.PressFloorButton(10);
+				e.HandleCommand(new Command(true, 10));
 				e.WaitForStop();
 				e.Floor.Should().Be(10);
 
-				e.PressFloorButton(1);
+				e.HandleCommand(new Command(true, 1));
 				e.WaitForStop();
 				e.Floor.Should().Be(1);
 			}
