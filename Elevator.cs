@@ -70,25 +70,6 @@ namespace Elevator
 		{
 			_cancellationToakenSource.Cancel();
 		}
-		/*
-		private void PrintState()
-		{
-			var message = new StringBuilder();
-			message.Append(" ");
-			message.Append(Floor + " ");
-			lock (_stateLock)
-			{
-				message.Append(_state == EState.MovingUp ? "U" : _state == EState.MovingDown ? "D" : "-");
-			}
-			message.Append("   ");
-
-			var left = Console.CursorLeft;
-			var top = Console.CursorTop;
-			Console.SetCursorPosition(0, top);
-			Console.Write(message);
-			Console.SetCursorPosition(left != 0 ? left : message.Length + 1, top);
-		}
-		*/
 
 		private void Run()
 		{
