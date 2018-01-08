@@ -199,20 +199,6 @@ namespace Elevator
 			return nextAltitude;
 		}
 
-		public void WaitForStop()
-		{
-			// can create another thread to wait for stop (Task)
-			while (true)
-			{
-				lock (_stateLock)
-				{
-					if (_state == EState.Stopped)
-						return;
-				}
-				Thread.Sleep(MillisecondsTimeout);
-			}
-		}
-
 		public void HandleCommand(Command c)
 		{
 			if (c.Floor < 1 || _floors < c.Floor)
