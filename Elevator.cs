@@ -13,38 +13,38 @@ namespace Elevator
 		private const int MillisecondsTimeout = 101;
 		private const int MillisecondsInSecond = 1000;
 		private const int MinFloors = 5;
-		private const int FloorHeightMetersDefault = 3;
-		private const int DoorSpeedSecondsDefault = 2;
+		private const int MetersFloorHeightDefault = 3;
+		private const int SecondsDoorSpeedDefault = 2;
 		private const double SpeedDefault = 0.5;
 		private readonly object _altitudeMetersLock = new object();
 		private readonly CancellationTokenSource _cancellationToakenSource;
-		private readonly double _floorHeightMeters;
+		private readonly double _metersFloorHeight;
 		private readonly int _floors;
 		private readonly object _nextFloorLock = new object();
 		private readonly List<int> _nextFloors = new List<int>();
-		private readonly double _speedMetersPerSeconds;
+		private readonly double _secondsPerMetersSpeed;
 		private readonly object _stateLock = new object();
-		private double _altitudeMeters; // starts at first floor
-		private readonly int _doorSpeedSeconds;
+		private double _metersAltitude; // starts at first floor
+		private readonly int _secondsDoorSpeed;
 		private readonly Task _elevatorTask;
 		private EState _state = EState.Stopped;
 
-		public Elevator(double speedMetersPerSeconds = SpeedDefault,
-		                double floorHeightMeters = FloorHeightMetersDefault,
+		public Elevator(double secondsPerMetersSpeed = SpeedDefault,
+		                double metersFloorHeight = MetersFloorHeightDefault,
 		                int floors = MinFloors,
-		                int doorSpeedSeconds = DoorSpeedSecondsDefault)
+		                int secondsDoorSpeed = SecondsDoorSpeedDefault)
 		{
-			if (floorHeightMeters < 0)
+			if (metersFloorHeight < 0)
 				throw new ArgumentException();
 			if (floors <= MinFloors)
 				throw new ArgumentException();
-			if (doorSpeedSeconds < 0)
+			if (secondsDoorSpeed < 0)
 				throw new ArgumentException();
 
 			_floors = floors;
-			_speedMetersPerSeconds = speedMetersPerSeconds;
-			_floorHeightMeters = floorHeightMeters;
-			_doorSpeedSeconds = doorSpeedSeconds;
+			_secondsPerMetersSpeed = secondsPerMetersSpeed;
+			_metersFloorHeight = metersFloorHeight;
+			_secondsDoorSpeed = secondsDoorSpeed;
 
 			_cancellationToakenSource = new CancellationTokenSource();
 			_elevatorTask = new Task(Run, _cancellationToakenSource.Token);
@@ -59,9 +59,9 @@ namespace Elevator
 				lock (_stateLock)
 				{
 					if(_state == EState.MovingDown)
-						return (int) Math.Ceiling(_altitudeMeters / _floorHeightMeters) + 1;
+						return (int) Math.Ceiling(_metersAltitude / _metersFloorHeight) + 1;
 					else
-						return (int) Math.Floor(_altitudeMeters / _floorHeightMeters) + 1;
+						return (int) Math.Floor(_metersAltitude / _metersFloorHeight) + 1;
 				}
 			}
 		}
@@ -88,11 +88,11 @@ namespace Elevator
 					if (_state == EState.Stopped)
 					{
 						nextAltitude = GetNextFloorAltitude();
-						if (nextAltitude != null && nextAltitude.Value != _altitudeMeters)
+						if (nextAltitude != null && nextAltitude.Value != _metersAltitude)
 						{
-							Thread.Sleep(_doorSpeedSeconds * MillisecondsInSecond); // wait for doors closing
+							Thread.Sleep(_secondsDoorSpeed * MillisecondsInSecond); // wait for doors closing
 							OnDoorsClosed();
-							_state = nextAltitude.Value > _altitudeMeters ? EState.MovingUp : EState.MovingDown;
+							_state = nextAltitude.Value > _metersAltitude ? EState.MovingUp : EState.MovingDown;
 							var now = DateTime.Now;
 							passedCheck = now;
 						}
@@ -101,24 +101,24 @@ namespace Elevator
 					{
 						Debug.Assert(passedCheck != null);
 						Debug.Assert(nextAltitude != null);
-						Debug.Assert(nextAltitude.Value != _altitudeMeters);
+						Debug.Assert(nextAltitude.Value != _metersAltitude);
 						var now = DateTime.Now;
 						var passed = now - passedCheck.Value;
 						passedCheck = now;
-						var movedMeters = _speedMetersPerSeconds * passed.TotalSeconds;
+						var movedMeters = _secondsPerMetersSpeed * passed.TotalSeconds;
 						int previousFloor = Floor;
 						// reached the floor or moved some 
-						_altitudeMeters =
+						_metersAltitude =
 							_state == EState.MovingUp
-								? Math.Min(_altitudeMeters + movedMeters, nextAltitude.Value)
-								: Math.Max(_altitudeMeters - movedMeters, nextAltitude.Value);
+								? Math.Min(_metersAltitude + movedMeters, nextAltitude.Value)
+								: Math.Max(_metersAltitude - movedMeters, nextAltitude.Value);
 						
 						if (Floor != previousFloor)
 							OnReachedFloor();
 
-						if (_altitudeMeters == nextAltitude.Value) // reached the floor
+						if (_metersAltitude == nextAltitude.Value) // reached the floor
 						{
-							Thread.Sleep(_doorSpeedSeconds * MillisecondsInSecond); // wait for doors
+							Thread.Sleep(_secondsDoorSpeed * MillisecondsInSecond); // wait for doors
 							OnDoorsOpened();
 							_state = EState.Stopped;
 						}
@@ -155,7 +155,7 @@ namespace Elevator
 					// simple strategy: FIFO
 					var floor = _nextFloors[0];
 					_nextFloors.RemoveAt(0);
-					nextAltitude = (floor - 1) * _floorHeightMeters;
+					nextAltitude = (floor - 1) * _metersFloorHeight;
 				}
 			}
 			return nextAltitude;
@@ -171,8 +171,7 @@ namespace Elevator
 					if (_state == EState.Stopped)
 						return;
 				}
-				var millisecondsTimeout = 101;
-				Thread.Sleep(millisecondsTimeout);
+				Thread.Sleep(MillisecondsTimeout);
 			}
 		}
 
