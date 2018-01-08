@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 
 namespace Elevator
 {
+	/// <summary>
+	/// Emulation of an elavator in a building by creating another 
+	/// thread in the pool which waits for commands from outside. 
+	/// </summary>
 	public class Elevator : IDisposable
 	{
 		private const int MillisecondsTimeout = 101;
@@ -46,6 +50,7 @@ namespace Elevator
 			_metersFloorHeight = metersFloorHeight;
 			_secondsDoorSpeed = secondsDoorSpeed;
 
+			// keep token for disposal
 			_cancellationToakenSource = new CancellationTokenSource();
 			_elevatorTask = new Task(Run, _cancellationToakenSource.Token);
 			_elevatorTask.Start();
@@ -68,9 +73,14 @@ namespace Elevator
 
 		public void Dispose()
 		{
+			// expect another thread to return it self 
 			_cancellationToakenSource.Cancel();
 		}
 
+		/// <summary>
+		/// Runs internal loop for the elevator. Processing incomming commands along the way
+		/// and output its state.
+		/// </summary>
 		private void Run()
 		{
 			double? nextAltitude = null;
@@ -79,6 +89,7 @@ namespace Elevator
 			{
 				Thread.Sleep(MillisecondsTimeout);
 
+				// to exit on disposal:
 				if (_cancellationToakenSource.IsCancellationRequested)
 					break;
 
@@ -86,8 +97,10 @@ namespace Elevator
 				lock (_altitudeMetersLock)
 				{
 					PrintFancyState();
+					
 					if (_state == EState.Stopped)
 					{
+						// check if needs to move to other floor:
 						nextAltitude = GetNextFloorAltitude();
 						if (nextAltitude != null && nextAltitude.Value != _metersAltitude)
 						{
@@ -100,6 +113,7 @@ namespace Elevator
 					}
 					else
 					{
+						// now moving up/down to the desired floor
 						Debug.Assert(passedCheck != null);
 						Debug.Assert(nextAltitude != null);
 						Debug.Assert(nextAltitude.Value != _metersAltitude);
@@ -113,9 +127,12 @@ namespace Elevator
 							_state == EState.MovingUp
 								? Math.Min(_metersAltitude + movedMeters, nextAltitude.Value)
 								: Math.Max(_metersAltitude - movedMeters, nextAltitude.Value);
-						
+
 						if (Floor != previousFloor)
+						{
+							// TODO implement strategy to open doors along the way
 							OnReachedFloor();
+						}
 
 						if (_metersAltitude == nextAltitude.Value) // reached the floor
 						{
