@@ -1,42 +1,59 @@
-/*
- * Hash table with separate chaining for collision resolution:
- *   put(..)
- *   search(..)
- */
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
+#include <assert.h>
 
-struct hnode {
+//
+//  HASHTABLE, linear probing for collision resolution
+//
+
+typedef struct {
 	int key;
 	char * value;
-};
+} Node;
 
-typedef struct hnode Node;
-typedef struct hnode * NodePtr;
-
-int get_hash(char * s) {
-	int r = 19;  // some radix for chars
-	int hash = 0;
-	int n = strlen(s);
-	for (int i = 0; i < n; i++) 
-		hash = hash*r + (int)s[i];
-	return hash;
-}
+typedef Node * NodePtr;
 
 int calculate_hash(int hash, int m) {
-	int bits31 = 0x7fffffff;
-	return (hash & bits31) % m;
+	return (hash & INT_MAX) % m;
 }
 
-void put (NodePtr ht[], int m, int key, char * value) {
+typedef struct HTStruct {
+	int count;
+	int m;
+	NodePtr * arr;
+} * HT;
+
+HT 
+HT_ctor(int m) {
+	HT ht = (HT) malloc(sizeof(struct HTStruct));
+	ht->count = 0;
+	ht->m = m;
+	NodePtr * arr = (NodePtr*) calloc(m, sizeof(NodePtr));
+	for (int i = 0; i < m; i++)
+		arr[i] = NULL;
+	ht->arr = arr;
+}
+
+void
+HT_free(HT ht) {
+	if (ht != NULL) {
+		if (ht->arr != NULL) 
+			free(ht->arr);
+		free(ht);
+	}
+}
+
+void
+_put(NodePtr* arr, int m, int key, char * value) {
 	int i = calculate_hash(key, m);
-	for (; ht[i] != NULL; i++) {
-		if (ht[i]->key == key)
+	for (; arr[i] != NULL; i = (i + 1) % m) {
+		if (arr[i]->key == key)
 		{
-			ht[i]->key = key;
-			ht[i]->value = value;
+			NodePtr n = arr[i];
+			n->key = key;
+			n->value = value;
 			return;
 		}
 	}
@@ -44,66 +61,97 @@ void put (NodePtr ht[], int m, int key, char * value) {
 	NodePtr newnode = (NodePtr) malloc(sizeof(Node));
 	newnode->key = key;
 	newnode->value = value;
-	ht[i] = newnode;
+	arr[i] = newnode;
 }
 
-char * search (NodePtr ht[], int m, int key) {
-	for (int i = calculate_hash(key, m); ht[i] != NULL; i++) {
-		if (ht[i]->key == key)
-			return ht[i]->value;
+void
+resize(HT ht, int m) {
+	printf("resize %d -> %d\n", ht->m, m);
+	assert(ht->count < m);
+	printf(" count=%d\n", ht->count);
+
+	NodePtr * arr = (NodePtr*) calloc(m, sizeof(NodePtr));
+	int count = 0;
+	for (int i = 0; i < ht->m; i++) {
+		NodePtr n = ht->arr[i];
+		if (n != NULL) {
+			_put(arr, m, n->key, n->value);
+			free(n);
+			count++;
+		}
+		else {
+			arr[i] = NULL;
+		}
+	}
+
+	free(ht->arr);
+	ht->arr = arr;
+	ht->m = m;
+	ht->count = count;
+}
+
+// Stores value by a key
+void 
+put (HT ht, int key, char * value) {
+	_put(ht->arr, ht->m, key, value);
+	ht->count++;
+	if (ht->count * 2 > ht->m) 
+		resize(ht, ht->m*2);
+}
+
+// Finds value by key
+char * 
+search (HT ht, int key) {
+	for (int i = calculate_hash(key, ht->m); ht->arr[i] != NULL; i = (i+1) % ht->m) {
+		if (ht->arr[i]->key == key)
+			return ht->arr[i]->value;
 	}
 	return NULL;
 }
 
-void print_ht(NodePtr ht[], int m) {
+
+// Removes key
+void
+delete (HT ht, int key) {
+	int i = calculate_hash(key, ht->m);
+	for (; ht->arr[i] != NULL; i = (i+1) % ht->m) {
+		if (ht->arr[i]->key == key) {			
+			ht->arr[i] = NULL;
+		}
+	}
+
+	i = (i+1) % ht->m;
+
+	while (ht->arr[i] != NULL) {
+		NodePtr n = ht->arr[i];
+		char * value = n->value;
+		int key = n->key;
+		free(n);
+		// TODO free(n->value)
+		ht->arr[i] = NULL;
+		put(ht, key, value);
+		if (ht->arr[i] == NULL)
+			break;
+		else
+			i = (i+1) % ht->m;
+	}
+
+	ht->count--;
+	if ( ht->count * 8 <= ht->m) 
+		resize(ht, (int)ht->m/2);
+}
+
+void 
+print_ht(HT ht) {
 	int count = 0;
-	for (int i = 0; i < m; i++) {
+	for (int i = 0; i < ht->m; i++) {
 		printf("%d: ", i);
-		if (ht[i] != NULL) {
-			NodePtr np = ht[i];
+		if (ht->arr[i] != NULL) {
+			NodePtr np = ht->arr[i];
 			printf("%d '%s'", np->key, np->value);
 			count++;
 		}
 		printf("\n");
 	}
-	printf("count: %d\n", count);
-}
-
-void main() {
-	char * s = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
-
-	int N = strlen(s);
-	int m = 100;
-	NodePtr hashtable[m];  
-	for (int i = 0; i < m; i++) // INIT! Or underfined (garbage).
-		hashtable[i] = NULL;
-	int word = 1;
-	char * sp = s;
-	int words_num = 0;
-	while ( *sp != '\0') {
-		if (*sp == ' ') {
-			if (word > 1) {
-				char * value = calloc(word, sizeof(char));
-				strncpy(value, (sp-word+1), word-1);
-				int key = get_hash(value);
-				put(hashtable, m, key, value);
-				words_num++;
-			}
-			sp++;
-			word = 1;
-		}
-		else {
-			sp++;
-			word++;
-		}
-	}
-	printf("%d\n", words_num);
-	print_ht(hashtable, m);
-
-	char * tests[] = { "Lorem", "ipsum", "kasd", "anything" };
-	for (int i = 0; i < 4; i++) {
-		int key = get_hash(tests[i]);
-		char * value = search(hashtable, m, key);
-		printf("test '%s': %s\n", tests[i], value);
-	}
+	printf("count: %d (%d)\n", count, ht->count);
 }
