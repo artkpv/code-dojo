@@ -135,6 +135,6 @@ bool test_resize() {
 void main() {
 	assert(test_many_keys());
 	assert(test_put_search_delete());
-	// assert(test_resize());
+	assert(test_resize());
 	printf("\nAll tests pass\n");
 }
