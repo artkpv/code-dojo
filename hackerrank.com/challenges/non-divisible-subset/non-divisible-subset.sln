@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2041
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "non-divisible-subset", "non-divisible-subset.pyproj", "{BDB603D4-4BF1-4A49-8581-723E6D92AF15}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BDB603D4-4BF1-4A49-8581-723E6D92AF15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDB603D4-4BF1-4A49-8581-723E6D92AF15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0AEC0385-D9DB-4AC8-B70E-E5BF1AD2FB04}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2041
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "fraudulent-activity-notifications", "fraudulent-activity-notifications.pyproj", "{C820A8D0-8000-41DB-B2C2-33611854AB7D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C820A8D0-8000-41DB-B2C2-33611854AB7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C820A8D0-8000-41DB-B2C2-33611854AB7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {ECD9E6A0-3C6D-4C47-8D3D-59F0A776BBD3}
+	EndGlobalSection
+EndGlobal
