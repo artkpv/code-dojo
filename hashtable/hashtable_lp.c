@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
+// #include <stdint.h>
 #include <string.h>
 #include <assert.h>
 
 //
 //  HASHTABLE, linear probing for collision resolution
 //
+
+// #define INT_MAX 0x7fffffff
 
 typedef struct {
 	int key;
@@ -37,10 +39,35 @@ HT_ctor(int m) {
 }
 
 void
+_arr_free(NodePtr * arr, int n, int free_elems) {
+	if (arr != NULL) {
+		if (free_elems == 1) {
+			for (int i = 0; i < n; i++) {
+				if (*(arr + i) != NULL)
+					free(*(arr + i));
+			}
+		}
+		free(arr);
+	}
+}
+
+void
+_ht_resize(HT ht, int newsize) {
+	printf(" resizing %d\n", newsize);
+	assert(ht->count <= newsize);
+	NodePtr * arr = calloc(newsize, sizeof(NodePtr));
+	for (int i = 0; i < ht->m; i++)
+		arr[i] = ht->arr[i];
+	free(ht->arr);
+	ht->arr = arr;
+	ht->m = newsize;
+}
+
+
+void
 HT_free(HT ht) {
 	if (ht != NULL) {
-		if (ht->arr != NULL) 
-			free(ht->arr);
+		_arr_free(ht->arr, ht->m, 1);
 		free(ht);
 	}
 }
@@ -64,39 +91,13 @@ _put(NodePtr* arr, int m, int key, char * value) {
 	arr[i] = newnode;
 }
 
-void
-resize(HT ht, int m) {
-	printf("resize %d -> %d\n", ht->m, m);
-	assert(ht->count < m);
-	printf(" count=%d\n", ht->count);
-
-	NodePtr * arr = (NodePtr*) calloc(m, sizeof(NodePtr));
-	int count = 0;
-	for (int i = 0; i < ht->m; i++) {
-		NodePtr n = ht->arr[i];
-		if (n != NULL) {
-			_put(arr, m, n->key, n->value);
-			free(n);
-			count++;
-		}
-		else {
-			arr[i] = NULL;
-		}
-	}
-
-	free(ht->arr);
-	ht->arr = arr;
-	ht->m = m;
-	ht->count = count;
-}
-
 // Stores value by a key
 void 
 put (HT ht, int key, char * value) {
 	_put(ht->arr, ht->m, key, value);
 	ht->count++;
-	if (ht->count * 2 > ht->m) 
-		resize(ht, ht->m*2);
+	if (ht->count * 2 > ht->m)
+		_ht_resize(ht, ht->m * 2);
 }
 
 // Finds value by key
@@ -138,7 +139,7 @@ delete (HT ht, int key) {
 
 	ht->count--;
 	if ( ht->count * 8 <= ht->m) 
-		resize(ht, (int)ht->m/2);
+		_ht_resize(ht, ht->m / 2);
 }
 
 void 
