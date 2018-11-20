@@ -1,0 +1,161 @@
+#region begin cut
+/*
+// PROBLEM STATEMENT
+// 
+There are some chickens and some cows in Farmer John's yard.
+
+
+John's daughter Susie counted that all the animals in the yard have a total of 3 heads. 
+John's son Billy counted their legs and got a total of 8. 
+Using their answers, Farmer John easily determined that there have to be exactly 2 chickens and 1 cow.
+
+
+Write a method that will solve a general version of Farmer John's problem.
+You are given two ints heads and legs. Compute the number of chickens and the number of cows. Return a int[] with two elements: first the number of chickens, then the number of cows. If there is no solution, return an empty int[] instead.
+
+
+DEFINITION
+Class:OnTheFarmDivTwo
+Method:animals
+Parameters:int, int
+Returns:int[]
+Method signature:int[] animals(int heads, int legs)
+
+
+NOTES
+-If the solution exists, it is always unique.
+-A chicken has 1 head and 2 legs. A cow has 1 head and 4 legs.
+
+
+CONSTRAINTS
+-heads will be between 0 and 1,000,000, inclusive.
+-legs will be between 0 and 1,000,000, inclusive.
+
+
+EXAMPLES
+
+0)
+3
+8
+
+Returns: {2, 1 }
+
+Two chickens and a cow have a total of three heads and eight legs.
+
+1)
+10
+40
+
+Returns: {0, 10 }
+
+Ten cows.
+
+2)
+10
+42
+
+Returns: { }
+
+This test case has no solution because the number of legs is too large (or the number of heads is too small).
+
+3)
+1
+3
+
+Returns: { }
+
+No set of animals can have one head and three legs.
+
+4)
+0
+0
+
+Returns: {0, 0 }
+
+*/
+#endregion end cut
+using System;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Collections;
+
+public class OnTheFarmDivTwo {
+    public int[] animals(int heads, int legs) {
+        int[] res;
+        return res;
+    }
+
+#region begin cut
+    public static void Main(String[] args) {
+        try  {
+            eq(0,(new OnTheFarmDivTwo()).animals(3, 8),new int[] {2, 1 });
+            eq(1,(new OnTheFarmDivTwo()).animals(10, 40),new int[] {0, 10 });
+            eq(2,(new OnTheFarmDivTwo()).animals(10, 42),new int[] { });
+            eq(3,(new OnTheFarmDivTwo()).animals(1, 3),new int[] { });
+            eq(4,(new OnTheFarmDivTwo()).animals(0, 0),new int[] {0, 0 });
+        } 
+        catch( Exception exx)  {
+            System.Console.WriteLine(exx);
+            System.Console.WriteLine( exx.StackTrace);
+        }
+Console.Read();
+    }
+    private static void eq( int n, object have, object need) {
+        if( eq( have, need ) ) {
+            Console.WriteLine( "Case "+n+" passed." );
+        } else {
+            Console.Write( "Case "+n+" failed: expected " );
+            print( need );
+            Console.Write( ", received " );
+            print( have );
+            Console.WriteLine();
+        }
+    }
+    private static void eq( int n, Array have, Array need) {
+        if( have == null || have.Length != need.Length ) {
+            Console.WriteLine("Case "+n+" failed: returned "+have.Length+" elements; expected "+need.Length+" elements.");
+            print( have );
+            print( need );
+            return;
+        }
+        for( int i= 0; i < have.Length; i++ ) {
+            if( ! eq( have.GetValue(i), need.GetValue(i) ) ) {
+                Console.WriteLine( "Case "+n+" failed. Expected and returned array differ in position "+i );
+                print( have );
+                print( need );
+                return;
+            }
+        }
+        Console.WriteLine("Case "+n+" passed.");
+    }
+    private static bool eq( object a, object b ) {
+        if ( a is double && b is double ) {
+            return Math.Abs((double)a-(double)b) < 1E-9;
+        } else {
+            return a!=null && b!=null && a.Equals(b);
+        }
+    }
+    private static void print( object a ) {
+        if ( a is string ) {
+            Console.Write("\"{0}\"", a);
+        } else if ( a is long ) {
+            Console.Write("{0}L", a);
+        } else {
+            Console.Write(a);
+        }
+    }
+    private static void print( Array a ) {
+        if ( a == null) {
+            Console.WriteLine("<NULL>");
+        }
+        Console.Write('{');
+        for ( int i= 0; i < a.Length; i++ ) {
+            print( a.GetValue(i) );
+            if( i != a.Length-1 ) {
+                Console.Write(", ");
+            }
+        }
+        Console.WriteLine( '}' );
+    }
+#endregion end cut
+}

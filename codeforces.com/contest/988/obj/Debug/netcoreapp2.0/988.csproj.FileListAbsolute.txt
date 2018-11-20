@@ -1,0 +1,11 @@
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\988\bin\Debug\netcoreapp2.0\988.deps.json
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\988\bin\Debug\netcoreapp2.0\988.runtimeconfig.json
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\988\bin\Debug\netcoreapp2.0\988.runtimeconfig.dev.json
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\988\bin\Debug\netcoreapp2.0\988.dll
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\988\bin\Debug\netcoreapp2.0\988.pdb
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\988\obj\Debug\netcoreapp2.0\988.csprojAssemblyReference.cache
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\988\obj\Debug\netcoreapp2.0\988.csproj.CoreCompileInputs.cache
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\988\obj\Debug\netcoreapp2.0\988.AssemblyInfoInputs.cache
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\988\obj\Debug\netcoreapp2.0\988.AssemblyInfo.cs
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\988\obj\Debug\netcoreapp2.0\988.dll
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\988\obj\Debug\netcoreapp2.0\988.pdb

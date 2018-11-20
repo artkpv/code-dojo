@@ -1,0 +1,11 @@
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\round491\cs\bin\Debug\netcoreapp2.0\cs.deps.json
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\round491\cs\bin\Debug\netcoreapp2.0\cs.runtimeconfig.json
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\round491\cs\bin\Debug\netcoreapp2.0\cs.runtimeconfig.dev.json
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\round491\cs\bin\Debug\netcoreapp2.0\cs.dll
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\round491\cs\bin\Debug\netcoreapp2.0\cs.pdb
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\round491\cs\obj\Debug\netcoreapp2.0\cs.csprojAssemblyReference.cache
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\round491\cs\obj\Debug\netcoreapp2.0\cs.csproj.CoreCompileInputs.cache
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\round491\cs\obj\Debug\netcoreapp2.0\cs.AssemblyInfoInputs.cache
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\round491\cs\obj\Debug\netcoreapp2.0\cs.AssemblyInfo.cs
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\round491\cs\obj\Debug\netcoreapp2.0\cs.dll
+X:\Yandex\_mine\Ref\И\ИнформатикаЗадачи\codeforces.com\contest\round491\cs\obj\Debug\netcoreapp2.0\cs.pdb

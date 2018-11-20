@@ -1,0 +1,156 @@
+#region begin cut
+/*
+// PROBLEM STATEMENT
+// The king and the queen want to go on a vacation together. Since the queen seldom asks for anything, the king is more than willing to reschedule his meetings if they conflict with the vacation.
+
+The vacation must last for K contiguous days, and must lie between day 1 and day N inclusive. You are given int[] workingDays, where each element is a day on which the king has a meeting scheduled. The king will have at most one meeting scheduled per day. Return the minimum number of meetings that must be rescheduled so that the king and the queen can have a happy vacation.
+
+
+DEFINITION
+Class:VacationTime
+Method:bestSchedule
+Parameters:int, int, int[]
+Returns:int
+Method signature:int bestSchedule(int N, int K, int[] workingDays)
+
+
+CONSTRAINTS
+-N will be between 1 and 1000, inclusive.
+-K will be between 1 and N, inclusive.
+-workingDays will contain between 1 and 50 elements, inclusive.
+-Each element of workingDays will be between 1 and N, inclusive.
+-Elements of workingDays will be distinct.
+
+
+EXAMPLES
+
+0)
+3
+3
+{2}
+
+Returns: 1
+
+The vacation must last from day 1 to day 3. Hence, the meeting on day 2 must be rescheduled. 
+
+1)
+4
+3
+{3, 1, 2}
+
+Returns: 2
+
+There are two options for the vacation: days 1 to 3, or days 2 to 4. The first option would require 3 meetings to be rescheduled, and the second requires 2 meetings to be rescheduled. 
+
+2)
+5
+3
+{4, 1}
+
+Returns: 1
+
+Any 3 consecutive days have exactly one meeting within them. 
+
+3)
+9
+2
+{7, 4, 5, 6, 2}
+
+Returns: 0
+
+The king will not have to reschedule any meetings, but the queen will have to wait until day 8 for the vacation to start. 
+
+4)
+1000
+513
+{808, 459, 792, 863, 715, 70, 336, 731}
+
+Returns: 2
+
+*/
+#endregion end cut
+using System;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Collections;
+
+public class VacationTime {
+    public int bestSchedule(int N, int K, int[] workingDays) {
+        int res;
+        return res;
+    }
+
+#region begin cut
+    public static void Main(String[] args) {
+        try  {
+            eq(0,(new VacationTime()).bestSchedule(3, 3, new int[] {2}),1);
+            eq(1,(new VacationTime()).bestSchedule(4, 3, new int[] {3, 1, 2}),2);
+            eq(2,(new VacationTime()).bestSchedule(5, 3, new int[] {4, 1}),1);
+            eq(3,(new VacationTime()).bestSchedule(9, 2, new int[] {7, 4, 5, 6, 2}),0);
+            eq(4,(new VacationTime()).bestSchedule(1000, 513, new int[] {808, 459, 792, 863, 715, 70, 336, 731}),2);
+        } 
+        catch( Exception exx)  {
+            System.Console.WriteLine(exx);
+            System.Console.WriteLine( exx.StackTrace);
+        }
+Console.Read();
+    }
+    private static void eq( int n, object have, object need) {
+        if( eq( have, need ) ) {
+            Console.WriteLine( "Case "+n+" passed." );
+        } else {
+            Console.Write( "Case "+n+" failed: expected " );
+            print( need );
+            Console.Write( ", received " );
+            print( have );
+            Console.WriteLine();
+        }
+    }
+    private static void eq( int n, Array have, Array need) {
+        if( have == null || have.Length != need.Length ) {
+            Console.WriteLine("Case "+n+" failed: returned "+have.Length+" elements; expected "+need.Length+" elements.");
+            print( have );
+            print( need );
+            return;
+        }
+        for( int i= 0; i < have.Length; i++ ) {
+            if( ! eq( have.GetValue(i), need.GetValue(i) ) ) {
+                Console.WriteLine( "Case "+n+" failed. Expected and returned array differ in position "+i );
+                print( have );
+                print( need );
+                return;
+            }
+        }
+        Console.WriteLine("Case "+n+" passed.");
+    }
+    private static bool eq( object a, object b ) {
+        if ( a is double && b is double ) {
+            return Math.Abs((double)a-(double)b) < 1E-9;
+        } else {
+            return a!=null && b!=null && a.Equals(b);
+        }
+    }
+    private static void print( object a ) {
+        if ( a is string ) {
+            Console.Write("\"{0}\"", a);
+        } else if ( a is long ) {
+            Console.Write("{0}L", a);
+        } else {
+            Console.Write(a);
+        }
+    }
+    private static void print( Array a ) {
+        if ( a == null) {
+            Console.WriteLine("<NULL>");
+        }
+        Console.Write('{');
+        for ( int i= 0; i < a.Length; i++ ) {
+            print( a.GetValue(i) );
+            if( i != a.Length-1 ) {
+                Console.Write(", ");
+            }
+        }
+        Console.WriteLine( '}' );
+    }
+#endregion end cut
+}

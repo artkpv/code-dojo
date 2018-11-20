@@ -1,0 +1,159 @@
+#region begin cut
+/*
+// PROBLEM STATEMENT
+// The king is trying to find new ways to generate revenue, and he is currently exploring tourism as one potential avenue. The kingdom is a group of islands, and the amount of revenue that can be generated depends on the combined total length of beaches on all the islands.
+
+You are given a string[] kingdom consisting of '.' or '#' characters. '#' represents a land mass, whereas '.' represents water. kingdom[i][j] represents a regular-hexagon shaped area with each side of unit length. Since the cells are hexagonal in shape, the odd-numbered rows (0-based) are 'shifted' towards the right. A beach is a segment which has water on one side, and land on the other.
+An example string[] and the corresponding image are given below to illustrate. The beaches are marked in red.
+
+{"..#.##",
+ ".##.#.",
+ "#.#..."}
+
+
+
+Return the combined total length of beaches on all the islands.
+
+DEFINITION
+Class:Islands
+Method:beachLength
+Parameters:string[]
+Returns:int
+Method signature:int beachLength(string[] kingdom)
+
+
+CONSTRAINTS
+-kingdom will contain between 1 and 50 elements, inclusive.
+-Each element of kingdom will contain between 1 and 50 characters, inclusive.
+-Each element of kingdom will contain the same number of characters.
+-Each character in kingdom will be either '.' or '#'.
+
+
+EXAMPLES
+
+0)
+{".#...#.."}
+
+Returns: 4
+
+There are two small islands with water on two sides of each island. 
+
+1)
+{"..#.##", 
+ ".##.#.", 
+ "#.#..."}
+
+Returns: 19
+
+The example in the problem statement. 
+
+2)
+{"#...#.....",
+ "##..#...#."}
+
+Returns: 15
+
+
+
+3)
+{"....#.",
+ ".#....",
+ "..#..#",
+ "####.."}
+
+Returns: 24
+
+
+
+*/
+#endregion end cut
+using System;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Collections;
+
+public class Islands {
+    public int beachLength(string[] kingdom) {
+        int res;
+        return res;
+    }
+
+#region begin cut
+    public static void Main(String[] args) {
+        try  {
+            eq(0,(new Islands()).beachLength(new string[] {".#...#.."}),4);
+            eq(1,(new Islands()).beachLength(new string[] {"..#.##", 
+                ".##.#.", 
+                "#.#..."}),19);
+            eq(2,(new Islands()).beachLength(new string[] {"#...#.....",
+                "##..#...#."}),15);
+            eq(3,(new Islands()).beachLength(new string[] {"....#.",
+                ".#....",
+                "..#..#",
+                "####.."}),24);
+        } 
+        catch( Exception exx)  {
+            System.Console.WriteLine(exx);
+            System.Console.WriteLine( exx.StackTrace);
+        }
+Console.Read();
+    }
+    private static void eq( int n, object have, object need) {
+        if( eq( have, need ) ) {
+            Console.WriteLine( "Case "+n+" passed." );
+        } else {
+            Console.Write( "Case "+n+" failed: expected " );
+            print( need );
+            Console.Write( ", received " );
+            print( have );
+            Console.WriteLine();
+        }
+    }
+    private static void eq( int n, Array have, Array need) {
+        if( have == null || have.Length != need.Length ) {
+            Console.WriteLine("Case "+n+" failed: returned "+have.Length+" elements; expected "+need.Length+" elements.");
+            print( have );
+            print( need );
+            return;
+        }
+        for( int i= 0; i < have.Length; i++ ) {
+            if( ! eq( have.GetValue(i), need.GetValue(i) ) ) {
+                Console.WriteLine( "Case "+n+" failed. Expected and returned array differ in position "+i );
+                print( have );
+                print( need );
+                return;
+            }
+        }
+        Console.WriteLine("Case "+n+" passed.");
+    }
+    private static bool eq( object a, object b ) {
+        if ( a is double && b is double ) {
+            return Math.Abs((double)a-(double)b) < 1E-9;
+        } else {
+            return a!=null && b!=null && a.Equals(b);
+        }
+    }
+    private static void print( object a ) {
+        if ( a is string ) {
+            Console.Write("\"{0}\"", a);
+        } else if ( a is long ) {
+            Console.Write("{0}L", a);
+        } else {
+            Console.Write(a);
+        }
+    }
+    private static void print( Array a ) {
+        if ( a == null) {
+            Console.WriteLine("<NULL>");
+        }
+        Console.Write('{');
+        for ( int i= 0; i < a.Length; i++ ) {
+            print( a.GetValue(i) );
+            if( i != a.Length-1 ) {
+                Console.Write(", ");
+            }
+        }
+        Console.WriteLine( '}' );
+    }
+#endregion end cut
+}
