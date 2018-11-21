@@ -60,7 +60,8 @@ bool test_many_keys(){
 
 				put(ht, key, value);
 				char * found = search(ht, key);
-				assert(found != NULL && strcmp(found, value) == 0);
+				assert(found != NULL);
+				assert(strcmp(found, value) == 0);
 			}
 			sp++;
 			word = 1;
@@ -80,6 +81,8 @@ bool test_many_keys(){
 
 	assert(search(ht, get_hash("anything")) == NULL);
 	// print_ht(ht);
+	for (int i = 0; i < ht->count; i++) 
+		free(ht->arr[i]);
 	HT_free(ht);
 	return TRUE;
 }
@@ -97,6 +100,8 @@ bool test_put_search_delete() {
 	found = search(ht, key);
 	assert(found == NULL);
 
+	for (int i = 0; i < ht->count; i++) 
+		free(ht->arr[i]);
 	HT_free(ht);
 	return TRUE;
 }
@@ -105,7 +110,7 @@ bool test_resize() {
 	int m = 1;
 	HT ht = HT_ctor(m);
 
-	int N = 15;
+	int N = 15000;
 	for (int i = 1; i <= N; i++) {
 		char * value = itos(i);
 		int key = get_hash(value);
@@ -115,19 +120,24 @@ bool test_resize() {
 		assert(ht->count == i);
 	}
 
-	print_ht(ht);
+	// print_ht(ht);
 
 	// BUG. TODO:
 	for (int i = 1; i <= N; i++) {
 		char * value = itos(i);
 		int key = get_hash(value);
+		free(value);
+		char * nvalue = search(ht, key);
 		delete(ht, key);
 		char * found = search(ht, key);
 		assert(found == NULL);
-		assert(ht->count == N - i);
-		print_ht(ht);
+		assert(ht->count == (N - i));
+		free(nvalue);
+		//print_ht(ht);
 	}
 
+	for (int i = 0; i < ht->count; i++) 
+		free(ht->arr[i]);
 	HT_free(ht);
 	return TRUE;
 }
