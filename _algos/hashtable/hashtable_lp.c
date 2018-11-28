@@ -105,7 +105,7 @@ delete (HT ht, int key) {
 	int i = calculate_hash(key, ht->m);
 	for (; ht->arr[i] != NULL; i = (i+1) % ht->m) {
 		if (ht->arr[i]->key == key) {			
-			free(ht->arr[i]);
+			// free(ht->arr[i]); // clients looks for garbage
 			ht->arr[i] = NULL;
 		}
 	}

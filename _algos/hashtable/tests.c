@@ -21,27 +21,6 @@ int get_hash(char * s) {
 	return (int)hash;
 }
 
-char * itos(int num) {
-	int chars_max = 10;
-	char s[chars_max+1];
-	int i = 0;
-	for (; num > 0 && i < chars_max; i++) {
-		s[i] = (char)((int)'0' + (num % 10));
-		num = (int)(num / 10);
-	}
-	// reverse:
-	for (int j = 0; j < i/2; j++) {
-		char t = s[j];
-		s[j] = s[i - 1 - j];
-		s[i - 1 - j] = t;
-	}
-	s[i] = '\0';
-	char * res = calloc(i, sizeof(char));
-	strcpy(res, s);
-	return res;
-}
-
-
 bool test_many_keys(){
 	int m = 100;
 	HT ht = HT_ctor(m);
@@ -107,13 +86,16 @@ bool test_put_search_delete() {
 }
 
 bool test_resize() {
-	int m = 1;
-	HT ht = HT_ctor(m);
+	int init_size = 1;
+	HT ht = HT_ctor(init_size);
 
 	int N = 15000;
 	for (int i = 1; i <= N; i++) {
-		char * value = itos(i);
-		int key = get_hash(value);
+		char buffer[20];
+		itoa(i, buffer, 10);
+		int key = get_hash(buffer);
+		char * value = calloc(strlen(buffer)+1, sizeof(char));
+		strcpy(value, buffer);
 		put(ht, key, value);
 		char * found = search(ht, key);
 		assert(strcmp(value, found) == 0);
@@ -122,18 +104,17 @@ bool test_resize() {
 
 	// print_ht(ht);
 
-	// BUG. TODO:
 	for (int i = 1; i <= N; i++) {
-		char * value = itos(i);
-		int key = get_hash(value);
-		free(value);
+		char buffer[20];
+		itoa(i, buffer, 10);
+		int key = get_hash(buffer);
 		char * nvalue = search(ht, key);
+		assert(nvalue != NULL);
 		delete(ht, key);
 		char * found = search(ht, key);
 		assert(found == NULL);
 		assert(ht->count == (N - i));
 		free(nvalue);
-		//print_ht(ht);
 	}
 
 	for (int i = 0; i < ht->count; i++) 
