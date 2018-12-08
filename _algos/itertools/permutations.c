@@ -76,7 +76,7 @@ convert_kfactorial_to_perms(int * kfactorial, int * perms, int n, int k) {
 	// 4 3 2 1
 	// 0 1 0 1   -- mask, 1,3 chosen, right aligned
 	int digits = 0; 
-	for (int i = 1; i <= k; i++) { 
+	for (int i = 1; i <= n; i++) { 
 		digits <<= 1;
 		digits |= 1;
 	}
@@ -104,8 +104,7 @@ convert_kfactorial_to_perms(int * kfactorial, int * perms, int n, int k) {
 
 int **
 permutations(int n, int k) {
-	if (n != k) 
-		assert (1 == 0); // BUG. CAN NOT. TODO
+	// assert (n == k); // BUG. CAN NOT. TODO
 
 	if (k == 0) return NULL;
 	if (n < k) return NULL;
@@ -139,6 +138,7 @@ void main() {
 	assert(perms1_1 != NULL);
 	assert(perms1_1[0] != NULL);
 	assert(perms1_1[0][0] == 1);
+	// TODO free
 
 	printf("perm 2 2\n");
 	int ** perms2_2 = permutations(2, 2);
@@ -149,6 +149,7 @@ void main() {
 	assert(perms2_2[1] != NULL);
 	assert(perms2_2[1][0] == 2);
 	assert(perms2_2[1][1] == 1);
+	// TODO free
 
 	printf("perm 3 3\n");
 	int ** perms3_3 = permutations(3, 3);
@@ -159,6 +160,7 @@ void main() {
 		printf("\n");
 	}
 	printf("\n");
+	// TODO free
 
 	// TODO:
 	printf("perm 5 4\n");
@@ -170,7 +172,7 @@ void main() {
 		printf("\n");
 	}
 	printf("\n");
-
+	// TODO free
 }
 
 
