@@ -17,6 +17,11 @@
  * 2 0100 1324
  * 3 0110 1342
  * etc.
+ *
+ *
+ * See
+ * - Python itertools
+ *   https://github.com/python/cpython/blob/9718b59ee5f2416cdb8116ea5837b062faf0d9f8/Modules/itertoolsmodule.c#L3226
  */
 
 #include <assert.h>
@@ -39,14 +44,15 @@ factorial(unsigned long n, unsigned long k) {
 }
 
 
-// increment kfactorial
+// Increment kfactorial
+// Example: n=4 k=3 kfactorial=311 Result: 320
 bool
 inc_kfactorial(int * kfactorial, int n, int k) {
 	int i = k-1;  // where to start incrementing
-	int a = 1; // number to add to kfactorial
+	int a = 1;    // number to add to kfactorial
 	while (i >= 0 || a <= 0) {
-		assert(kfactorial[i] <= k-1-i);
-		int max = k-1-i;
+		assert(kfactorial[i] <= n-1-i); // max value here
+		int max = n-1-i;
 		if (kfactorial[i] + a <= max) {
 			kfactorial[i] += a;
 			return TRUE;
@@ -126,6 +132,27 @@ permutations(int n, int k) {
 	return perms;
 }
 
+void
+free_permutation(int ** p, int n, int k) {
+	for (int i = 0; i < n; i++)
+		free(p[i]);
+	free(p);
+}
+
+void 
+print_permutation(int ** p, int n, int k) {
+	printf("permutation %d n, %d k:\n", n, k);
+	for (int i = 0; i < factorial(n, k); i++) {
+		printf("%d:", i+1);
+		for (int j = 0; j < k; j++) {
+			printf(" %d", p[i][j]);
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
+
+
 
 void main() {
 	printf("perm 1 0\n");
@@ -133,51 +160,51 @@ void main() {
 	printf("perm 1 2\n");
 	assert(permutations(1, 2) == NULL);
 
-	printf("perm 1 1\n");
-	int ** perms1_1 = permutations(1, 1);
-	assert(perms1_1 != NULL);
-	assert(perms1_1[0] != NULL);
-	assert(perms1_1[0][0] == 1);
-	// TODO free
-
-	printf("perm 2 2\n");
-	int ** perms2_2 = permutations(2, 2);
-	assert(perms2_2 != NULL);
-	assert(perms2_2[0] != NULL);
-	assert(perms2_2[0][0] == 1);
-	assert(perms2_2[0][1] == 2);
-	assert(perms2_2[1] != NULL);
-	assert(perms2_2[1][0] == 2);
-	assert(perms2_2[1][1] == 1);
-	// TODO free
-
-	printf("perm 3 3\n");
-	int ** perms3_3 = permutations(3, 3);
-	for (int i = 0; i < factorial(3, 3); i++) {
-		for (int j = 0; j < 3; j++) {
-			printf("%d ", perms3_3[i][j]);
-		}
-		printf("\n");
+	{
+		printf("perm 1 1\n");
+		int ** p = permutations(1, 1);
+		assert(p != NULL);
+		assert(p[0] != NULL);
+		assert(p[0][0] == 1);
+		free_permutation(p, 1, 1);
 	}
-	printf("\n");
-	// TODO free
 
-	// TODO:
-	printf("perm 5 4\n");
-	int ** perms5_4 = permutations(5, 4);
-	for (int i = 0; i < factorial(5, 4); i++) {
-		for (int j = 0; j < 4; j++) {
-			printf("%d ", perms5_4[i][j]);
-		}
-		printf("\n");
+	{ 
+		printf("perm 2 2\n");
+		int ** p = permutations(2, 2);
+		assert(p != NULL);
+		assert(p[0] != NULL);
+		assert(p[0][0] == 1);
+		assert(p[0][1] == 2);
+		assert(p[1] != NULL);
+		assert(p[1][0] == 2);
+		assert(p[1][1] == 1);
+		free_permutation(p, 2, 2);
 	}
-	printf("\n");
-	// TODO free
+
+	{
+		printf("perm 3 3\n");
+		int ** p = permutations(3, 3);
+		free_permutation(p, 3, 3);
+	}
+
+	{
+		int ** p = permutations(5, 4);
+		assert(p != NULL);
+		assert(p[0] != NULL);
+		assert(p[46] != NULL);
+		assert(p[46][0] == 2);
+		assert(p[46][1] == 5);
+		assert(p[46][2] == 4);
+		assert(p[46][3] == 1);
+		print_permutation(p, 5, 4);
+		free_permutation(p, 5, 4);
+	}
 }
 
 
 
-/*  HARD WAY
+/*  
  
 void 
 _exch(int* a, int i, int j) {
