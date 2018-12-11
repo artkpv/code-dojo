@@ -8,6 +8,11 @@ at least one p_i and one t_i
 
 1)
 
+Ex1
+5
+5 6 7 8 9  > 32=35-3
+2 1 2 2 3
+
 
 
 
@@ -29,9 +34,9 @@ with open('input.txt') as f:
         else:
             sum_ += t[i]
             taken_t += 1
-        if p[i] > p[p_max_i]:
+        if t[i] >= p[i] and t[i] - p[i] < t[p_max_i] - p[p_max_i]:
             p_max_i = i
-        if t[i] > t[t_max_i]:
+        if p[i] >= t[i] and p[i] - t[i] < p[t_max_i] - t[t_max_i]:
             t_max_i = i
     if taken_t == n:
         sum_ -= t[p_max_i]
