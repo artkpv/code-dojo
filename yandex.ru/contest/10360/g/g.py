@@ -1,4 +1,50 @@
 #!python3
+"""
+Путешествующий Дед Мороз.
+https://contest.yandex.ru/contest/10360/problems/G/
+
+Следующее: определи как в алгоритме Прима определять лучшее расстояние. 
+Либо не понятно как вообще тогда считать, ведь мы зависим и от времени и от 
+хорошести города (количество детей и писем оттуда)
+"""
+
+import heapq
+
+class PrimMST:
+   def __init__(self, graph, source):
+       minheap = []
+       s = [source]
+       edgeTo = [None] * graph.V
+       INF = 9e9
+       distTo = [INF] * graph.V  # how good to get there: time - childs - emails?
+       while any(s):
+           v = s.pop()
+           # relax:
+           for w in graph.adj(v):
+
+
+
+def count_tour(g, tour):
+    pass
+
+class ApproxTSP:
+    def __init__(self, g):
+        self.graph = g
+
+        best_tour = []
+        best_tour_value = -1
+        for s in range(g.V):
+            mst = PrimMST(g, s).mst
+            tour = traverse_inorder_distinct(mst)
+            # assert connected cities:
+            for i in range(1, len(tour)):
+                v, w = tour[i-1], tour[i]
+                assert w in g.adj[v]
+            value = count_tour(g, tour)
+            if value > best_tour_value:
+                best_tour = tour
+        self.tour = best_tour
+
 
 class G:
     def __init__(self, n):
@@ -21,7 +67,6 @@ class G:
 if __name__ == '__main__':
     with open('cities') as f:
         n = int(f.readline().strip())
-        n += 1  # wtf ? but cities has it!
         graph = G(n)
         for i in range(n):
             id,name,childs, emails = f.readline().strip().split(',')
@@ -32,4 +77,6 @@ if __name__ == '__main__':
                 break
             edge = [int(i) for i in l.strip().split(',')]
             graph.add_road(edge[0], edge[1], edge[2])
+        tsp = ApproxTSP(graph)
+        print(tsp.tour)
 
