@@ -21,6 +21,7 @@ class PrimMST:
            v = s.pop()
            # relax:
            for w in graph.adj(v):
+               pass
 
 
 
@@ -68,15 +69,23 @@ if __name__ == '__main__':
     with open('cities') as f:
         n = int(f.readline().strip())
         graph = G(n)
+        # as cities file has ids not 0-based :
+        city_inx = 0
+        id_inx = {}  
+        inx_id = [None] * n
         for i in range(n):
             id,name,childs, emails = f.readline().strip().split(',')
-            graph.add_city(int(id), name, int(childs), int(emails))
+            id = int(id)
+            id_inx[id] = city_inx
+            inx_id[city_inx] = id
+            graph.add_city(city_inx, name, int(childs), int(emails))
+            city_inx += 1
         while True:
             l = f.readline()
             if not l:
                 break
             edge = [int(i) for i in l.strip().split(',')]
-            graph.add_road(edge[0], edge[1], edge[2])
+            graph.add_road(id_inx[edge[0]], id_inx[edge[1]], edge[2])
         tsp = ApproxTSP(graph)
-        print(tsp.tour)
+        print(inx_id[i] for i in tsp.tour)
 
