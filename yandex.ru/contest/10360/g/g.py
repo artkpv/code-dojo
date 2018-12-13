@@ -10,60 +10,86 @@ https://contest.yandex.ru/contest/10360/problems/G/
 
 import heapq
 
-class PrimMST:
-   def __init__(self, graph, source):
-       minheap = []
-       s = [source]
-       edgeTo = [None] * graph.V
-       INF = 9e9
-       distTo = [INF] * graph.V  # how good to get there: time - childs - emails?
-       while any(s):
-           v = s.pop()
-           # relax:
-           for w in graph.adj(v):
-               pass
-
-
-
-def count_tour(g, tour):
-    pass
 
 class ApproxTSP:
     def __init__(self, g):
         self.graph = g
-
-        best_tour = []
-        best_tour_value = -1
+        self.max_time = 372
+        self.best_tour = []
+        self.best_tour_value = -1
         for s in range(g.V):
-            mst = PrimMST(g, s).mst
-            tour = traverse_inorder_distinct(mst)
-            # assert connected cities:
-            for i in range(1, len(tour)):
-                v, w = tour[i-1], tour[i]
-                assert w in g.adj[v]
-            value = count_tour(g, tour)
-            if value > best_tour_value:
-                best_tour = tour
-        self.tour = best_tour
+            print('From source', s)
+            mst = self.prim(g, s)
+            # print(' mst:', str(mst))
+            value, tour = self.traverse(mst, g)
+            print(' value:', value, 'len tour:', len(tour))
+            if value > self.best_tour_value:
+                self.best_tour = tour
+                self.best_tour_value = value
+
+    def prim(self, graph, source):
+        minheap = [(0, source)]
+        mst = []
+        marked = [False] * graph.V
+        count = 0
+        weight_sum = 0
+        while any(minheap) and count < graph.V and weight_sum < self.max_time:
+            weight, v = heapq.heappop(minheap)
+            if marked[v]:  # HACK . TODO
+                continue
+            marked[v] = True
+            weight_sum += 2
+            mst += [v]
+            count += 1
+            for w in graph.adj(v):
+                if not marked[w]:
+                    edge_weight = graph.time[(v,w)]
+                    heapq.heappush(minheap, (edge_weight, w))
+        return mst
+
+    def traverse(self, mst, g):
+        time = 2
+        # marked = [False] * g.V
+        # marked[mst[0]] = True
+        tour = [mst[0]]
+        happyness = g.cities[mst[0]][1]
+        i = 1
+        while time < self.max_time and i < len(mst):
+            if mst[i] in g.adj(tour[-1]):  # new city
+                tour += [mst[i]]
+                happyness += g.cities[mst[i]][1] if time + 2 <= self.max_time else 0
+                time += 2 + g.time[(tour[-2], tour[-1])]
+                i += 1
+            else:  # go back
+                j = len(tour) - 2
+                while mst[i] not in g.adj(tour[-1]) and time < self.max_time:
+                    tour += [tour[j]]
+                    time += g.time[(tour[-2], tour[-1])]
+                    j -= 1
+        return happyness, tour
 
 
 class G:
     def __init__(self, n):
         self.V = n
         self.cities = {}
-        self.adj = []
+        self._adj = []
         for i in range(self.V):
-            self.adj.append([])
+            self._adj.append([])
         self.time = {}
 
-    def add_city(self, id, name, children, emails):
-        self.cities[id-1] = (name, children, emails)
+    def add_city(self, inx, name, children, emails):
+        happyness = emails*2 + (children - emails)
+        self.cities[inx] = (name, happyness)
+
+    def adj(self, v):
+        return self._adj[v]
 
     def add_road(self, v, w, time):
-        v -=1
-        w -=1
-        self.adj[v] += [w]
+        self._adj[v] += [w]
+        self._adj[w] += [v]
         self.time[(v,w)] = time
+        self.time[(w,v)] = time
 
 if __name__ == '__main__':
     with open('cities') as f:
@@ -87,5 +113,6 @@ if __name__ == '__main__':
             edge = [int(i) for i in l.strip().split(',')]
             graph.add_road(id_inx[edge[0]], id_inx[edge[1]], edge[2])
         tsp = ApproxTSP(graph)
-        print(inx_id[i] for i in tsp.tour)
+        print(tsp.best_tour_value)
+        print(tsp.best_tour)
 
