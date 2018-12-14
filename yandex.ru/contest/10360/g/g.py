@@ -3,13 +3,35 @@
 Путешествующий Дед Мороз.
 https://contest.yandex.ru/contest/10360/problems/G/
 
-Следующее: Попробовать на основе алгоримта для кратчайших путей, а не минимального оставного дерева.
-
 """
 
 import heapq
 import bisect
 
+class MinPQ:
+    def __init__(self):
+        self.arr = []
+
+    def push(self, k, v):
+        heapq.heappush(self.arr, (k, v))
+
+    def pop(self):
+        return heapq.heappop(self.arr)
+
+    def change_or_push(self, k, v):
+        found = False
+        for i,e in enumerate(self.arr):
+            if e[0] == k:
+                self.arr[i] = (k, v)
+                found = True
+                break
+        if found:
+            heapq.heapify(self.arr)
+        else:
+            heapq.heappush(self.arr, (k, v))
+
+    def count(self):
+        return len(self.arr)
 
 class ApproxTSP:
     def __init__(self, g, max_time, adjusting_ratio):
@@ -19,11 +41,31 @@ class ApproxTSP:
         self.tour_value = -1
         self.adjusting_ratio = adjusting_ratio
         for s in range(g.V):
-            mst = self.prim(g, s)
+            # mst = self.prim(g, s)
+            mst = self.closest_neighbor(g, s)
             value, tour = self.traverse(mst, g)
             if value > self.tour_value:
                 self.tour = tour
                 self.tour_value = value
+
+    def closest_neighbor(self, graph, source):
+        # find shortest paths:
+        INF = 9e9
+        distto = [INF] * graph.V
+        distto[source] = 0
+        pq = MinPQ()
+        pq.push(0, source)
+        mst = []
+        while len(mst) < graph.V and pq.count() > 0:
+            v, weight = pq.pop()
+            mst += [v]
+            # relax:
+            for w in graph.adj(v):
+                edge_weight = self.get_road_weight(graph, graph.time[(v,w)], v, w)
+                if distto[w] > distto[v] + edge_weight:
+                    distto[w] = distto[v] + edge_weight
+                    pq.change_or_push(w, distto[w])
+        return mst
 
     def prim(self, graph, source):
         minheap = [(0, source)]
@@ -39,13 +81,12 @@ class ApproxTSP:
             count += 1
             for w in graph.adj(v):
                 if not marked[w]:
-                    edge_weight = self.get_road_weight(graph, graph.time[(v,w)], v, w, marked)
+                    edge_weight = self.get_road_weight(graph, graph.time[(v,w)], v, w)
                     heapq.heappush(minheap, (edge_weight, w))
         return mst
 
-    def get_road_weight(self, g, road_time, v, w, visited):
-        weight = road_time + (2 if w not in visited else 0)
-        return weight
+    def get_road_weight(self, g, road_time, v, w, visited=False):
+        weight = road_time + (2 if not visited else 0)
         points = g.get_city_points()
         point = g.cities[v][1]
         inx = bisect.bisect_left(points, point)
