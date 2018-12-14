@@ -78,6 +78,14 @@ void main() {
 	assert(rt_search(trie, "entry") == 4);
 	assert(rt_search(trie, "entrance") == 6);
 	assert(rt_search(trie, "ending") == NULLVALUE);
+	rt_put(trie, "she", 10);
+	rt_put(trie, "shell", 11);
+	rt_put(trie, "sea", 12);
+	assert(rt_search(trie, "she") == 10);
+	assert(rt_search(trie, "shell") == 11);
+	assert(rt_search(trie, "sea") == 12);
+
+	
 	Node_free(trie);
 	printf("all tests pass\n");
 }
