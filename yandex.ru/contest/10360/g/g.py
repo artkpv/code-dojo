@@ -36,29 +36,27 @@ class ApproxTSP:
             if marked[v]:  # HACK . TODO
                 continue
             marked[v] = True
-            weight_sum += 2
+            weight_sum += 2 + weight
             mst += [v]
             count += 1
             for w in graph.adj(v):
                 if not marked[w]:
-                    edge_weight = graph.time[(v,w)]
-                    # TODO: the more weight the worse it
-                    edge_weight *= (1.01 - self.get_city_happyness_ratio(graph, w))
+                    edge_weight = self.get_road_weight(graph, graph.time[(v,w)], v, w)
                     heapq.heappush(minheap, (edge_weight, w))
         return mst
 
-    def get_city_happyness_ratio(self, g, v):
-        """
-        0 < ratio <= 1.0
-        How city is attractable compared to others. The more ratio the more attractible.
-        """
-        weights = g.get_city_weights()
-        weight = g.cities[v][1]
-        inx = bisect.bisect_left(weights, weight)
-        p = (inx+1)/g.V  # percentile
-        p *= (1+self.adjusting_ratio)
-        return p if p <= 1.0 else 1.0
-
+    def get_road_weight(self, g, road_time, v, w):
+        weight = road_time
+        return weight
+        points = g.get_city_points()
+        point = g.cities[v][1]
+        inx = bisect.bisect_left(points, point)
+        # how city is attractable compared to others:
+        p = 1 - (inx+1)/g.V  # percentile
+        p = p if p > 0 else 0.01
+        weight -= (weight * self.adjusting_ratio * p)
+        return weight 
+ 
 
     def traverse(self, mst, g):
         time = 2
@@ -91,18 +89,18 @@ class G:
             self._adj.append([])
         self.time = {}
         self.total_happyness = 0
-        self._city_weights = []
+        self._city_points = []
 
     def add_city(self, inx, name, children, emails):
         happyness = emails*2 + (children - emails)
         self.cities[inx] = (name, happyness)
-        self._city_weights += [happyness]
-        self._city_weights = sorted(self._city_weights)
+        self._city_points += [happyness]
+        self._city_points = sorted(self._city_points)
         self.total_happyness += happyness
 
-    def get_city_weights(self):
+    def get_city_points(self):
         # return sorted asc city weights
-        return self._city_weights
+        return self._city_points
 
     def adj(self, v):
         return self._adj[v]
@@ -163,7 +161,7 @@ if __name__ == '__main__':
 
         max_tsp = None
         max_value = 0
-        for ratio in range(1, 9):
+        for ratio in range(1, 11):
             ratio = ratio * 0.1
             tsp = ApproxTSP(graph, max_time, ratio)
             if tsp.best_tour_value > max_value:
