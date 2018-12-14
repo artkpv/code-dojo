@@ -15,15 +15,15 @@ class ApproxTSP:
     def __init__(self, g, max_time, adjusting_ratio):
         self.graph = g
         self.max_time = max_time
-        self.best_tour = []
-        self.best_tour_value = -1
+        self.tour = []
+        self.tour_value = -1
         self.adjusting_ratio = adjusting_ratio
         for s in range(g.V):
             mst = self.prim(g, s)
             value, tour = self.traverse(mst, g)
-            if value > self.best_tour_value:
-                self.best_tour = tour
-                self.best_tour_value = value
+            if value > self.tour_value:
+                self.tour = tour
+                self.tour_value = value
 
     def prim(self, graph, source):
         minheap = [(0, source)]
@@ -33,20 +33,18 @@ class ApproxTSP:
         weight_sum = 0
         while any(minheap) and count < graph.V and weight_sum < self.max_time:
             weight, v = heapq.heappop(minheap)
-            if marked[v]:  # HACK . TODO
-                continue
             marked[v] = True
-            weight_sum += 2 + weight
+            weight_sum += weight
             mst += [v]
             count += 1
             for w in graph.adj(v):
                 if not marked[w]:
-                    edge_weight = self.get_road_weight(graph, graph.time[(v,w)], v, w)
+                    edge_weight = self.get_road_weight(graph, graph.time[(v,w)], v, w, marked)
                     heapq.heappush(minheap, (edge_weight, w))
         return mst
 
-    def get_road_weight(self, g, road_time, v, w):
-        weight = road_time
+    def get_road_weight(self, g, road_time, v, w, visited):
+        weight = road_time + (2 if w not in visited else 0)
         return weight
         points = g.get_city_points()
         point = g.cities[v][1]
@@ -164,7 +162,7 @@ if __name__ == '__main__':
         for ratio in range(1, 11):
             ratio = ratio * 0.1
             tsp = ApproxTSP(graph, max_time, ratio)
-            if tsp.best_tour_value > max_value:
+            if tsp.tour_value > max_value:
                 max_tsp = tsp
-        print_tour(graph, max_tsp.best_tour, max_time, inx_id)
+        print_tour(graph, max_tsp.tour, max_time, inx_id)
 
