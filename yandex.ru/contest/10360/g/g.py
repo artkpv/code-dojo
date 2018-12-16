@@ -7,6 +7,8 @@ https://contest.yandex.ru/contest/10360/problems/G/
 
 import heapq
 import bisect
+import math
+import random
 
 class MinPQ:
     def __init__(self):
@@ -102,12 +104,12 @@ class ApproxTSP:
         # marked = [False] * g.V
         # marked[mst[0]] = True
         tour = [mst[0]]
-        happyness = g.cities[mst[0]][1]
+        joy = g.cities[mst[0]][1]
         i = 1
         while time < self.max_time and i < len(mst):
             if mst[i] in g.adj(tour[-1]):  # new city
                 tour += [mst[i]]
-                happyness += g.cities[mst[i]][1] if time + 2 <= self.max_time else 0
+                joy += g.cities[mst[i]][1] if time + 2 <= self.max_time else 0
                 time += 2 + g.time[(tour[-2], tour[-1])]
                 i += 1
             else:  # go back
@@ -116,7 +118,7 @@ class ApproxTSP:
                     tour += [tour[j]]
                     time += g.time[(tour[-2], tour[-1])]
                     j -= 1
-        return happyness, tour
+        return joy, tour
 
 
 class G:
@@ -127,15 +129,15 @@ class G:
         for i in range(self.V):
             self._adj.append([])
         self.time = {}
-        self.total_happyness = 0
+        self.total_joy = 0
         self._city_points = []
 
     def add_city(self, inx, name, children, emails):
-        happyness = emails*2 + (children - emails)
-        self.cities[inx] = (name, happyness)
-        self._city_points += [happyness]
+        joy = emails*2 + (children - emails)
+        self.cities[inx] = (name, joy)
+        self._city_points += [joy]
         self._city_points = sorted(self._city_points)
-        self.total_happyness += happyness
+        self.total_joy += joy
 
     def get_city_points(self):
         # return sorted asc city weights
@@ -154,7 +156,7 @@ def print_tour(g, tour, max_time, inx_id):
     print('Tour:')
     print(' '.join(str(inx_id[i]) for i in tour))
     assert(len(tour) > 0)
-    happyness = g.cities[tour[0]][1]
+    joy = g.cities[tour[0]][1]
     city_time = 2
     time = city_time
     marked = [False] * g.V
@@ -169,10 +171,106 @@ def print_tour(g, tour, max_time, inx_id):
             if time + city_time > max_time:
                 break
             time += city_time
-            happyness += g.cities[e][1]
+            joy += g.cities[e][1]
             marked[e] = True
     print('Tour len:', len(tour))
-    print('Happyness:', happyness)
+    print('joy:', joy)
+
+class Tour:
+    def __init__(self, cities, graph, max_time):
+        self.cities = cities
+        self._g = graph
+        self._max_time = max_time
+        self._calc_joy()
+        assert(self.joy is not None)
+        assert(self.time is not None)
+
+    def print(self):
+        print(self.cities)
+
+    def _calc_joy(self):
+        cities = self.cities
+        g = self._g
+        max_time = self._max_time
+        if len(cities) == 0:
+            return 0
+        joy = g.cities[cities[0]][1]
+        city_time = 2
+        time = city_time
+        marked = [False] * g.V
+        marked[cities[0]] = True
+        for i,e in enumerate(cities):
+            if i == 0:
+                continue
+            road_time = g.time[(cities[i-1], e)]
+            if time + road_time >= max_time:
+                break
+            time += road_time
+            if not marked[e]:
+                if time + city_time > max_time:
+                    break
+                time += city_time
+                joy += g.cities[e][1]
+                marked[e] = True
+        self.joy = joy
+        self.time = time
+
+class SimulatedAnnealing:
+    def __init__(self, graph, max_time, min_joy, max_joy):
+        # choose one with max joy:
+        tour = Tour([i for i,e in 
+                     enumerate(graph.cities) 
+                     if e[1] == graph.get_city_points()[-1]], graph, max_time)
+        current_joy = tour.joy
+        limit_joy = min_joy
+        for i in range(100000):
+            candidate = self.next_tour(tour, graph, max_time)
+            c_joy = tour.joy
+            if c_joy < current_joy: 
+                current_joy = c_joy
+                tour = candidate
+            else:
+                p = self.transition_probability(c_joy - current_joy, limit_joy)
+                if self.is_transition(p):
+                    current_joy = c_joy
+                    tour = candidate
+            limit_joy = self.increase_joy(min_joy, i)
+            if limit_joy >= max_joy:
+                break
+        self.tour = tour
+
+    def increase_joy(self, min_joy, i):
+        return min_joy * (1 + 0.1 * i)
+
+    def transition_probability(self, dE, e):
+        return math.exp(-dE,e)
+
+    def is_transition(self, probability):
+        r = random.random()
+        return r <= probability;
+
+    def next_tour(self, tour, graph, max_time):
+        # randomly modify tour but keep it within max time
+        cities = tour.cities
+        num = len(cities)
+        assert(num > 0)
+        # delete some:
+        todelete = random.randint(0, num//2)
+        if todelete > 0 :
+            deleted = [False] * graph.V
+            even = True
+            i = 0
+            def delete_one_city():
+                pass
+            while todelete > 0:
+                v = cities[i]
+                if not deleted[v]:
+                    is_leaf = i == 0 or i == num - 1
+                    if i % 2 == 0 and even:
+                        pass # delete
+                    else:
+                        pass
+               i = (i+1) % num
 
 
 if __name__ == '__main__':
@@ -198,12 +296,18 @@ if __name__ == '__main__':
             graph.add_road(id_inx[edge[0]], id_inx[edge[1]], edge[2])
         max_time = 372
 
-        max_tsp = None
-        max_value = 0
-        for ratio in range(1, 11):
-            ratio = ratio * 0.1
-            tsp = ApproxTSP(graph, max_time, ratio)
-            if tsp.tour_value > max_value:
-                max_tsp = tsp
-        print_tour(graph, max_tsp.tour, max_time, inx_id)
+        max_joy = 47000
+        sa = SimulatedAnnealing(graph, max_time, max_joy)
+        tour = sa.tour
+        print(tour.print())
+        print(tour.joy)
+
+        # max_tsp = None
+        # max_value = 0
+        # for ratio in range(1, 11):
+        #     ratio = ratio * 0.1
+        #     tsp = ApproxTSP(graph, max_time, ratio)
+        #     if tsp.tour_value > max_value:
+        #         max_tsp = tsp
+        # print_tour(graph, max_tsp.tour, max_time, inx_id)
 
