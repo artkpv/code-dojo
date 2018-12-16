@@ -3,6 +3,10 @@
 Путешествующий Дед Мороз.
 https://contest.yandex.ru/contest/10360/problems/G/
 
+?
+[213, 299, 239, 228, 153, 273, 153, 228, 239, 228, 239, 228, 153, 228, 153, 228, 153, 273, 153, 273, 209, 273, 209, 97, 172, 97, 209, 273, 209, 273, 209, 273, 209, 97, 172, 97, 209, 273, 209, 97, 172, 15, 172, 15, 172, 97, 209, 97, 172, 97, 209, 97, 172, 15, 90, 108, 90, 15, 172, 97, 172, 15, 172, 15, 172, 97, 172, 15, 90, 108, 102, 108, 90, 108, 102, 108, 90, 15, 172, 97, 172, 15, 172, 15, 172, 15, 90, 108, 102, 108, 90, 108, 102, 108, 90, 108, 90, 15]
+None
+60788
 """
 
 import heapq
@@ -12,6 +16,7 @@ import random
 import sys
 
 CITY_TIME = 2
+MAX_TIME = 372
 
 class MinPQ:
     def __init__(self):
@@ -39,9 +44,8 @@ class MinPQ:
         return len(self.arr)
 
 class ApproxTSP:
-    def __init__(self, g, max_time, adjusting_ratio):
+    def __init__(self, g, adjusting_ratio):
         self.graph = g
-        self.max_time = max_time
         self.tour = []
         self.tour_value = -1
         self.adjusting_ratio = adjusting_ratio
@@ -78,7 +82,7 @@ class ApproxTSP:
         marked = [False] * graph.V
         count = 0
         weight_sum = 0
-        while any(minheap) and count < graph.V and weight_sum < self.max_time:
+        while any(minheap) and count < graph.V and weight_sum < MAX_TIME:
             weight, v = heapq.heappop(minheap)
             marked[v] = True
             weight_sum += weight
@@ -100,7 +104,6 @@ class ApproxTSP:
         p = p if p > 0 else 0.01
         weight -= (weight * self.adjusting_ratio * p)
         return weight 
- 
 
     def traverse(self, mst, g):
         time = CITY_TIME
@@ -109,15 +112,15 @@ class ApproxTSP:
         tour = [mst[0]]
         joy = g.city2joy[mst[0]]
         i = 1
-        while time < self.max_time and i < len(mst):
+        while time < MAX_TIME and i < len(mst):
             if mst[i] in g.adj(tour[-1]):  # new city
                 tour += [mst[i]]
-                joy += g.city2joy[mst[i]] if time + CITY_TIME <= self.max_time else 0
+                joy += g.city2joy[mst[i]] if time + CITY_TIME <= MAX_TIME else 0
                 time += CITY_TIME + g.time[(tour[-2], tour[-1])]
                 i += 1
             else:  # go back
                 j = len(tour) - 2
-                while mst[i] not in g.adj(tour[-1]) and time < self.max_time:
+                while mst[i] not in g.adj(tour[-1]) and time < MAX_TIME:
                     tour += [tour[j]]
                     time += g.time[(tour[-2], tour[-1])]
                     j -= 1
@@ -151,51 +154,32 @@ class G:
         self.time[(v,w)] = time
         self.time[(w,v)] = time
 
-def print_tour(g, tour, max_time, inx_id):
-    print('Tour:')
-    print(' '.join(str(inx_id[i]) for i in tour))
-    assert(len(tour) > 0)
-    joy = g.city2joy[tour[0]]
-    time = CITY_TIME
-    marked = [False] * g.V
-    marked[tour[0]] = True
-    for i,e in enumerate(tour):
-        if i == 0:
-            continue
-        time += g.time[(tour[i-1], e)]
-        if time >= max_time:
-            break
-        if not marked[e]:
-            if time + city_time > max_time:
-                break
-            time += city_time
-            joy += g.city2joy[e]
-            marked[e] = True
-    print('Tour len:', len(tour))
-    print('joy:', joy)
 
 class Tour:
-    def __init__(self, cities, graph, max_time):
+    def __init__(self, cities, graph):
         self.cities = cities
         self._g = graph
-        self._max_time = max_time
         self._calc_tour()
         assert(self.joy is not None)
         assert(self.time is not None)
 
     def print(self):
-        print(self.cities)
+        print('Tour %d len, %d joy, %d time:\n%s' % (
+            len(self.cities),
+            self.joy,
+            self.time,
+            ' '.join(str(c) for c in self.cities)
+            ))
 
     def add_random_cities(self):
         """
         Randomly add cities to left or right of tour till has time.
         """
         g = self._g
-        max_time = self._max_time
         while True:
             is_left = random.random() >= .5
             v = self.cities[0 if is_left else -1]
-            adj = g.adj(v)
+            adj = g.adj(v)  # adjecent to the city
             tries_num = 3
             w = None
             while tries_num > 0:
@@ -206,7 +190,7 @@ class Tour:
             w_time = g.time[(v,w)]
             if w not in self.marked:
                 w_time += CITY_TIME
-            if self.time + w_time > max_time:
+            if self.time + w_time > MAX_TIME:
                 break
             if is_left:
                 self.cities = [w] + self.cities
@@ -220,7 +204,6 @@ class Tour:
     def _calc_tour(self):
         cities = self.cities
         g = self._g
-        max_time = self._max_time
         if len(cities) == 0:
             return 0
         joy = g.city2joy[cities[0]]
@@ -231,11 +214,11 @@ class Tour:
             if i == 0:
                 continue
             road_time = g.time[(cities[i-1], e)]
-            if time + road_time >= max_time:
+            if time + road_time >= MAX_TIME:
                 break
             time += road_time
             if not self.marked[e]:
-                if time + CITY_TIME > max_time:
+                if time + CITY_TIME > MAX_TIME:
                     break
                 time += CITY_TIME
                 joy += g.city2joy[e]
@@ -243,20 +226,20 @@ class Tour:
         self.joy = joy
         self.time = time
 
+
 class SimulatedAnnealing:
-    def __init__(self, graph, max_time, min_joy, max_joy):
+    def __init__(self, graph, min_joy, max_joy):
         # choose one with max joy:
         tour = Tour([i for i,e in 
                      enumerate(graph.city2joy) 
-                     if e == max(graph.city2joy()), graph, max_time)
+                     if e == max(graph.city2joy)], graph)
         limit_joy = min_joy
         for i in range(100000):
-            if i%1000 == 0:
+            if i%100 == 0:
                 sys.stdout.write("\r i:%d ljoy:%d tour joy:%d len:%d\n" % 
-                                 (i, limit_joy, tour.joy, len(tour.cities))
-                                 )
+                                 (i, limit_joy, tour.joy, len(tour.cities)))
             # candidate:
-            c = self.next_tour(tour, graph, max_time)
+            c = self.next_tour(tour, graph)
             if c.joy > tour.joy: 
                 tour = c
             else:
@@ -269,7 +252,7 @@ class SimulatedAnnealing:
         self.tour = tour
 
     def increase_joy(self, min_joy, i):
-        return min_joy * (1 + i)
+        return min_joy * (i+1)
 
     def transition_probability(self, dE, e):
         return math.exp(-dE/e)
@@ -278,7 +261,7 @@ class SimulatedAnnealing:
         r = random.random()
         return r <= probability;
 
-    def next_tour(self, tour, graph, max_time):
+    def next_tour(self, tour, graph):
         cities = tour.cities
         num = len(cities)
         assert(num > 0)
@@ -291,7 +274,7 @@ class SimulatedAnnealing:
             else:
                 cities = cities[-1:-todelete-1:-1]
         # randomly add cities while has time:
-        tour = Tour(cities, graph, max_time)
+        tour = Tour(cities, graph)
         tour.add_random_cities()
         return tour
 
@@ -317,19 +300,20 @@ if __name__ == '__main__':
                 break
             edge = [int(i) for i in l.strip().split(',')]
             graph.add_road(id_inx[edge[0]], id_inx[edge[1]], edge[2])
-        max_time = 372
 
-        sa = SimulatedAnnealing(graph, max_time, min_joy=1, max_joy=47000)
+        sa = SimulatedAnnealing(graph, min_joy=1000, max_joy=47000)
         tour = sa.tour
+        retour = Tour(tour.cities, graph)
         print(tour.print())
-        print(tour.joy)
+        print(retour.print())
+        print('Ids:', ' '.join(str(inx_id[c]) for c in retour.cities))
 
         # max_tsp = None
         # max_value = 0
         # for ratio in range(1, 11):
         #     ratio = ratio * 0.1
-        #     tsp = ApproxTSP(graph, max_time, ratio)
+        #     tsp = ApproxTSP(graph, ratio)
         #     if tsp.tour_value > max_value:
         #         max_tsp = tsp
-        # print_tour(graph, max_tsp.tour, max_time, inx_id)
+        # print_tour(graph, max_tsp.tour, inx_id)
 
