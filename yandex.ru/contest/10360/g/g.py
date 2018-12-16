@@ -9,6 +9,9 @@ import heapq
 import bisect
 import math
 import random
+import sys
+
+CITY_TIME = 2
 
 class MinPQ:
     def __init__(self):
@@ -88,9 +91,9 @@ class ApproxTSP:
         return mst
 
     def get_road_weight(self, g, road_time, v, w, visited=False):
-        weight = road_time + (2 if not visited else 0)
-        points = g.get_city_points()
-        point = g.cities[v][1]
+        weight = road_time + (CITY_TIME if not visited else 0)
+        points = sorted(g.city2joy)
+        point = g.city2joy[v]
         inx = bisect.bisect_left(points, point)
         # how city is attractable compared to others:
         p = 1 - (inx+1)/g.V  # percentile
@@ -100,17 +103,17 @@ class ApproxTSP:
  
 
     def traverse(self, mst, g):
-        time = 2
+        time = CITY_TIME
         # marked = [False] * g.V
         # marked[mst[0]] = True
         tour = [mst[0]]
-        joy = g.cities[mst[0]][1]
+        joy = g.city2joy[mst[0]]
         i = 1
         while time < self.max_time and i < len(mst):
             if mst[i] in g.adj(tour[-1]):  # new city
                 tour += [mst[i]]
-                joy += g.cities[mst[i]][1] if time + 2 <= self.max_time else 0
-                time += 2 + g.time[(tour[-2], tour[-1])]
+                joy += g.city2joy[mst[i]] if time + CITY_TIME <= self.max_time else 0
+                time += CITY_TIME + g.time[(tour[-2], tour[-1])]
                 i += 1
             else:  # go back
                 j = len(tour) - 2
@@ -124,24 +127,20 @@ class ApproxTSP:
 class G:
     def __init__(self, n):
         self.V = n
-        self.cities = {}
+        self.city2joy = [0] * n
         self._adj = []
         for i in range(self.V):
             self._adj.append([])
         self.time = {}
+        self.names = [None] * n
         self.total_joy = 0
-        self._city_points = []
 
     def add_city(self, inx, name, children, emails):
-        joy = emails*2 + (children - emails)
-        self.cities[inx] = (name, joy)
-        self._city_points += [joy]
-        self._city_points = sorted(self._city_points)
+        EMAIL_JOY = 2
+        joy = emails*EMAIL_JOY + (children - emails)
+        self.city2joy[inx] = joy
+        self.names[inx] = name
         self.total_joy += joy
-
-    def get_city_points(self):
-        # return sorted asc city weights
-        return self._city_points
 
     def adj(self, v):
         return self._adj[v]
@@ -156,9 +155,8 @@ def print_tour(g, tour, max_time, inx_id):
     print('Tour:')
     print(' '.join(str(inx_id[i]) for i in tour))
     assert(len(tour) > 0)
-    joy = g.cities[tour[0]][1]
-    city_time = 2
-    time = city_time
+    joy = g.city2joy[tour[0]]
+    time = CITY_TIME
     marked = [False] * g.V
     marked[tour[0]] = True
     for i,e in enumerate(tour):
@@ -171,7 +169,7 @@ def print_tour(g, tour, max_time, inx_id):
             if time + city_time > max_time:
                 break
             time += city_time
-            joy += g.cities[e][1]
+            joy += g.city2joy[e]
             marked[e] = True
     print('Tour len:', len(tour))
     print('joy:', joy)
@@ -181,24 +179,54 @@ class Tour:
         self.cities = cities
         self._g = graph
         self._max_time = max_time
-        self._calc_joy()
+        self._calc_tour()
         assert(self.joy is not None)
         assert(self.time is not None)
 
     def print(self):
         print(self.cities)
 
-    def _calc_joy(self):
+    def add_random_cities(self):
+        """
+        Randomly add cities to left or right of tour till has time.
+        """
+        g = self._g
+        max_time = self._max_time
+        while True:
+            is_left = random.random() >= .5
+            v = self.cities[0 if is_left else -1]
+            adj = g.adj(v)
+            tries_num = 3
+            w = None
+            while tries_num > 0:
+                tries_num -= 1
+                w = adj[random.randint(0, len(adj)-1)]
+                if w not in self.marked:
+                    break
+            w_time = g.time[(v,w)]
+            if w not in self.marked:
+                w_time += CITY_TIME
+            if self.time + w_time > max_time:
+                break
+            if is_left:
+                self.cities = [w] + self.cities
+            else:
+                self.cities = self.cities + [w]
+            self.time += w_time
+            if w not in self.marked:
+                self.joy += g.city2joy[w]
+            self.marked[w] = True
+
+    def _calc_tour(self):
         cities = self.cities
         g = self._g
         max_time = self._max_time
         if len(cities) == 0:
             return 0
-        joy = g.cities[cities[0]][1]
-        city_time = 2
-        time = city_time
-        marked = [False] * g.V
-        marked[cities[0]] = True
+        joy = g.city2joy[cities[0]]
+        time = CITY_TIME
+        self.marked = [False] * g.V
+        self.marked[cities[0]] = True
         for i,e in enumerate(cities):
             if i == 0:
                 continue
@@ -206,12 +234,12 @@ class Tour:
             if time + road_time >= max_time:
                 break
             time += road_time
-            if not marked[e]:
-                if time + city_time > max_time:
+            if not self.marked[e]:
+                if time + CITY_TIME > max_time:
                     break
-                time += city_time
-                joy += g.cities[e][1]
-                marked[e] = True
+                time += CITY_TIME
+                joy += g.city2joy[e]
+                self.marked[e] = True
         self.joy = joy
         self.time = time
 
@@ -219,58 +247,53 @@ class SimulatedAnnealing:
     def __init__(self, graph, max_time, min_joy, max_joy):
         # choose one with max joy:
         tour = Tour([i for i,e in 
-                     enumerate(graph.cities) 
-                     if e[1] == graph.get_city_points()[-1]], graph, max_time)
-        current_joy = tour.joy
+                     enumerate(graph.city2joy) 
+                     if e == max(graph.city2joy()), graph, max_time)
         limit_joy = min_joy
         for i in range(100000):
-            candidate = self.next_tour(tour, graph, max_time)
-            c_joy = tour.joy
-            if c_joy < current_joy: 
-                current_joy = c_joy
-                tour = candidate
+            if i%1000 == 0:
+                sys.stdout.write("\r i:%d ljoy:%d tour joy:%d len:%d\n" % 
+                                 (i, limit_joy, tour.joy, len(tour.cities))
+                                 )
+            # candidate:
+            c = self.next_tour(tour, graph, max_time)
+            if c.joy > tour.joy: 
+                tour = c
             else:
-                p = self.transition_probability(c_joy - current_joy, limit_joy)
+                p = self.transition_probability(c.joy - tour.joy, limit_joy)
                 if self.is_transition(p):
-                    current_joy = c_joy
-                    tour = candidate
+                    tour = c
             limit_joy = self.increase_joy(min_joy, i)
             if limit_joy >= max_joy:
                 break
         self.tour = tour
 
     def increase_joy(self, min_joy, i):
-        return min_joy * (1 + 0.1 * i)
+        return min_joy * (1 + i)
 
     def transition_probability(self, dE, e):
-        return math.exp(-dE,e)
+        return math.exp(-dE/e)
 
     def is_transition(self, probability):
         r = random.random()
         return r <= probability;
 
     def next_tour(self, tour, graph, max_time):
-        # randomly modify tour but keep it within max time
         cities = tour.cities
         num = len(cities)
         assert(num > 0)
-        # delete some:
-        todelete = random.randint(0, num//2)
+        is_at_beginning = random.random() >= .5
+        # randomly delete first or last cities in the tour:
+        todelete = random.randint(0, 3*num//4)
         if todelete > 0 :
-            deleted = [False] * graph.V
-            even = True
-            i = 0
-            def delete_one_city():
-                pass
-            while todelete > 0:
-                v = cities[i]
-                if not deleted[v]:
-                    is_leaf = i == 0 or i == num - 1
-                    if i % 2 == 0 and even:
-                        pass # delete
-                    else:
-                        pass
-               i = (i+1) % num
+            if is_at_beginning:
+                cities = cities[0:todelete]
+            else:
+                cities = cities[-1:-todelete-1:-1]
+        # randomly add cities while has time:
+        tour = Tour(cities, graph, max_time)
+        tour.add_random_cities()
+        return tour
 
 
 if __name__ == '__main__':
@@ -296,8 +319,7 @@ if __name__ == '__main__':
             graph.add_road(id_inx[edge[0]], id_inx[edge[1]], edge[2])
         max_time = 372
 
-        max_joy = 47000
-        sa = SimulatedAnnealing(graph, max_time, max_joy)
+        sa = SimulatedAnnealing(graph, max_time, min_joy=1, max_joy=47000)
         tour = sa.tour
         print(tour.print())
         print(tour.joy)
