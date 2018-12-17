@@ -133,11 +133,12 @@ class SimulatedAnnealing:
                      if e == max(graph.city2joy)], graph)
         max_tour = Tour(tour.cities, graph)
         i_joy = min_joy
-        ITER_LIMIT = 100000000000
+        ITER_LIMIT = 1400
         for i in range(ITER_LIMIT):
-            if i%1000 == 0:
-                sys.stdout.write("\r i:%d, limit joy:%.1fK, tour joy:%.1fK, len:%d\n" % 
-                                 (i, i_joy/1000, tour.joy/1000, len(tour.cities)))
+            # if i%1000 == 0:
+            #     sys.stdout.write("\r i:%d, i joy:%.1fK, anneal joy:%.1fK (%d), max joy: %.1fK (%d)\n" % 
+            #                      (i, i_joy/1000, tour.joy/1000, len(tour.cities), max_tour.joy/1000,
+            #                      len(max_tour.cities)))
             # candidate:
             c = self.next_tour(tour, graph)
             if c.joy > tour.joy: 
@@ -153,7 +154,7 @@ class SimulatedAnnealing:
             i_joy = self.increase_joy(min_joy, i)
             if i_joy >= max_joy:
                 break
-        tour.print()
+        # tour.print()
         self.tour = max_tour
 
     def increase_joy(self, min_joy, i):
@@ -207,9 +208,9 @@ if __name__ == '__main__':
             edge = [int(i) for i in l.strip().split(',')]
             graph.add_road(id_inx[edge[0]], id_inx[edge[1]], edge[2])
 
-        sa = SimulatedAnnealing(graph, min_joy=3000, max_joy=100000)
+        sa = SimulatedAnnealing(graph, min_joy=45000, max_joy=70000)
         tour = sa.tour
-        assert(Tour(tour.cities, graph).joy == tour.joy)
+        # assert(Tour(tour.cities, graph).joy == tour.joy)
         tour.print()
         print(' '.join(str(inx_id[c]) for c in tour.cities))
 
