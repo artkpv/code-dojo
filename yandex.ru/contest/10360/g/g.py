@@ -4,9 +4,8 @@
 https://contest.yandex.ru/contest/10360/problems/G/
 
 
-51000
-239 221 294 221 239 177 105 196 112 181 76 296 226 127 186 208 186 18 193 218 283 218 283 147 150 147 150 227 101 110 17 293 74 122 99 236 99 236 146 133 107 197 49 151 60 126 223 145 89 277 192 259 102 277 102 259 192 277 102 259 151 60 126 223 126 48 250 13 279 87 255 25 161 44 166 263 3 156 24 164 33 36 289 43 219 43 79 27 201 4 70 32 204 247 153 154 230 241 301 215 51 103 109 91 16 91 109 91
-
+54.14K:
+111 22 47 40 170 89 277 102 259 151 197 107 192 212 11 163 82 193 83 11 28 162 149 208 186 127 226 296 76 181 286 72 73 1 52 265 242 209 242 265 110 17 293 74 122 99 236 229 273 248 285 87 255 25 161 44 166 263 2 156 3 295 225 155 284 292 201 284 201 27 79 43 289 36 33 164 247 153 154 230 154 275 211 98 173 16 91 109 103 51 215 301 241 301 241 301
 """
 
 import heapq
@@ -133,12 +132,12 @@ class SimulatedAnnealing:
                      enumerate(graph.city2joy) 
                      if e == max(graph.city2joy)], graph)
         max_tour = Tour(tour.cities, graph)
-        limit_joy = min_joy
-        ITER_LIMIT = 1000
+        i_joy = min_joy
+        ITER_LIMIT = 100000000000
         for i in range(ITER_LIMIT):
-            # if i%1000 == 0:
-            #     sys.stdout.write("\r i:%d, limit joy:%.1fK, tour joy:%.1fK, len:%d\n" % 
-            #                      (i, limit_joy/1000, tour.joy/1000, len(tour.cities)))
+            if i%1000 == 0:
+                sys.stdout.write("\r i:%d, limit joy:%.1fK, tour joy:%.1fK, len:%d\n" % 
+                                 (i, i_joy/1000, tour.joy/1000, len(tour.cities)))
             # candidate:
             c = self.next_tour(tour, graph)
             if c.joy > tour.joy: 
@@ -147,20 +146,22 @@ class SimulatedAnnealing:
                     max_tour = Tour(tour.cities, graph)
             else:
                 delta = c.joy - tour.joy
-                p = self.transition_probability(delta, limit_joy)
+                p = self.transition_probability(delta, i_joy)
                 assert(0<p and p<=1)
                 if self.is_transition(p):
                     tour = c
-            limit_joy = self.increase_joy(min_joy, i)
-            if limit_joy >= max_joy:
+            i_joy = self.increase_joy(min_joy, i)
+            if i_joy >= max_joy:
                 break
+        tour.print()
         self.tour = max_tour
 
     def increase_joy(self, min_joy, i):
-        return min_joy * (.001*i+1)
+        return min_joy * (.0001*i+1)
 
-    def transition_probability(self, delta, limit_joy):
-        return math.exp(delta/limit_joy)
+    def transition_probability(self, delta, i_joy):
+        assert(delta <= 0)
+        return math.exp(delta/i_joy)
 
     def is_transition(self, probability):
         r = random.random()
@@ -205,11 +206,12 @@ if __name__ == '__main__':
                 break
             edge = [int(i) for i in l.strip().split(',')]
             graph.add_road(id_inx[edge[0]], id_inx[edge[1]], edge[2])
-        sa = SimulatedAnnealing(graph, min_joy=1000, max_joy=57000)
+
+        sa = SimulatedAnnealing(graph, min_joy=3000, max_joy=100000)
         tour = sa.tour
         assert(Tour(tour.cities, graph).joy == tour.joy)
+        tour.print()
         print(' '.join(str(inx_id[c]) for c in tour.cities))
-        # print(tour.joy)
 
         # WEAKER solution using MST:
         # max_tsp = None
