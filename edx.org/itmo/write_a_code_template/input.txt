@@ -1,0 +1,35 @@
+10 9
+1234567890
+!@#$%^&*()
+qwertyuiop
+QWERTYUIOP
+asdfghjkl;
+ASDFGHJKL:
+zxcvbnm,./
+ZXCVBNM<>?
+[]{}='"-|+
+Pascal
+%TEMPLATE-START%
+begin
+  reset(input, 'filename.in');
+  rewrite(output, 'filename.out');
+end.
+%TEMPLATE-END%
+C
+%TEMPLATE-START%
+int main()
+{
+    freopen("filename.in", "r", stdin);
+    freopen("filename.out", "w", stdout);
+}
+%TEMPLATE-END%
+Java
+%TEMPLATE-START%
+import mooc.*;
+public class Main {
+    public static void main(String[] args) {
+        try (EdxIO io = EdxIO.create()) {
+        }
+    }
+}
+%TEMPLATE-END%
