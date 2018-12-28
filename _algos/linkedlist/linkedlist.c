@@ -41,7 +41,7 @@ void ll_free(linkedlist * ll) {
 void ll_addright(linkedlist * ll, void * value) {
     assert(ll != NULL);
     assert(value != NULL);
-    llnode * node = (llnode*)malloc(sizeof(llnode));
+    llnode * node = malloc(sizeof(llnode));
     *node = (llnode) {.left = ll->right, .right = NULL, .value = value};
     if (ll->right != NULL) {
         ll->right->right = node;
@@ -56,7 +56,7 @@ void ll_addright(linkedlist * ll, void * value) {
 void ll_addleft(linkedlist * ll, void * value) {
     assert(ll != NULL);
     assert(value != NULL);
-    llnode * node = (llnode*)malloc(sizeof(llnode));
+    llnode * node = malloc(sizeof(llnode));
     *node = (llnode) {.left = NULL, .right = ll->left, .value = value};
     if (ll->left != NULL) {
         ll->left->left = node;

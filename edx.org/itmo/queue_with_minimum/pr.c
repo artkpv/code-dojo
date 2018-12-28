@@ -8,101 +8,145 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
-#include "linkedlist.c"
 
-linkedlist * queue = ll_ctor();
-linkedlist * mins = ll_ctor();
+typedef struct llnode {
+	struct llnode * left;
+	struct llnode * right;
+	void* value;
+} llnode;
 
-typedef struct mqueue {
-	vnode * vqueue_start;
-	vnode * vqueue_end;
-	cnode * cqueue_start;
-	cnode * cqueue_end;
-} mqueue;
+typedef struct linkedlist {
+	llnode * left;
+	llnode * right;
+    int count;
+} linkedlist;
 
-mqueue * mq_ctor() {
-	mqueue * mq = malloc(sizeof(mqueue));
-	*mq = (mqueue) {
-		.vqueue_start = NULL,
-		.vqueue_end = NULL,
-		.cqueue_start = NULL,
-		.cqueue_end = NULL
+linkedlist * ll_ctor() {
+	linkedlist * ll = malloc(sizeof(linkedlist));
+	*ll = (linkedlist) {
+        .left = NULL,
+        .right = NULL,
+        .count = 0
 	};
-	return mq;
+	return ll;
 }
 
-void mq_enqueue(mqueue * mq, int n) {
-	{ 
-		vnode * vnew = (vnode*) malloc(sizeof(vnode));
-		*vnew = (vnode) {.value = n, .next = NULL};
-		vnode * end = mq->vqueue_end;
-		if (end != NULL)
-			end->next = vnew;
-		mq->vqueue_end = vnew;
-		if (mq->vqueue_start == NULL)
-			mq->vqueue_start = vnew;
-	}
-
-	// min tracking:
-	{
-		int counter = 1;
-		while (mq->cqueue_end != NULL && mq->cqueue_end->value >= n) {
-			counter += mq->cqueue_end->count;
-			if (mq->cqueue_start == mq->cqueue_end) {
-				free(mq->cqueue_start);
-				mq->cqueue_start = NULL;
-				mq->cqueue_end = NULL;
-			}
-			else {
-				cnode * prev = mq->cqueue_end->prev;
-				prev->next = NULL;
-				free(mq->cqueue_end);
-				mq->cqueue_end = prev;
-			}
-		}
-		cnode * end = mq->cqueue_end;
-		cnode * new = (cnode*) malloc(sizeof(cnode));
-		*new = (cnode) {.value = n, .count = counter, .next = NULL, .prev=end};
-		if (end != NULL) {
-			end->next = new;
-		}
-		mq->cqueue_end = new;
-		if (mq->cqueue_start == NULL)
-			mq->cqueue_start = new;
-	}
-}
-void mq_dequeue(mqueue * mq) {
-	{
-		if (mq->vqueue_start == NULL)
-			return;
-		vnode * next = mq->vqueue_start->next;
-		free(mq->vqueue_start);
-		mq->vqueue_start = next;
-		if (next == NULL)
-			mq->vqueue_end == NULL;
-	}
-
-	{
-		cnode * start = mq->cqueue_start;
-		if (start->count > 1) {
-			start->count--;
-		}
-		else {
-			cnode * next = start->next;
-			free(start);
-			mq->cqueue_start = next;
-			if (next == NULL)
-				mq->cqueue_end == NULL;
-			else {
-				next->prev = NULL;
-			}
-		}
-	}
+void ll_free(linkedlist * ll) {
+    llnode * node = ll->left;
+    while (node != NULL) {
+        if (node->value) free(node->value);
+        llnode * next = node->right;
+        free(node);
+        node = next;
+    }
+    free(ll);
 }
 
-int mq_get_min(mqueue * mq) {
-	assert(mq->cqueue_start != NULL);
-	return mq->cqueue_start->value;
+void ll_addright(linkedlist * ll, void * value) {
+    assert(ll != NULL);
+    assert(value != NULL);
+    llnode * node = malloc(sizeof(llnode));
+    *node = (llnode) {.left = ll->right, .right = NULL, .value = value};
+    if (ll->right != NULL) {
+        ll->right->right = node;
+    }
+    ll->right = node;
+    if (ll->left == NULL){ 
+        ll->left = ll->right;
+    }
+    ll->count++;
+}
+
+void ll_addleft(linkedlist * ll, void * value) {
+    assert(ll != NULL);
+    assert(value != NULL);
+    llnode * node = malloc(sizeof(llnode));
+    *node = (llnode) {.left = NULL, .right = ll->left, .value = value};
+    if (ll->left != NULL) {
+        ll->left->left = node;
+    }
+    ll->left = node;
+    if (ll->right == NULL){ 
+        ll->right = ll->left;
+    }
+    ll->count++;
+}
+
+void * ll_popright(linkedlist * ll) {
+    if (ll->right == NULL) return NULL;
+    llnode * node = ll->right;
+    if (node->left) {
+        ll->right = node->left;
+        node->left->right = NULL;
+        node->left = NULL;
+    }
+    else {
+        assert(ll->left == node);
+        ll->right = NULL;
+        ll->left = NULL;
+    }
+    void * value = node->value;
+    free(node);
+    return value;
+}
+
+void * ll_popleft(linkedlist * ll) {
+    if (ll->left == NULL) return NULL;
+    llnode * node = ll->left;
+    if (node->right) {
+        ll->left = node->right;
+        node->right->left = NULL;
+        node->right = NULL;
+    }
+    else {
+        assert(ll->right == node);
+        ll->left = NULL;
+        ll->right = NULL;
+    }
+    void * value = node->value;
+    free(node);
+    return value;
+}
+
+
+void enqueue(linkedlist * q, linkedlist * mins, int num) {
+	int * nump = (int*) malloc(sizeof(int));
+	*nump = num;
+	ll_addright(q, nump);
+
+	int * num_count = (int*)calloc(2, sizeof(int));
+	num_count[0] = num;
+	num_count[1] = 1;
+	llnode * x = mins->right;
+	while (x != NULL && ((int*)x->value)[0] >= num) {
+		num_count[1] += ((int*)x->value)[1];
+		ll_popright(mins);
+		x = mins->right;
+	}
+	ll_addright(mins, num_count);
+}
+
+void dequeue(linkedlist * q, linkedlist * mins) {
+	if (q->left == NULL) return;
+	int * nump = (int*) ll_popleft(q);
+	int num = *nump;
+	free(nump);
+
+	assert(mins->left);
+	llnode * minn = mins->left;
+	int * num_count = (int*)minn->value;
+	if (num_count[1] > 1){
+		num_count[1]--;
+	}
+	else{
+		ll_popleft(mins);
+	}
+}
+
+int get_min(linkedlist * q, linkedlist * mins) {
+	llnode * minn = mins->left;
+	int * num_count = (int*)minn->value;
+	return num_count[0];
 }
 
 void main() {
@@ -111,7 +155,8 @@ void main() {
 	int n = 0;
 	scanf("%d\n", &n);
 
-	mqueue * mq = mq_ctor();
+	linkedlist * queue = ll_ctor();
+	linkedlist * mins = ll_ctor();
 
 	while (n-- > 0) {
 		char op;
@@ -119,15 +164,17 @@ void main() {
 		scanf(" %c", &op);
 		if (op == '+') {
 			scanf("%d", &num);
-			mq_enqueue(mq, num);
+			enqueue(queue, mins, num);
 		}
 		else if (op == '-') {
-			mq_dequeue(mq);
+			dequeue(queue, mins);
 		}
 		else if (op == '?') {
-			int min = mq_get_min(mq);
+			int min = get_min(queue, mins);
 			printf("%d\n", min);
 		}
 	}
+	ll_free(queue);
+	ll_free(mins);
 	exit(0);
 }
