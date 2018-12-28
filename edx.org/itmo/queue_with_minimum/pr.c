@@ -1,6 +1,6 @@
 /*
 
-1e6 
+Idea with using two queues (two doubly linked list)
 
 */ 
 

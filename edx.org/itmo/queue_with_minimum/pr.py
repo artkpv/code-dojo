@@ -1,54 +1,48 @@
 #!python3
 """
+Using two stacks for one queue.
 
-Ex1
-+ 10    10
-+ 9     9
-+ 8     8
-+ 7
+Enqueue stack - ES:
+Dequeue stack - DS:
 
-Ex2
-+ 1     1
-+ 10    1 10
-+ 2     1 2
--       2
--       2
--       None
+ES_M - min for ES
+DS_M - min for DS
 
-
-
+Time for N operations: ~N amortized
+Space: 2N
 """
 
 from collections import deque
 
+INF = 9e9
+
 class QueueWithMin:
     def __init__(self):
-        self.arr = deque()
-        self.minarr = deque()
+        self.es = []  # enqueue stack
+        self.ds = []  # dequeue stack
+        self.es_m = []  # min for enqueue stack
+        self.ds_m = []  # min for dequeue stack
     
     def enqueue(self, n):
-        self.arr.append(n)
-        counter = 1
-        while self.minarr and self.minarr[-1][0] >= n:
-            counter += self.minarr[-1][1]
-            self.minarr.pop()
-        self.minarr.append((n, counter))
+        if self.es_m:
+            self.es_m += [min(self.es_m[-1], n)]
+        else:
+            self.es_m += [n]
+        self.es += [n]
 
     def dequeue(self):
-        if not self.arr:
-            return None
-        n = self.arr[0]
-        self.arr.popleft()
-        counter = self.minarr[0][1]
-        counter -= 1
-        if counter == 0:
-            self.minarr.popleft()
-        else:
-            self.minarr[0] = (self.minarr[0][0], counter)
-        return n
-    
+        if not self.ds:
+            self.ds += [self.es.pop()]
+            self.ds_m += [self.ds[-1]]
+            while self.es:
+                self.ds += [self.es.pop()]
+                self.ds_m += [min(self.ds_m[-1], self.ds[-1])]
+            self.es_m = []
+        self.ds.pop()
+        self.ds_m.pop()
+
     def get_min(self):
-        return self.minarr[0][0] if self.minarr else None
+        return min(self.ds_m[-1] if self.ds_m else INF, self.es_m[-1] if self.es_m else INF)
 
 
 if __name__ == '__main__':
@@ -65,17 +59,3 @@ if __name__ == '__main__':
                 queue_with_min.dequeue()
             elif op == "?":
                 io.write("%d\n" % queue_with_min.get_min())
-
-    # fr = open('input.txt' if not sys.argv else sys.argv[1], 'r')
-    # fw = open('output.txt', 'w')
-
-    # n = int(fr.readline().strip())
-    # queue_with_min = QueueWithMin()
-    # for operation in range(n):
-    #     op = fr.readline().strip().split(' ')
-    #     if op[0] == "+":
-    #         queue_with_min.enqueue(int(op[1]))
-    #     elif op[0] == "-":
-    #         queue_with_min.dequeue()
-    #     elif op[0] == "?":
-    #         fw.write("%d\n" % queue_with_min.get_min())
