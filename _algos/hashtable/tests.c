@@ -127,5 +127,6 @@ void main() {
 	assert(test_put_search_delete());
 	assert(test_many_keys());
 	assert(test_resize());
-	printf("\nAll tests pass\n");
+	printf("\nAll tests pass. Press any key.\n");
+	getc(stdin);
 }

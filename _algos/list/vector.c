@@ -19,6 +19,8 @@ void Vector_free(VectorPtr v);
 
 void v_push(VectorPtr v, const void* el);
 
+void v_pop(VectorPtr v);
+
 void v_delete_at(VectorPtr v, int inx);
 
 int v_delete(VectorPtr v, const void* el, int (*equals)(const void* a, const void* b));
@@ -78,6 +80,10 @@ void v_delete_at(VectorPtr v, int inx) {
 	if (v->count * 4 <= v->size) {
 		v_resize(v, v->size / 2);
 	}
+}
+
+void v_pop(VectorPtr v) {
+	v_delete_at(v, v->count - 1);
 }
 
 int v_delete(VectorPtr v, const void* el, int (*equals)(const void* a, const void* b)) {

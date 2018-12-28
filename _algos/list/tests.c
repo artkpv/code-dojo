@@ -94,6 +94,15 @@ int put_various_objects_test() {
 	return 1;
 }
 
+int stack_tests() {
+	Vector * v = Vector_ctor();
+	v_push(v, "some");
+	assert(v->count == 1);
+	v_pop(v);
+	assert(v->count == 0);
+	return 1;
+}
+
 int main() {
 	assert(test_adds_deletes() == 1);
 	printf("Done test_adds_delete\n");
@@ -101,6 +110,8 @@ int main() {
 	printf("Done resizing_perf\n");
 	assert(put_various_objects_test() == 1);
 	printf("Done put_various_objects_test\n");
+	assert(stack_tests() == 1);
+	printf("Done stack_tests\n");
 
 	printf("Tests done. Press any key.\n");
 	getc(stdin);
