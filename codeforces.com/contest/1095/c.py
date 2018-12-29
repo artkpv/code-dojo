@@ -43,54 +43,98 @@ Ex4
 
 глубина дерева 
 
+
+15 = 8 + 7 = 8 + 4 + 3 = 8 + 4 + 2 + 1 = 2**3 + 2**2 + 2**1 + 2**0  | base power two
+
+
+16 = 8 8 
+
+
+28,5
+> 16,3     12,2
+> 8 4 4    8 4
+
+
+5* 3/4 =3.7   3.7 + 1.3
 """
 
 import math
 
-d = {}
+# d = {}
+# def f_old(n, k, res):
+#     if (n,k) in d:
+#         d_nk = d[(n,k)]
+#         res += res[d_nk[0]:d_nk[1]+1]
+#         return
+#     if n == 0:
+#         return
+#     if n > k:
+#         return
 
-def f(n, k, res):
-    if (n,k) in d:
-        d_nk = d[(n,k)]
-        res += res[d_nk[0]:d_nk[1]+1]
-        return
-    if n == 0:
-        return
-    assert(n >= k)
-    assert(not (n > 1 and n % 2 == 1 and k == 1))
-    i = len(res)
-    if k == 1:
-        p = math.log(n, 2)  # pow
-        assert(round(p,0) == p)
-        res += [n]
-    elif n % 2 == 1:
-        res += [1]
-        n -= 1
-        k -= 1
-        f(n, k, res)
-    elif k % 2 == 1:
-        res += [2]
-        k -= 1
-        n -= 2
-        f(n, k, res)
-    else:
-        f(n//2, k//2, res)
-        f(n//2, k//2, res)
-    d[(n,k)] = (i, len(res)-1)
+#     i = len(res)
+#     log2 = math.log(n, 2)
+#     nearest_power = 2**int(log2)
+#     remain = n - nearest_power
+#     if remain == 0:
+#         if k == 1:
+#             res += [n]
+#         else:
+#             f(n//2, k//2, res)
+#             f(n//2, k - k//2, res)
+#     else:
+#         kk = k * remain/nearest_power
+#         f(remain, kk, res)
+#         f(nearest_power, k - kk, res)
+
+#     d[(n,k)] = (i, len(res)-1)
+
+
+def last_power_2(n):
+    log2 = math.log(n, 2)
+    return 2**int(log2)
+
+def f(res):
+    i = 0
+    while i < len(res):
+        n = res[i]
+        a = last_power_2(res[i])
+        if n - a == 0:
+            break
+        else:
+            if i + 1 == len(res): 
+                # Example: 11 2 > 8 3 ?
+                return False
+            else:
+                res[i] = a
+                res[i+1] = n-a
+        i += 1
+
+    if i < len(res):
+        # fill remaining:
+        j = 0
+        i += 1
+        while j < len(res) and i < len(res):
+            if res[j] == 1:
+                j += 1
+            else: 
+                m = res[j]
+                res[i] = m//2
+                res[j] = m//2
+                i += 1
+        return True
 
 
 n, k = [int(i) for i in input().strip().split(' ')]
-res = []
-if not (n < k or (k == 1 and n > 1 and n % 2 == 1)):
-    f(n, k, res)
+res = [0] * k
+res[0] = n
 
-if res:
+if n >= k and f(res):
     print("YES")
+    assert(sum(res) == n)
     print(" ".join(str(i) for i in res))
 else:
     print("NO")
 
-print(d)
 
 # res = []
 # while n > 0 and k > 1:
