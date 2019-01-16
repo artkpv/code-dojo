@@ -1,20 +1,18 @@
 #!python3
 """
 1 <= n <= 10^5
-
-Correct for each pair OR for concatenation of pairs ?
-
-Pair: equal L = R
+sum of chars <= 5*10^5
+Find max correct pairs num.
+Pair: concats into valid seq.
 
 I1 BF
+choose one pair, then second, then third:
 N*(N-1) / 2
 (N-1)(n-2) / 2
 ..
 4*3/2
 2*1/2
-Sum = n/2*1/2 * ( n*(n-1) + (n-1)(n-2) + .. + 4*3 + 2 * 1 ) ~~ n ^ 3
-
-Recursive to iterate
+Sum = 1/2 * ( n*(n-1) + (n-1)(n-2) + .. + 4*3 + 2 * 1 ) ~~ n ^ 3
 
 
 I2
@@ -33,6 +31,14 @@ E1
 ) 1 0
 ) 1 0
 Out:  2
+
+
+E2
+(
+)
+)( -- invalid
+
+
 
 
 """
@@ -57,20 +63,18 @@ for seqence_num in range(1, n+1):
     if not can_make_pair:
         continue
     if l > 0:
-        if -l in pairs:
-            pairs[-l] += 1
-        else:
-            pairs[-l] = 1
-    else:  # r > 0
-        if r in pairs:
-            pairs[r] += 1
-        else:
-            pairs[r] = 1
+        pairs[-l] = pairs[-l] + 1 if -l in pairs else 1
+    elif r > 0:
+        pairs[r] = pairs[r] + 1 if r in pairs else 1
+    else:  # l == 0 and r == 0
+        pairs[0] = pairs[0] + 1 if 0 in pairs else 1
 
 count = 0
 for k in pairs:
     if k > 0:
         if -k in pairs:
             count += min(pairs[-k], pairs[k])
+count += pairs[0] // 2 if 0 in pairs else 0
+
 print(count)
 
