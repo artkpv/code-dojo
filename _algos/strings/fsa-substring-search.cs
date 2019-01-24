@@ -1,3 +1,10 @@
+/*
+    Substring search using finite state automaton.
+
+    Time: running time - O(n), construction - O(m^3*r) 
+          for n-length text, m-length pattern and r radix.
+
+ */
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -35,9 +42,8 @@ public static class Program
                     // check p_k is suffix of p:
                     int ii = 0;
                     foreach (var p_k_c in p_k) {
-                        if (p[ii] != p_k_c) {
+                        if (p[ii] != p_k_c)
                             break;
-                        }
                         ii++;
                     }
                     if (ii == k) // found
@@ -59,6 +65,6 @@ public static class Program
         Debug.Assert(Search("AAAB", "AABAABAABAABAAAB") == 12);
         Debug.Assert(Search("exam", "some more sophisticated example") == 24);
         Console.WriteLine("Done");
-        return 1;
+        return 0;
     }
 }
