@@ -10,34 +10,30 @@
 
 typedef struct {
 	int key;
-	char * value;
+	const char * value;
 } Node;
-
-typedef Node * NodePtr;
 
 int calculate_hash(int hash, int m) {
 	return (hash & INT_MAX) % m;
 }
 
-typedef struct HTStruct {
+typedef struct {
 	int count;
 	int m;
-	NodePtr * arr;
-} * HT;
+	Node ** arr;
+} HT;
 
-HT 
-HT_ctor(int m) {
-	HT ht = (HT) malloc(sizeof(struct HTStruct));
+HT * HT_ctor(int m) {
+	HT * ht = (HT*) malloc(sizeof(HT));
 	ht->count = 0;
 	ht->m = m;
-	NodePtr * arr = (NodePtr*) calloc(m, sizeof(NodePtr));
+	Node ** arr = (Node **) calloc(m, sizeof(Node*));
 	for (int i = 0; i < m; i++)
 		arr[i] = NULL;
 	ht->arr = arr;
 }
 
-void
-HT_free(HT ht) {
+void HT_free(HT * ht) {
 	if (ht != NULL) {
 		if (ht->arr != NULL) 
 			free(ht->arr);
@@ -45,31 +41,29 @@ HT_free(HT ht) {
 	}
 }
 
-void
-_put(NodePtr* arr, int m, int key, char * value) {
+void _put(Node ** arr, int m, int key, const char * value) {
 	int i = calculate_hash(key, m);
 	for (; arr[i] != NULL; i = (i + 1) % m) {
 		if (arr[i]->key == key)
 		{
-			NodePtr n = arr[i];
+			Node * n = arr[i];
 			n->key = key;
 			n->value = value;
 			return;
 		}
 	}
-	NodePtr newnode = (NodePtr) malloc(sizeof(Node));
+	Node * newnode = (Node*) malloc(sizeof(Node));
 	newnode->key = key;
 	newnode->value = value;
 	arr[i] = newnode;
 }
 
-void
-_ht_resize(HT ht, int newsize) {
+void _ht_resize(HT * ht, int newsize) {
 	printf(" resizing %d\n", newsize);
 	assert(ht->count <= newsize);
-	NodePtr * arr = (NodePtr*) calloc(newsize, sizeof(NodePtr));
+	Node ** arr = (Node**) calloc(newsize, sizeof(Node*));
 	for (int i = 0; i < ht->m; i++){
-		NodePtr node = ht->arr[i];
+		Node * node = ht->arr[i];
 		if (node != NULL) 
 			_put(arr, newsize, node->key, node->value);
 	}
@@ -79,8 +73,7 @@ _ht_resize(HT ht, int newsize) {
 }
 
 // Stores value by a key
-void 
-put (HT ht, int key, char * value) {
+void put (HT * ht, int key, const char * value) {
 	_put(ht->arr, ht->m, key, value);
 	ht->count++;
 	if (ht->count > 0 && ht->count * 2 >= ht->m)
@@ -88,8 +81,7 @@ put (HT ht, int key, char * value) {
 }
 
 // Finds value by key
-char * 
-search (HT ht, int key) {
+const char * search (HT * ht, int key) {
 	int i = calculate_hash(key, ht->m);
 	for (; ht->arr[i] != NULL; i = (i+1) % ht->m) {
 		if (ht->arr[i]->key == key)
@@ -100,8 +92,7 @@ search (HT ht, int key) {
 
 
 // Removes key
-void
-delete (HT ht, int key) {
+void ht_delete (HT * ht, int key) {
 	int i = calculate_hash(key, ht->m);
 	for (; ht->arr[i] != NULL; i = (i+1) % ht->m) {
 		if (ht->arr[i]->key == key) {			
@@ -113,8 +104,8 @@ delete (HT ht, int key) {
 	i = (i+1) % ht->m;
 
 	while (ht->arr[i] != NULL) {
-		NodePtr n = ht->arr[i];
-		char * value = n->value;
+		Node * n = ht->arr[i];
+		const char * value = n->value;
 		int key = n->key;
 		free(n);
 		ht->arr[i] = NULL;
@@ -128,13 +119,12 @@ delete (HT ht, int key) {
 		_ht_resize(ht, ht->m / 2);
 }
 
-void 
-print_ht(HT ht) {
+void print_ht(HT * ht) {
 	int count = 0;
 	for (int i = 0; i < ht->m; i++) {
 		printf("%d: ", i);
 		if (ht->arr[i] != NULL) {
-			NodePtr np = ht->arr[i];
+			Node* np = ht->arr[i];
 			printf("%d '%s'", np->key, np->value);
 			count++;
 		}
