@@ -7,7 +7,7 @@
 /*
 
 HASHTABLE / map
-Linear probing for collision resolution
+Linear probing for collision resolution and resizing.
 
 */
 
@@ -25,13 +25,18 @@ typedef struct {
 } HT;
 
 HT * HT_ctor(int m);
+
 void HT_free(int m);
-// Stores value by a key
+
+// Stores value by a key. Increases size if limit reached.
 void ht_put (HT * ht, int key, const char * value);
-// Finds value by key
+
+// Finds value by key. Returns NULL if nothing found.
 const char * ht_search (HT * ht, int key);
-// Removes key
+
+// Removes key. Shrinks hashtable if sparse.
 void ht_delete (HT * ht, int key);
+
 // Prints to STDOUT all key/value pairs
 void print_ht(HT * ht); 
 
@@ -64,6 +69,7 @@ void HT_free(HT * ht) {
 	}
 }
 
+// Puts key/value into the given arr
 void _put(Node ** arr, int m, int key, const char * value) {
 	int i = _calculate_hash(key, m);
 	for (; arr[i] != NULL; i = (i + 1) % m) {
@@ -81,6 +87,7 @@ void _put(Node ** arr, int m, int key, const char * value) {
 	arr[i] = newnode;
 }
 
+// Copies all nodes to new array of newsize size. Replaces the old.
 void _ht_resize(HT * ht, int newsize) {
 	printf(" resizing %d\n", newsize);
 	assert(ht->count <= newsize);
