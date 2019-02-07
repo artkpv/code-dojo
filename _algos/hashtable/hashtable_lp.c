@@ -4,24 +4,42 @@
 #include <string.h>
 #include <assert.h>
 
-//
-//  HASHTABLE, linear probing for collision resolution
-//
+/*
 
+HASHTABLE / map
+Linear probing for collision resolution
+
+*/
+
+// Key and value pair
 typedef struct {
 	int key;
 	const char * value;
 } Node;
 
-int calculate_hash(int hash, int m) {
-	return (hash & INT_MAX) % m;
-}
-
+// Hashtable
 typedef struct {
 	int count;
 	int m;
 	Node ** arr;
 } HT;
+
+HT * HT_ctor(int m);
+void HT_free(int m);
+// Stores value by a key
+void ht_put (HT * ht, int key, const char * value);
+// Finds value by key
+const char * ht_search (HT * ht, int key);
+// Removes key
+void ht_delete (HT * ht, int key);
+// Prints to STDOUT all key/value pairs
+void print_ht(HT * ht); 
+
+
+// Truncates by modulo m
+int _calculate_hash(int hash, int m) {
+	return (hash & INT_MAX) % m;
+}
 
 HT * HT_ctor(int m) {
 	HT * ht = (HT*) malloc(sizeof(HT));
@@ -35,14 +53,19 @@ HT * HT_ctor(int m) {
 
 void HT_free(HT * ht) {
 	if (ht != NULL) {
-		if (ht->arr != NULL) 
+		if (ht->arr != NULL) {
+			for (int i = 0; i < ht->count; i++) {
+				// free((void*)ht->arr[i]->value);
+				free(ht->arr[i]);
+			}
 			free(ht->arr);
+		}
 		free(ht);
 	}
 }
 
 void _put(Node ** arr, int m, int key, const char * value) {
-	int i = calculate_hash(key, m);
+	int i = _calculate_hash(key, m);
 	for (; arr[i] != NULL; i = (i + 1) % m) {
 		if (arr[i]->key == key)
 		{
@@ -72,17 +95,15 @@ void _ht_resize(HT * ht, int newsize) {
 	ht->m = newsize;
 }
 
-// Stores value by a key
-void put (HT * ht, int key, const char * value) {
+void ht_put (HT * ht, int key, const char * value) {
 	_put(ht->arr, ht->m, key, value);
 	ht->count++;
 	if (ht->count > 0 && ht->count * 2 >= ht->m)
 		_ht_resize(ht, ht->m * 2);
 }
 
-// Finds value by key
-const char * search (HT * ht, int key) {
-	int i = calculate_hash(key, ht->m);
+const char * ht_search (HT * ht, int key) {
+	int i = _calculate_hash(key, ht->m);
 	for (; ht->arr[i] != NULL; i = (i+1) % ht->m) {
 		if (ht->arr[i]->key == key)
 			return ht->arr[i]->value;
@@ -90,16 +111,17 @@ const char * search (HT * ht, int key) {
 	return NULL;
 }
 
-
-// Removes key
 void ht_delete (HT * ht, int key) {
-	int i = calculate_hash(key, ht->m);
+	int i = _calculate_hash(key, ht->m);
 	for (; ht->arr[i] != NULL; i = (i+1) % ht->m) {
 		if (ht->arr[i]->key == key) {			
-			// free(ht->arr[i]); // clients looks for garbage
+			free((void*)ht->arr[i]->value);
+			free(ht->arr[i]);
 			ht->arr[i] = NULL;
+			break;
 		}
 	}
+	ht->count--;
 
 	i = (i+1) % ht->m;
 
@@ -110,11 +132,11 @@ void ht_delete (HT * ht, int key) {
 		free(n);
 		ht->arr[i] = NULL;
 		ht->count--;
-		put(ht, key, value);
+		_put(ht->arr, ht->m, key, value);
+		ht->count++;
 		i = (i+1) % ht->m;
 	}
 
-	ht->count--;
 	if (ht->count > 0 && ht->count * 8 <= ht->m) 
 		_ht_resize(ht, ht->m / 2);
 }
