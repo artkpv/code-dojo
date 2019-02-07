@@ -2,7 +2,7 @@
 
 """
 
-NEXT: optimize 
+NEXT: Optimize. How to DIVIDE optimal solution?  Try: optimal = current seq taken or not;
 
 
 PROBLEM: http://codeforces.com/contest/1107/problem/e
