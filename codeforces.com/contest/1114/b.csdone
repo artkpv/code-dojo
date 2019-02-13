@@ -1,0 +1,29 @@
+﻿using System;
+using System.Linq;
+
+namespace _1114
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            int[] xyz = Console.ReadLine().Trim().Split(' ').Select(Int32.Parse).ToArray();
+            int[] abc = Console.ReadLine().Trim().Split(' ').Select(Int32.Parse).ToArray();
+            
+            abc[0] -= xyz[0];
+            if (abc[0] >= 0) {
+                int ab = abc[0] + abc[1];
+                ab -= xyz[1];
+                if (ab >= 0){
+                    int left = ab + abc[2];
+                    left -= xyz[2];
+                    if (left >= 0){
+                        Console.WriteLine("YES");
+                        return;
+                    }
+                }
+            }
+            Console.WriteLine("NO");
+        }
+    }
+}

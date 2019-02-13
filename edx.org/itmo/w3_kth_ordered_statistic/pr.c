@@ -47,9 +47,62 @@ int compare_ints(const void* a, const void* b)
     // return (arg1 > arg2) - (arg1 < arg2); // possible shortcut
     // return arg1 - arg2; // erroneous shortcut (fails if INT_MIN is present)
 }
+
+inline void _swap(int * a, int i, int j){
+    int t = a[i];
+    a[i] = a[j];
+    a[j] = t;
+}
+
+void quicksortk(int * a, int k1, int k2, int l, int r) {
+    /*
+    Ex1. [1 2 13 48], 3, 4, 0, 3
+         i-1 = 0
+    p=2
+    i j 
+    0 3
+
+    Ex2. [1 2 85 -51, 133], 3, 4, 0, 4
+    p = 85
+    i j
+    0 4  
+    1 2 -51 85 133
+
+    Ex3
+    [1 2 800005 -516268571 1331571109], 3, 4, 0, 4
+    p=8..5
+    i j
+    0 4
+
+     
+    */
+
+    // TODO : FIX THIS
+    if (l >= r)
+        return;
+    int m = (l+r)/2;
+    m = a[l] < a[m] && a[m] < a[r] ? m : 
+                (a[l] < a[r] && a[r] < a[m] ? r : l);
+    int p = a[m];
+    // a[l..j-1] <= p <= a[j+1..r]
+    _swap(a, l, m);
+    int i = l, j = r-1;
+    while (1) {
+        while (a[++i] <= p) if (i == r) break;
+        while (p <= a[--j]) if (j == l) break;
+        if (i >= j) break;
+        _swap(a, i, j);
+    }
+    _swap(a, l, j);
+    // j el at correct place
+    if (k1 < j) 
+        quicksortk(a, k1, k2, l, j-1);
+    if (j < k2)
+        quicksortk(a, k1, k2, j+1, r);
+}
  
-int main() {
-	freopen("input.txt", "r", stdin);
+int main( int argc, char *argv[]) {
+	freopen(argc > 1 ? argv[1] : "input.txt", "r", stdin);
 	freopen("output.txt", "w", stdout);
     int n, k1, k2;
     scanf("%d %d %d", &n, &k1, &k2);
@@ -60,8 +113,10 @@ int main() {
     a[1] = a2;
     for(size_t i = 2; i < n; i++)
         a[i] = (int) ((int)A*a[i-2] + (int)B*a[i-1] + C);  // ignore int overflow.. 
-    qsort(a, n, sizeof(int), compare_ints);
-    for(size_t i = k1-1; i < k2; i++)
+
+    quicksortk(a, k1-1, k2-1, 0, n-1);
+    
+    for(size_t i = k1-1; i <= k2-1; i++)
         printf("%d ", a[i]);
     return 0;
 }
