@@ -108,53 +108,36 @@ namespace _1114
         {
             int[] nmk = Console.ReadLine().Trim().Split(' ').Select(Int32.Parse).ToArray();
             int n = nmk[0], m = nmk[1], k = nmk[2];
-            int[] a = Console.ReadLine().Trim().Split(' ').Select(Int32.Parse).ToArray();
-
-            int[] sorted = a.OrderByDescending().ToArray();
-
-            var divs = new int[k];
-            var div_inxs = new LinkedList<int>[k];
-            var div_mins = new int[k];
-            for (int i = 0; i < k; i++) {
-                divs[i] = Math.Max(0, i*m - 1);
-                div_inxs[i] = new LinkedList<int>(Enumerable.Range(i*k, m));
-                div_mins[i] = a.Skip(i*k).Take(m).Min();
-            }
-
-            for (int i = m*k; i < n; i++)
+            Int64[] a = Console.ReadLine().Trim().Split(' ').Select(Int64.Parse).ToArray();
+            var maxs = new Dictionary<Int64,int>();
+            Int64 max = 0;
+            foreach (var i in a.Select((e,i) => new {e, i}).OrderByDescending(i => i.e).Take(m*k))
             {
-                int new_inx = i;
-                // Increase sizes of divs greedily:
-                for (int ii = k-1; ii >= 1; ii--) {
-                    // Update maxs in adj divs, shrink right one w/o decrease of sum.
-
-                    // 1) Is to replace left most with new_inx?
-                    // 2) Otherwise if to update min with the new_inx?
-                    //    BUT then we BREAK linked list!
-
-                    int compare = a[div_inxs[ii].First.Value] - a[new_inx];
-                    int compare2 = a[div_maxs[ii][0]] - a[div_maxs[ii-1][m-1]];
-
-                    int first = divs[ii];
-                    if (a[first] > a[last]) {
-                        break;
+                max += i.e;
+                if (maxs.ContainsKey(i.e))
+                    maxs[i.e]++;
+                else
+                    maxs[i.e] = 1;
+            }
+            
+            // fill divs going from left to right and taking all from sorted:
+            var divs = new int[k];
+            int count = 0;
+            int j = 0;
+            for (int i = 0; i < a.Length; i++)
+            {
+                if (maxs.ContainsKey(a[i]) && maxs[a[i]] > 0){
+                    count++;
+                    maxs[a[i]]--;
+                    if (count == m) {
+                        divs[j++] = i;
+                        count = 0;
                     }
-                    else if (a[first] == a[last])
                 }
             }
 
-            int max = 0;
-            // count max
-            for (int i = 0; i < k; i++)
-            {
-                int start = divs[i];
-                int len = (i+1 < k ? divs[i+1] : n) - start;
-
-                max += a.Skip(divs[i]).Take(len).OrderByDescending(ii => ii).Take(m).Sum();
-            }
-
             Console.WriteLine(max);
-            Console.WriteLine(string.Join(' ', divs.Skip(1).Select(i=>i.ToString())));
+            Console.WriteLine(string.Join(" ", divs.Take(k-1).Select(i=>(i+1).ToString())));
         }
     }
 }
