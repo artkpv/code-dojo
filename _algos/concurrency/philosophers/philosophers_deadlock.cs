@@ -1,5 +1,5 @@
 ﻿/*
-# Dinning philosophers problem
+# Dinning philosophers problem - deadlock example
 
 Statement (wiki)
 
@@ -30,7 +30,7 @@ namespace DPProblem
 {
     public static class Program
     {
-        private const int philosophersAmount = 4;
+        private const int philosophersAmount = 5;
 
         private static bool[] forks = new[] { true, true, true, true, true };
 
@@ -47,14 +47,14 @@ namespace DPProblem
         static Program()
         {
             const int dueTime = 3000;
-            const int period = 100;
-            threadingTimer = new Timer(Observe, null, dueTime, period);
+            const int checkPeriod = 2000;
+            threadingTimer = new Timer(Observe, null, dueTime, checkPeriod);
         }
 
         public static void TakeFork(int fork_inx)
         {
-            while (!forks[fork_inx])
-                forks[fork_inx] = false;
+            SpinWait.SpinUntil(()=>forks[fork_inx]);
+            forks[fork_inx] = false;
         }
 
         public static void PutFork(int fork_inx)
@@ -68,7 +68,7 @@ namespace DPProblem
             int circles = 0;
             void Think()
             {
-                const int modulo = 0b1000000000000000000 - 1;
+                const int modulo = 0b1000000 - 1;
                 int copy = number;
                 for (int delimiter = 2; delimiter * delimiter <= number; delimiter++)
                     while (copy % delimiter == 0)
@@ -85,7 +85,7 @@ namespace DPProblem
             {
                 // This should go into deadlock eventually:
                 // i-th philosopher takes i-th fork and waits forever for i+1 fork.
-                // Think();
+                Think(); // the same no deadlock, if philosopher doesn't think
                 TakeFork(i);
                 TakeFork((i + 1) % philosophersAmount);
                 eatenFood[i] = (eatenFood[i] + 1) % (int.MaxValue - 1);
@@ -99,7 +99,7 @@ namespace DPProblem
             for (int i = 0; i < philosophersAmount; i++)
             {
                 if (lastEatenFood[i] == eatenFood[i])
-                    Console.WriteLine($"Philosopher {i + 1} STARVATION: last {lastEatenFood[i]}, now {eatenFood[i]}.");
+                    Console.WriteLine($"Philosopher {i + 1} starvation: last {lastEatenFood[i]}, now {eatenFood[i]}.");
                 lastEatenFood[i] = eatenFood[i];
             }
         }
