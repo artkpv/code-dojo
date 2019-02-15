@@ -31,7 +31,7 @@ namespace DPProblem
 {
     public static class Program
     {
-        private const int philosophersAmount = 10;
+        private const int philosophersAmount = 4;
 
         // use integer to be able to use Interlocked:
         private static int[] forks;
