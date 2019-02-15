@@ -30,57 +30,87 @@ namespace DPProblem
 {
     public static class Program
     {
-        public const int N = 5;
+        private const int philosophersAmount = 4;
 
-        public static bool[] Forks = new[] {true, true, true, true, true};
-        public static int[] EatenFood = new int[N];
-        public static int[] Thoughts = new int[N];
+        private static bool[] forks = new[] { true, true, true, true, true };
 
-        public static void TakeFork(int fork_inx){
-            while (!Forks[fork_inx])
-                Forks[fork_inx] = false;
-        }
-        
-        public static void PutFork(int fork_inx) {
-            Forks[fork_inx] = true;
-        }
+        private static int[] eatenFood = new int[philosophersAmount];
 
-        public static void DoPhilosopher(int i) 
+        private static int[] lastEatenFood = new int[philosophersAmount];
+
+        private static int[] thoughts = new int[philosophersAmount];
+
+        private static Timer threadingTimer;
+
+        private static DateTime startTime;
+
+        static Program()
         {
-            int n = 1;
+            const int dueTime = 3000;
+            const int period = 100;
+            threadingTimer = new Timer(Observe, null, dueTime, period);
+        }
+
+        public static void TakeFork(int fork_inx)
+        {
+            while (!forks[fork_inx])
+                forks[fork_inx] = false;
+        }
+
+        public static void PutFork(int fork_inx)
+        {
+            forks[fork_inx] = true;
+        }
+
+        public static void DoPhilosopher(int i)
+        {
+            int number = 1;
             int circles = 0;
-            void Think(){
-                const int MODULO = 0b1000000000000000000 - 1;
-                int m = n;
-                for (int j = 2; j*j <= n; j++)
-                    while (m % j == 0) 
-                        m /= j;
-                if (n%MODULO == 0) {
-                    circles++;
-                    Thoughts[i] = circles;
-                }
-                n = (n+1)%MODULO;
-            }
-            Console.WriteLine($"Philosopher {i+1} starting");
-            while(true) 
+            void Think()
             {
-                // TODO:
+                const int modulo = 0b1000000000000000000 - 1;
+                int copy = number;
+                for (int delimiter = 2; delimiter * delimiter <= number; delimiter++)
+                    while (copy % delimiter == 0)
+                        copy /= delimiter;
+                if (number % modulo == 0)
+                {
+                    circles++;
+                    thoughts[i] = circles;
+                }
+                number = (number + 1) % modulo;
+            }
+            Console.WriteLine($"Philosopher {i + 1} starting");
+            while (true)
+            {
                 // This should go into deadlock eventually:
                 // i-th philosopher takes i-th fork and waits forever for i+1 fork.
                 // Think();
                 TakeFork(i);
-                TakeFork((i+1)%N);
-                EatenFood[i] = (EatenFood[i] + 1)%(int.MaxValue-1);
+                TakeFork((i + 1) % philosophersAmount);
+                eatenFood[i] = (eatenFood[i] + 1) % (int.MaxValue - 1);
                 PutFork(i);
-                PutFork((i+1)%N);
+                PutFork((i + 1) % philosophersAmount);
             }
         }
-        static void Main(string[] args)
+
+        private static void Observe(object state)
         {
+            for (int i = 0; i < philosophersAmount; i++)
+            {
+                if (lastEatenFood[i] == eatenFood[i])
+                    Console.WriteLine($"Philosopher {i + 1} STARVATION: last {lastEatenFood[i]}, now {eatenFood[i]}.");
+                lastEatenFood[i] = eatenFood[i];
+            }
+        }
+
+        public static void Main(string[] args)
+        {
+            // Observer:
             Console.WriteLine("Starting...");
-            var start = DateTime.Now;
-            var philosophers = new Task[N];
-            for (int i = 0; i < N; i++)
+            startTime = DateTime.Now;
+            var philosophers = new Task[philosophersAmount];
+            for (int i = 0; i < philosophersAmount; i++)
             {
                 int icopy = i;
                 philosophers[i] = Task.Run(() => DoPhilosopher(icopy));
@@ -88,13 +118,9 @@ namespace DPProblem
 
             Console.WriteLine("Press any key to exit...");
             Console.ReadLine();
+            for (int i = 0; i < philosophersAmount; i++)
+                try { philosophers[0].Dispose(); } catch { };
 
-            Console.WriteLine($"Time: {DateTime.Now - start}");
-            for (int i = 0; i < N; i++)
-            {
-                try { philosophers[0].Dispose(); } catch {};
-                Console.WriteLine($"Philosopher {i+1} eaten {EatenFood[i]}, thoughts {Thoughts[i]}");
-            }
             Console.WriteLine("Exit");
         }
     }
