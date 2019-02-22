@@ -1,5 +1,6 @@
 #!python3
 """
+
 arr, n length 
 swap k
 1 <= n,k <= 10^6
@@ -40,66 +41,68 @@ E2
 1 2 5 4 9 10
 
 """
-fr = open('input.txt')
+import sys
+fr = open('input.txt' if len(sys.argv) < 2 else sys.argv[1])
 fw = open('output.txt', 'w')
 
 n, k = [int(i) for i in fr.readline().strip().split(' ')]
 a = [int(i) for i in fr.readline().strip().split(' ')]
 
-def quicksortx(a, k, l, r):
+def sort_by_k(a, k, left, right):
     """
-    Sorts elements at k-th position beginning from l and ending on r
-
-    Mid point:
-     Example: k = 2, l=1, r=13
-     1 3 5 7 9 11 13  -> m = 7
-     0 1 2 3 4 5  6 -> offset=3, offset*k+1 = m
-     Ex2: k=2 l=1, r=11
-     1 3 5 7 9 11 -> m=5 (not 6)
-     0 1 2 3 4 5 -> offset=2, 3th from left
-     Ex3: k=1 l=0 r=9
-
+    Sorts elements at k-th position beginning from left and ending on right
     """
-    if l >= r: 
+    if left >= right: 
         return
-    offset = (r-l)//k//2
-    m = offset * k + 1
-    # choose median to improve:
-    m = m if a[m] > a[l] and a[m] < a[r] else l if a[l] < a[r] else r
-    p = a[m]
-    i = l
-    j = r
+    """ 
+    Mid point:
+     a=0 1 2 3 4 5 6 
+     k=2, left=0, right=6 => m=2
+
+     a[2..11]= { 2 3 4 5 6 7 8 9 10 11 }, 2 5 8 11
+     k=3 (from 2), left=2, right=11 => m = 5
+    """
+    elements_num = right-left + 1
+    k_th_elements_num = elements_num // k + 1
+    middle_el_num = k_th_elements_num // 2
+    middle_inx = left + (middle_el_num - 1)*k
+    pivot = a[middle_inx]
+    i = left
+    j = right
     while i <= j:
-        while i < j and a[i] < p:
+        while a[i] < pivot:
             i += k
-        while i < j and a[j] > p:
+        while a[j] > pivot:
             j -= k
-        if i >= j:
-            break
-        a[i], a[j] = a[j], a[i]
-        i += k
-        j -= k
-    return quicksortx(a, k, l, i-k) and quicksortx(a, k, i, r)
+        if i <= j:
+            a[i], a[j] = a[j], a[i]
+            i += k
+            j -= k
+    return sort_by_k(a, k, left, i-k) and sort_by_k(a, k, i+k, right)
+
+if k == 1:
+    fw.write("YES")
+    exit()
 
 """
 Examples:
 1) n=5, k=3, s=0, r=3, s=1 r=4, s=2 r=2, 
 0 1 2 3 4
 2) n=6, k=2, s=0 r=4, s=1 r=5
-
 """
-if k == 1:
-    fw.write("YES")
-    exit()
+for left in range(k-1):
+    right = left + k*(n//k)
+    while right >= n:
+        right -= k
+    sort_by_k(a, k, left, right)
 
-for s in range(k-1):
-    quicksortx(a, k, s, s+k*((n-s-1)//k))
+# print(a)
 
-print(a)
-
-for i in range(1, len(a)):
+i = 1
+while i < len(a):
     if a[i-1] > a[i]:
         fw.write("NO")
         break
+    i += 1
 else:
     fw.write("YES")
