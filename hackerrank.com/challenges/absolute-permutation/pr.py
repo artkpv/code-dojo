@@ -1,57 +1,54 @@
 #!python3
 """
 
-1) BF O(n!*n)
+I1. BF. Iterate all permutations and find the one.
 
-2) Inorder trav. of permut. tree
-Time: O(n1)
+Time: O(n!*n)
 
-How to speed up? Add exit condition? How to determine that no solution possible for this tree?
+I2.
+Iterate all possible elements at i-th position.
 
+Time: O(2^n)
+Space: O(n+n)
 
-{d : 1..n} - possible digits
-{i..n}  - possible places
+At i-th index 0-based possible candidates: i+1+k, i+1-k
 
-d_min ? Может быть ниже, на i-k или выше, на i+k
-i-k <= d_min and d_min <= n+k
+Ex2
+3 0
+1 2 3 
 
-
+Ex3
 
 """
 
 import sys
-sys.setrecursionlimit(999999)
+sys.setrecursionlimit(99999)
 
-def find(i, perm, n, m, s):
-    if i > n:
+def _find(inx, permutation, n, k, elements):
+    if not elements and inx == n:
         return True
-    min_s = min(s)
-    if not (i-m <= min_s and min_s <= n+m):
-        return False
-    max_s = max(s)
-    if not (i-m <= max_s and max_s <= n+m):
-        return False
-
-    for i_v in [i-m, m+i]:
-        if 1 <= i_v and i_v <= n and i_v not in perm[:i]:
-            perm[i-1] = i_v
-            s.remove(i_v)
-            if find(i+1, perm, n, m, s):
+    for candidate in (inx+1-k, inx+1+k):
+        if candidate in elements:
+            permutation[inx] = candidate
+            elements.remove(candidate)
+            if _find(inx+1, permutation, n, k, elements):
                 return True
-            perm[i-1] = None
-            s.add(i_v)
+            permutation[inx] = None
+            elements.add(candidate)
     return False
 
 
+def find(permutation, n, k):
+    elements = set(range(1,n+1))
+    return _find(0, permutation, n, k, elements)
 
-t = int(input().strip())
-while t > 0:
-    t -= 1
-    n,m = [int(i) for i in input().strip().split(' ')]
-    s = set(range(1,n+1))
-    perm = [None] * n
-    if find(1, perm, n, m, s):
-        print(' '.join(str(i) for i in perm))
+
+tests = int(input().strip())
+for test in range(tests):
+    n,k = [int(i) for i in input().strip().split(' ')]
+    permutation = [None] * n
+    if find(permutation, n, k):
+        print(' '.join(str(i) for i in permutation))
     else:
         print(-1)
 

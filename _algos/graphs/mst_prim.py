@@ -3,7 +3,8 @@
     Prim's algorithm for finding minimum spanning tree.
 """
 
-import sys, heapq
+import sys
+from minqueue import MinPQ
 POS_INF = 9e9
 
 class Graph:
@@ -27,32 +28,6 @@ class Graph:
     def weight(self, v, w):
         return self._weight.get((v, w), POS_INF)
 
-class MinPQ:
-    def __init__(self):
-        self.a = []
-
-    def add(self, weight, value):
-        heapq.heappush(self.a, (weight, value))
-
-    def pop(self):
-        if self.a:
-            return heapq.heappop(self.a)[1]
-        return None
-
-    def contains(self, v):
-        return v in (i[1] for i in self.a)
-
-    def decrease(self, weight, value):
-        for i,e in enumerate(self.a):
-            if e[1] == value:
-                break
-        del self.a[i]
-        heapq.heapify(self.a)
-        heapq.heappush(self.a, (key, value))
-
-    def count(self):
-        return len(self.a)
-
 
 class PrimMST:
     """
@@ -66,7 +41,7 @@ class PrimMST:
         q = MinPQ()
         q.add(0, source)
         self._mst = []  # ve
-        while q.count() > 0:
+        while q:
             v = q.pop()
             marked[v] = True
             self._mst += [(v, edgeTo[v])]
