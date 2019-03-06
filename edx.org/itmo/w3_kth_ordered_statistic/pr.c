@@ -33,6 +33,7 @@ generate -> k-th order statistic ?
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include "edx-io.h"
 
 inline void _swap(int * leftp, int * rightp) 
 {
@@ -96,12 +97,13 @@ void sort_interval(int * a, int k1, int k2, int l, int r) {
 }
  
 int main( int argc, char *argv[]) {
-	freopen(argc > 1 ? argv[1] : "input.txt", "r", stdin);
-	freopen("output.txt", "w", stdout);
-    int n, k1, k2;
-    scanf("%d %d %d", &n, &k1, &k2);
-    int A,B,C,a1,a2;
-    scanf("%d %d %d %d %d", &A, &B, &C, &a1, &a2);
+    edx_open();
+	// freopen(argc > 1 ? argv[1] : "input.txt", "r", stdin);
+	// freopen("output.txt", "w", stdout);
+    int n = edx_next_i32(), k1 = edx_next_i32(), k2 = edx_next_i32();
+    // scanf("%d %d %d", &n, &k1, &k2);
+    int A = edx_next_i32(), B = edx_next_i32(), C = edx_next_i32(), a1 = edx_next_i32(), a2 = edx_next_i32();
+    // scanf("%d %d %d %d %d", &A, &B, &C, &a1, &a2);
     int * a = (int*)calloc(n, sizeof(int));
     a[0] = a1;
     a[1] = a2;
@@ -110,7 +112,11 @@ int main( int argc, char *argv[]) {
 
     sort_interval(a, k1-1, k2-1, 0, n-1);
     
-    for(size_t i = k1-1; i <= k2-1; i++)
-        printf("%d ", a[i]);
+    for(size_t i = k1-1; i <= k2-1; i++) {
+        edx_print_i32(a[i]);
+        edx_print_char(' ');
+    }
+        // printf("%d ", a[i]);
+    edx_close();
     return 0;
 }

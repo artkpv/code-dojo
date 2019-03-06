@@ -6,9 +6,9 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "gcc",
+            "command": "g++",
             "args" : [
-                "-g", "-o","pr.exe", "pr.c"
+                "-g", "-o","pr.exe", "pr.c", "edx-io.c"
             ],
             "group": {
                 "kind": "build",

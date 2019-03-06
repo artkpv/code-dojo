@@ -5,8 +5,6 @@ directed graph with negative weights.
 """
 
 POSITIVE_INFINITY = 999
-import heapq
-
 
 def other(one, sequence):
     """ Returns another item in a sequence """
@@ -95,7 +93,7 @@ class BellmanFordShortestPaths(object):
                 self._find_cycle()
 
     def _find_cycle(self):
-        """ On the shortest pathes tree, runs cycles detection """
+        """ On the shortest paths tree, runs cycles detection """
         tree = Graph(self._graph.verticesnum)
         for key in self._edgeto:
             tree.add(key, other(key, self._edgeto[key]), 0)
