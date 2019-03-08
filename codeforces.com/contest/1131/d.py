@@ -12,6 +12,12 @@ a_ij
 I1
 dfs on two sets
 
+I2
+CC on '=' group.
+
+
+----
+
 E1
 3 4
 >>>>
@@ -41,7 +47,6 @@ a2 < b1 and a2 > b2
 a1, a2, b1, b2 ?
 
 a1=1 < b1, a2 < b1 
-
 
 
 Ex4
