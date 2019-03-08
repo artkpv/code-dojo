@@ -42,7 +42,7 @@ E2
 
 """
 import sys
-fr = open('input.txt' if len(sys.argv) < 2 else sys.argv[1])
+fr = open(sys.argv[1] if len(sys.argv) > 1 and 'input' in sys.argv[1] else 'input.txt' )
 fw = open('output.txt', 'w')
 
 n, k = [int(i) for i in fr.readline().strip().split(' ')]
@@ -61,11 +61,15 @@ def sort_by_k(a, k, left, right):
 
      a[2..11]= { 2 3 4 5 6 7 8 9 10 11 }, 2 5 8 11
      k=3 (from 2), left=2, right=11 => m = 5
+
+     1 10 3 4 5 6 7 8 9 2
+
+
     """
     elements_num = right-left + 1
-    k_th_elements_num = elements_num // k + 1
-    middle_el_num = k_th_elements_num // 2
-    middle_inx = left + (middle_el_num - 1)*k
+    k_th_elements_num, remainder = divmod(elements_num, k)
+    k_th_elements_num += 1 if remainder > 0 else 0
+    middle_inx = left + k * ((k_th_elements_num - 1) // 2)
     pivot = a[middle_inx]
     i = left
     j = right
@@ -78,7 +82,8 @@ def sort_by_k(a, k, left, right):
             a[i], a[j] = a[j], a[i]
             i += k
             j -= k
-    return sort_by_k(a, k, left, i-k) and sort_by_k(a, k, i+k, right)
+    sort_by_k(a, k, left, i-k)
+    sort_by_k(a, k, i+k, right)
 
 if k == 1:
     fw.write("YES")
@@ -90,13 +95,13 @@ Examples:
 0 1 2 3 4
 2) n=6, k=2, s=0 r=4, s=1 r=5
 """
-for left in range(k-1):
+for left in range(k):
     right = left + k*(n//k)
     while right >= n:
         right -= k
     sort_by_k(a, k, left, right)
 
-# print(a)
+print(a)
 
 i = 1
 while i < len(a):

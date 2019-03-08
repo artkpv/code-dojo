@@ -13,35 +13,47 @@ Space: O(n+n)
 
 At i-th index 0-based possible candidates: i+1+k, i+1-k
 
+
+I3
+if i - k
+
+
+E1
+3
+2 1
+3 0
+3 2
+
 Ex2
 3 0
-1 2 3 
+1 2 3
 
 Ex3
+n = 4, k = 2
+1 2 3 4
+3 4 1 2
+3 4 1 2
 
+1 2 3 4 5  k = 1
+2 1 4 3
+
+1 2 3 4 5 6 7  k=3
+4 5 6 1 2 3
 """
-
-import sys
-sys.setrecursionlimit(99999)
-
-def _find(inx, permutation, n, k, elements):
-    if not elements and inx == n:
-        return True
-    for candidate in (inx+1-k, inx+1+k):
-        if candidate in elements:
-            permutation[inx] = candidate
-            elements.remove(candidate)
-            if _find(inx+1, permutation, n, k, elements):
-                return True
-            permutation[inx] = None
-            elements.add(candidate)
-    return False
 
 
 def find(permutation, n, k):
     elements = set(range(1,n+1))
-    return _find(0, permutation, n, k, elements)
-
+    for i in range(n):
+        if i+1-k in elements:
+            elements.remove(i+1-k)
+            permutation[i] = i+1-k
+        elif i+1+k in elements:
+            elements.remove(i+1+k)
+            permutation[i] = i+1+k
+        else:
+            return False
+    return True
 
 tests = int(input().strip())
 for test in range(tests):
