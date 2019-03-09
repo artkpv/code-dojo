@@ -9,11 +9,12 @@ n , m
 cmp i with j
 a_ij
 
-I1
-dfs on two sets
-
-I2
-CC on '=' group.
+IDEA ?
+Run detection of connected components on graph with cycles ('=' compare). And detect contradictions, bad cycles.
+Time:
+V = 1000
+E = O(500*500 = 250_000
+2E + 2E ~= O(1_000_000)
 
 
 ----
@@ -30,34 +31,16 @@ E2
 <<<
 >>>
 
-1,1  ,-1   1,
- ,0  ,0  ,0
-
 E3
 2 2
 < >
 < >
-
-1,1  , 
-2,   ,0
-
-a1 > b1 and a1 > b2
-a2 < b1 and a2 > b2
-
-a1, a2, b1, b2 ?
-
-a1=1 < b1, a2 < b1 
-
 
 Ex4
 3 2
 ==
 =<
 ==
-   1,11,1
-1,1 =  =
- ,  =  <
- ,  =  =
 
 """
 
@@ -66,90 +49,102 @@ comparisons = []
 for i in range(n):
     comparisons += [input().strip()]
 
-class Node:
-    def __init__(self):
-        self.min = None  
-        self.max = None  
+# THE BELOW IS A TRY OF IDEA 1. CC on graph. Does not work
+# as it is unclear how to effectively form CC.
 
-first = [Node() for _ in range(n)]
-second = [Node() for _ in range(n)]
+class UnionFind:
+    def __init__(self, count):
+        self.arr = [i for i in range(count)]
+        self.count = count
+    
+    def find(self, a):
+        """ Gets set id with path compression """
+        while a != self.arr[a]:
+            self.arr[a] = self.find(self.arr[a])
+        return self.arr[a]
 
-# to balace around first day:
-first[i].max = 1
-first[i].min = 1
+    def union(self, a, b):
+        """ Unions two sets """
+        parent_a = self.find(a)
+        parent_b = self.find(b)
+        if parent_a == parent_b:
+            return 
+        self.arr[parent_b] = parent_a
+        self.count -= 1
 
+    def unify(self):
+        for i in range(self.count):
+            for replace_i, replace_e in enumerate(self.arr):
+                if replace_e > i:
+                    self.arr[replace_i] = i
+                    for j in range(replace_i + 1, len(self.arr)):
+                        if self.arr[j] == replace_e:
+                            self.arr[j] = i
+        assert(min(self.arr) == 0)
+        assert(max(self.arr) == self.count - 1)
+        assert(len(set(self.arr)) == self.count)
 
-def eq(a, b):
-    """ Try to make a == b """
-    # can be balanced:
-    if b.min and a.max and a.max < b.min:
-        return False
-    if b.max and a.min and b.max < a.min:
-        return False
-    # balance:
-    a.min = b.min = (a.min or b.min)
-    a.max = b.max = (a.max or b.max)
+unionfind = UnionFind(n + m)
+
+# distinguish already connected :
+# for i in range(n):
+#   for j in range(m):
+#       if comparisons[i][j] == '=':
+#           unionfind.union(i, n + j)
+
+order = []
+marked = [False] * (n+m)
+stack = [False] * (n+m)  # to detect cycles
+def dfs(inx):
+    """ Gets topological sort into 'order'. And detects bad cycles. """
+    marked[inx] = True
+    stack[inx] = True
+    for i, compare in enumerate(
+                      comparisons[inx] if inx < n 
+                      else (row[inx] for row in comparisons)):
+        other_inx = i if inx < n else n + i
+        if compare = '>' or compare = '=':  # adjacent
+            if not marked[other_inx]:
+                dfs(other_inx)
+                # if not dfs(other_inx):
+                #     return False
+            # elif stack[other_inx]:
+                # Detect bad cycles. Like: (a1 > ... = a1) or (a1 = ... > a1) or (a1 = b1 > ... = a1) etc
+                # if compare = '>':
+                #     return unionfind.find(inx) != unionfind.find(other_inx)
+                # elif compare = '=':
+                #     return unionfind.find(inx) == unionfind.find(other_inx)
+    order.append(inx)
     return True
 
-
-def lt(a, b):
-    """ Try to make a < b """
-    # is balanced:
-    if b.min and a.max and a.max < b.min:
-        return False
-    if b.max and a.min and b.max < a.min:
-        return False
-    # balance:
-    if a.min:
-        b.min = a.min + 1
-    return True
-
-def gt(a, b):
-    """ Try to make a > b """
-    # is balanced:
-    if b.min and a.max and a.max < b.min:
-        return False
-    if b.max and a.min and b.max < a.min:
-        return False
-    # balance:
-    if a.max:
-        b.max = a.max - 1
-    return True
-
-balance_actions = {'=': eq, '<': lt, '>': gt}
-for i in range(n):
-    for j in range(m): 
-        comparison = comparisons[i][j]
-        if not balance_actions[comparison](first[i], second[j]):
-            # could not balance so break
-            isbalanced = False
-            break
-    else:
-        isbalanced = True
-    if not isbalanced:
+# get reversed post order (topological order):
+for inx in range(n+m):
+    stack = [False] * (n+m) 
+    nocycles = dfs(inx)
+    if not nocycles:
         break
 
-# Min and max for all marks are set or it is un-balanced.
-# So try to find min absolute marks satisfying this condition.
-while isbalanced:
-    first_copy = first.copy()
-    second_copy = second.copy()
-    for i in range(n):
-        mark = first_copy[i]
-        if mark.min < mark.max:
-            mark.max = mark.min
-            break
-    else:
-        isbalanced = False
+if not nocycles:
+    print("No")
+    exit()
 
+def dfs_reversed(inx):
+    """ Updates unionfind with connected components reached on this dfs run """
+    marked[inx] = True
+    for i, compare in enumerate(
+                      comparisons[inx] if inx < n 
+                      else (row[inx] for row in comparisons)):
+        other_inx = i if inx < n else n + i
+        if compare == '=' or compare = '<':  # reversed adjacent
+            if not marked[other_inx]:
+                unionfind.union(inx, other_inx)
+                dfs_reversed(other_inx)
 
-print('YES' if isbalanced else 'NO')
-if isbalanced:
-    # now add absolute value to get 1 based marks:
-    min_value = min(min(i.min for i in first), min(i.min for i in second))
-    for day in first:
-        day.min += min_value
-    for day in second:
-        day.min += min_value
-    print(' '.join(str(i.min) for i in first))
-    print(' '.join(str(i.min) for i in second))
+marked = [False] * (n+m)
+while order:
+    inx = order.pop()
+    dfs_reversed(inx)
+
+print("Yes")
+print(' '.join(str(i) for i in unionfind.arr[:n]))
+print(' '.join(str(i) for i in unionfind.arr[n:]))
