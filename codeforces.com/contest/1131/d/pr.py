@@ -1,11 +1,6 @@
 #!python3
 """
-NEXT: Implement this. But fix that it can visit leaves first and assign 1 to them. How to fix?
-Run DFS, with a > b, a points to b. Vertices with '=' in one group. If cycle
-then stop. Assign number when no children or by taking from child. Then 
-unify.
-
-
+NEXT: Fix test 6 (input6.txt)
 
 
 Time:
@@ -23,7 +18,7 @@ E1
 >>>>
 
 Tree:
-a1 > b1 
+a1 > b1
 a2   b2
 a3   b3
 
@@ -39,7 +34,7 @@ E3
 < >
 < >
 1 1
-2 
+2
 
 Ex4
 3 2
@@ -51,78 +46,76 @@ Ex
 
 """
 
-n,m = [int(i) for i in input().strip().split(' ')]
-comparisons = []
-for i in range(n):
-    comparisons += [input().strip()]
+class UnionFind:
+    def __init__(self, count):
+        self.arr = [i for i in range(count)]
+        self.count = count
 
-# class UnionFind:
-#     def __init__(self, count):
-#         self.arr = [i for i in range(count)]
-#         self.count = count
+    def find(self, a):
+        """ Gets set id with path compression """
+        if a != self.arr[a]:
+            self.arr[a] = self.find(self.arr[a])
+        return self.arr[a]
 
-#     def find(self, a):
-#         """ Gets set id with path compression """
-#         if a != self.arr[a]:
-#             self.arr[a] = self.find(self.arr[a])
-#         return self.arr[a]
+    def union(self, a, b):
+        """ Unions two sets """
+        parent_a = self.find(a)
+        parent_b = self.find(b)
+        if parent_a == parent_b:
+            return
+        self.arr[parent_b] = parent_a
+        self.count -= 1
 
-#     def union(self, a, b):
-#         """ Unions two sets """
-#         parent_a = self.find(a)
-#         parent_b = self.find(b)
-#         if parent_a == parent_b:
-#             return
-#         self.arr[parent_b] = parent_a
-#         self.count -= 1
-
-# unionfind = UnionFind(n + m)
-
-# for i in range(n):
-#     for j in range(m):
-#         if comparisons[i][j] == '=':
-#             unionfind.union(i, n + j)
-
-scores = [None] * (n+m)
-marked = [False] * (n+m)
-iscycle = False
-def dfs(i):
+def dfs(v, level):  # v - vertex
+    """
+    Visit graph of assessments using comparision table.
+    Where w adjecent of v for v > or = w.
+    """
     global iscycle
+    print(' ' * level, 'dfs',v)
     if iscycle:
         return
-    marked[i] = True
+    marked[v] = True  # to mark all vertices
+    visited[v] = True  # to detect cycles
     haschildren = False
-    for other_i, compare in enumerate(
-                      comparisons[i] if i < n
-                      else (row[i-n] for row in comparisons)):
-        j = n+other_i if i < n else other_i
-        left = i if i < n else j
-        right = j if j >= n else i
-        if ((left == i and compare == '>') or
-            (right == i and compare == '<')):
-            if marked[j]:
+    for othervertex, compare in enumerate(
+                      comparisons[v] if v < firstnum
+                      else (row[v-firstnum] for row in comparisons)):
+        w = firstnum+othervertex if v < firstnum else othervertex
+        left = v if v < firstnum else w
+        right = w if w >= firstnum else v
+        if ((left == v and compare == '>') or
+            (right == v and compare == '<')):
+            if unionfind.find(w) == unionfind.find(v):
+                # in one component '=' but now with '>'
+                # thus it is cycle
                 iscycle = True
                 break
-            else:
-                if scores[i] is not None:
-                    scores[j] = scores[i] - 1
-                dfs(j)
-                if scores[i] is None:
+            if not marked[w]:
+                if scores[v] is not None:
+                    scores[w] = scores[v] - 1
+                dfs(w, level+1)
+                if scores[v] is None:
                     # take number from first child if not assigned
-                    scores[i] = scores[j] + 1
+                    scores[v] = scores[w] + 1
+            else:
+                if visited[w]:
+                    # print('cycle found for ', v, '>', w)
+                    iscycle = True
+                    break
+                if scores[v] is None and scores[w] is not None:
+                    scores[v] = scores[w] + 1
             haschildren = True
         elif compare == '=':
-            if not marked[j]:
-                dfs(j)
+            if not marked[w]:
+                dfs(w, level+1)
                 haschildren = True
-                if scores[i] is None:
-                    scores[i] = scores[j]
-    if not haschildren:
-        scores[i] = 1  # a leave or last visisted in a connected component
+                if scores[v] is None:
+                    scores[v] = scores[w]
+    visited[v] = False
+    if not haschildren and scores[v] is None:
+        scores[v] = 1  # a leave
 
-                
-for i in range(n+m):
-    dfs(i)
 
 def unify(scores):
     auxiliary = [None] * len(scores)
@@ -135,10 +128,33 @@ def unify(scores):
         next_ += 1
     return auxiliary
 
+#
+# RUN
+#
+firstnum,secondnum = [int(i) for i in input().strip().split(' ')]
+comparisons = []
+for i in range(firstnum):
+    comparisons += [input().strip()]
+
+unionfind = UnionFind(firstnum + secondnum)
+for i in range(firstnum):
+    for j in range(secondnum):
+        if comparisons[i][j] == '=':
+            unionfind.union(i, firstnum + j)
+
+scores = [None] * (firstnum+secondnum)
+marked = [False] * (firstnum+secondnum)
+iscycle = False
+
+for i in range(firstnum+secondnum):
+    visited = [False] * (firstnum+secondnum) # to find cycle
+    dfs(i, 0)
+
+
 if not iscycle:
     scores = unify(scores)
     print("Yes")
-    print(' '.join(str(i) for i in scores[:n]))
-    print(' '.join(str(i) for i in scores[n:]))
+    print(' '.join(str(i) for i in scores[:firstnum]))
+    print(' '.join(str(i) for i in scores[firstnum:]))
 else:
     print("No")

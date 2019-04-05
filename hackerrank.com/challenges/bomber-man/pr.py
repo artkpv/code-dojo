@@ -40,6 +40,7 @@ init mask  field  (!init)&field
 
 """
 
+
 def tonum(s):
     num = 0
     for i in range(len(s)):
@@ -48,6 +49,7 @@ def tonum(s):
         if i != len(s) - 1:
             num <<= 1
     return num
+
 
 def print_field(field, cols):
     for row in field:
@@ -91,8 +93,10 @@ new field:
         exploded[i] ^= 2**(cols)-1
     return tuple(exploded)
 
+
 def getfilled(rows, cols):
     return (2**cols-1 for _ in range(rows))
+
 
 #
 # READ INPUT:
@@ -104,9 +108,10 @@ if seconds == 1:
 elif seconds % 2 == 0:  # plants all field before next explosion
     print_field(getfilled(rows, cols), cols)
 else:  # seconds % 2 == 1
-    cache = {field:1}
+    cache = {field: 1}
     second = 1
-    while second < seconds:
+
+    while second <= seconds:
         second += 2
         field = plant_explode(field, rows, cols)
         assert(second <= seconds)
