@@ -42,63 +42,91 @@ Ex3
 
 """
 
+def makeequal(array, moves, unmatch, changed, i):
+    left = array[i]
+    right = array[-i-1]
 
-def getpolyndrom(s, k):
-    unmatch = sum(1 if e != s[-i-1] else 0
-                  for i, e in enumerate(s[:len(s)//2]))
-    if unmatch > k:
-        return None
+    if left != right
+        if moves == 0:
+            return False
+        if right == '9':
+            array[i] = '9'
+            moves -= 1
+            changed.add(i)
+        else: 
+
+    pass
+
+def getpolyndrom(array, moves):
+    unmatch = sum(1 if e != array[-i-1] else 0
+                  for i, e in enumerate(array[:len(array)//2]))
+
+    changed = set()
+
+    for i, e in enumerate(array[:len(array)//2]):
+        makeequal(array, moves, unmatch, changed, 0)
+
+    # middle:
+    if i == len(array)//2 and len(array) % 2 == 0:
+        if array[i] != '9' and moves > 0:
+            array[i] = '9'
+            changed.add(i)
+        return True
+
+
 
     # make polyndrom:
-    for i, e in enumerate(s[:len(s)//2]):
-        assert unmatch <= k
-        candoboth = unmatch - 1 < k - 2
-        if e != '9' and s[-i-1] != '9' and candoboth:
+    for i, e in enumerate(array[:len(array)//2]):
+        assert unmatch <= moves
+        candoboth = unmatch - 1 < moves - 2
+        if e != '9' and array[-i-1] != '9' and candoboth:
             # substitude both
-            s[i] = '9'
-            s[-i-1] = '9'
-            k -= 2
+            array[i] = '9'
+            array[-i-1] = '9'
+            moves -= 2
         else:  # substitude one
-            x = s[i] if s[i] > s[-i-1] else s[-i-1]
-            s[i] = x
-            s[-i-1] = x
-            k -= 1
+            x = array[i] if array[i] > array[-i-1] else array[-i-1]
+            array[i] = x
+            array[-i-1] = x
+            moves -= 1
         unmatch -= 1
-        print(s)
+        print(array)
 
     assert unmatch == 0
 
-    if k == 0:
-        return s
+    if moves == 0:
+        return array
 
-    # make even greater polyndrom:
-    for i, e in enumerate(s[:len(s)//2]):
-        if k == 0:
+    # greater via left part
+    for i, e in enumerate(array[:len(array)//2]):
+        if moves == 0:
             break
         if e != '9':
-            tosubstitude = 2 if s[-i-1] != '9' else 1
-            if k - tosubstitude < 0:
+            tosubstitude = 2 if array[-i-1] != '9' else 1
+            if moves - tosubstitude < 0:
                 continue
-            k -= tosubstitude
-            s[i] = '9'
-            s[-i-1] = '9'
+            moves -= tosubstitude
+            array[i] = '9'
+            array[-i-1] = '9'
 
-    for i in range(len(s)//2-1, -1, -1):  # from middle to outer
-        if k == 0:
+    # greater via right part
+    for i in range(len(array)//2-1, -1, -1):
+        if moves == 0:
             break
-        e = s[i]
-        if s[-i-1] != '9':
+        e = array[i]
+        if array[-i-1] != '9':
             tosubstitude = 2 if e != '9' else 1
-            if k - tosubstitude < 0:
+            if moves - tosubstitude < 0:
                 continue
-            k -= tosubstitude
-            s[i] = '9'
-            s[-i-1] = '9'
+            moves -= tosubstitude
+            array[i] = '9'
+            array[-i-1] = '9'
 
-    if len(s) % 2 == 1 and k > 0:
-        s[len(s)//2] = '9'
+    # middle
+    if len(array) % 2 == 1 and moves > 0:
+        array[len(array)//2] = '9'
 
-    return s
+    return array
 
 
 n, k = [int(i) for i in input('').strip().split(' ')]
