@@ -127,33 +127,23 @@ Example 9
 
 num, ratio = [int(i) for i in input('').strip().split(' ')]
 array = [int(i) for i in input('').strip().split(' ')]
-
-if ratio == 1:
-    counter = {}
-    for e in array:
-        counter[e] = counter.get(e, 0) + 1
-    sum_ = sum(x*(x-1)*(x-2)//6 for x in counter.values() if x >= 3)
-    print(sum_)
-    exit()
-
-cache = {}
-count = 0
+ones = {}
+pairs = {}
+triples = 0
 for i, e in enumerate(array):
-    if i <= num - 3:  # else can not be first
-        if e not in cache:
-            cache[e] = [1, 0, 0]
-        else:
-            cache[e][0] += 1
+    # update triples:
+    base, remainder = divmod(e, ratio*ratio)
+    if base > 0 and remainder == 0:
+        if base in pairs:
+            triples += pairs[base]
 
-    if 1 <= i <= num - 2:  # else can not be second
-        q1, r1 = divmod(e, ratio)
-        if r1 == 0 and q1 in cache:
-            cache[q1][1] += 1
+    # update pairs:
+    base, remainder = divmod(e, ratio)
+    if base > 0 and remainder == 0:
+        pairs[base] = pairs.get(base, 0) + ones.get(base, 0)
 
-    if 2 <= i:  # else can not be third
-        q2, r2 = divmod(e, ratio*ratio)
-        if r2 == 0 and q2 in cache:
-            count += cache[q2][0] * cache[q2][1]
-            cache[q2][2] += 1
+    # update ones
+    ones[e] = ones.get(e, 0) + 1
 
-print(count)
+
+print(triples)
