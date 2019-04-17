@@ -15,8 +15,17 @@ k*log(k)*n
 """
 
 k = int(input('').strip())
-arrays = []
+MAX = 100
+counts = [0] * (MAX+1)
+result_len = 0
 for i in range(k):
     line = [int(i) for i in input('').strip().split(' ')]
-    arrays += [line[1:]]
+    result_len += line[0]
+    for e in line[1:]:
+        num = int(e)
+        counts[num] += 1
 
+for num, count in enumerate(counts):
+    if count > 0:
+        print((str(num) + ' ') * count, end='')
+print('\n')

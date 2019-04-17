@@ -43,7 +43,7 @@ int nextpermutation(char * p, int n) {
     
 }
 
-#define MAX_LEN 2049
+#define MAX_LEN 2049*1024
 int _array[MAX_LEN];
 int count = 0;
 
@@ -53,17 +53,19 @@ void generate(int length, int p, int i, int opens) {
         if (opens != 0) // invalid
             return;
         _array[count] = p;
+        count++;
         return;
     }
     if (length / 2 < opens) { // can not close then
         return;
     }
     // 1) open
-    p &= 1 << (length - i + 1);
+    int shift = (length - i - 1);
+    p &= ~(0 << shift);
     generate(length, p, i+1, opens+1);
     if (opens > 0) {
         // 2) close
-        p &= 0 << (length - i + 1);
+        p |= (1 << shift);
         generate(length, p, i+1, opens-1);
     }
     return;
@@ -73,16 +75,17 @@ int main() {
     int n;
     scanf("%d", &n);
     int p = 0;
-    generate(n*2, p, 0, 0);
-    qsort(_array, count, sizeof(char), compare);
+    int length = n*2;
+    generate(length, p, 0, 0);
+    // qsort(_array, count, sizeof(char), compare);
     for (int i = 0; i < count; i++) {
         int p = _array[i];
-        printf("%d", p);
-        for (int j = 0; j < n; j++) {
-            if ((p & (1 << (n-j+1)))== 1)
-                putc('(', stdout);
-            else
+        for (int j = 0; j < length; j++) {
+            int shift = (length - j - 1);
+            if ((p & (1 << shift)) > 0)
                 putc(')', stdout);
+            else
+                putc('(', stdout);
         }
         putc('\n', stdout);
     }

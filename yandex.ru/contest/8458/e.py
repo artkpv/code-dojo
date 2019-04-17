@@ -1,5 +1,5 @@
 #!python3
-
+# run please
 
 def count(s):
     radix = ord('z') - ord('a') + 1
