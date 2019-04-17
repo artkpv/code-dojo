@@ -42,7 +42,7 @@ DON"T WORK !!!
 
 Idea 3
 The same as idea 2 but store indecies.
-Need to count triples. BUT b0_inx < b1_inx < b3_inx  !
+Need to count triples. BUT b0_inx < b1_inx < b2_inx  !
 TODO
 
 
