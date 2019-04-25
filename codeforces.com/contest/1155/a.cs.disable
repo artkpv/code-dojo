@@ -1,0 +1,26 @@
+﻿using System;
+/*
+ *
+ * s <= 3*10^5
+ *
+ * Find any substring that when reversed is less the original.
+ */
+namespace Contest
+{
+    public class A
+    {
+        static void Main(string[] args)
+        {
+            int n = int.Parse(Console.ReadLine().Trim());
+            string s = Console.ReadLine().Trim();
+            for (int i = 1; i < s.Length; i++) {
+                if (s[i-1] > s[i])
+                {
+                    Console.WriteLine($"YES\n{i} {i+1}");
+                    return;
+                }
+            }
+            Console.WriteLine("NO");
+        }
+    }
+}

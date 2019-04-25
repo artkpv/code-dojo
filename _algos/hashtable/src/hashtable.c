@@ -33,6 +33,9 @@ void put (NodePtr ht[], int m, char * s, int n) {
 
 	NodePtr np = ht[inx];
 
+
+
+    
 	while (np != NULL) {
 		if (hash == np->key) {
 			free(np->s);
