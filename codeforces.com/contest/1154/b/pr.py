@@ -28,64 +28,41 @@ Ex3
 """
 
 
-def getmiddle(a, b):
-    assert a != b
-    middle, remainder = divmod(max(a, b) - min(a, b), 2)
-    if remainder > 0:
-        return None
-    return (a + middle, middle)
-
-
-def getvariants(D, a):
-
-    for point in list(D.keys()):
-        diff = D[point]
-        if (a - diff != point
-                and a + diff != point
-                and a != point):
-            del D[point]
-    return D
+def getvariants(variants, x):
+    left = []
+    for point, diff in variants:
+        if (x - diff == point
+                or x + diff == point
+                or x == point):
+            left += [(point, diff)]
+    return left
 
 
 n = int(input('').strip())
 A = [int(i) for i in input('').strip().split(' ')]
 
-# find:
-D = {A[0]: None}
-for a in A[1:]:
-    D = getvariants(D, a)
-    if not D:
-        break
-
-# output:
-values = list(D.values())
-if len(values) == 1 and values[0] is None:
-    values[0] = 0
-print(-1 if not values else min(values))
-
-
-
 a = A[0]
-b = None
-for i in range(1, len(A)):
+variants = None
+i = 1
+while i < len(A):
     if A[i] != a:
         b = A[i]
+        variants = [(a, abs(a - b)), (b, abs(a - b))]
+        diff, remainder = divmod(max(a, b) - min(a, b), 2)
+        if remainder == 0:
+            variants += [(min(a, b)+diff, diff)]
         break
+    i += 1
 
-if b is None:
+if not variants:
     print(0)
     exit()
 else:
-    D = {a: abs(a - b), b: abs(a - b)}
-    middle = getmiddle(a, b)
-    if middle is not None:
-        D[middle[0]] = middle[1]
-
-    for b in A[i+1:]:
-        D = getvariants(D, b)
-        if not D:
+    for x in A[i+1:]:
+        variants = getvariants(variants, x)
+        if not variants:
             break
-    if not D:
+    if not variants:
         print(-1)
     else:
-        print(min(D.values()))
+        print(min(diff for point, diff in variants))
