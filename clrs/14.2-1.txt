@@ -1,0 +1,33 @@
+
+
+// For min max:
+
+def Min(T):  // max
+  T.min      // max
+
+def insert(v,x):
+  if v == None:
+	return Node(x)
+  if v.key == x
+	  pass
+  elif v.key > x:
+	v.left = insert(v.left,x)
+    if v == T.min:
+		T.min = v.left
+  else
+	v.right = insert(v.right, x)
+    if v == T.max:
+		T.max = v.right
+  return v
+
+
+// For Successor Predecessor
+// Store for each node.
+// To maintain:
+//  for newly inserted node
+//  find successor
+//    set it for this node and for successor set predecessor
+//  find predecessor
+//    set it for this node and for predecessor set successor
+
+
