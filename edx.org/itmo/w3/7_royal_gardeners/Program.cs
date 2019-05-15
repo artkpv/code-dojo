@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,27 +9,43 @@ namespace _7_royal_gardeners
     {
         static void Main(string[] args)
         {
-            int B = int.Parse(Console.ReadLine());
-            int N = int.Parse(Console.ReadLine());
+			TextReader input;
+	#if JUDGE
+			input = new StreamReader("input.txt");
+	#else
+			input = Console.In;
+	#endif
+            int B = int.Parse(input.ReadLine());
+            int N = int.Parse(input.ReadLine());
 			var garderners = new (int d, int l, int r)[N];
 			for (int i = 0; i < N; i++)
 			{
-				int[] d_l_r = Console.ReadLine().Trim().Split(' ').Select(int.Parse).ToArray();
+				int[] d_l_r = input.ReadLine().Trim().Split(' ').Select(int.Parse).ToArray();
 				garderners[i] = (d_l_r[0], d_l_r[1], d_l_r[2]);
 			}
 
-            int M = int.Parse(Console.ReadLine());
+            int M = int.Parse(input.ReadLine());
 			int[] outSums = new int[M];
 			var inspectors = new (int l, int r, int inx)[M];
 			for (int i = 0; i < M; i++)
 			{
-				int[] l_r = Console.ReadLine().Trim().Split(' ').Select(int.Parse).ToArray();
+				int[] l_r = input.ReadLine().Trim().Split(' ').Select(int.Parse).ToArray();
 				inspectors[i] = (l_r[0], l_r[1], i);
 				outSums[i] = 0;
 			}
+			input.Close();
 
 			Calculate(garderners, inspectors, outSums);
-			Console.WriteLine(string.Join('\n', outSums));
+
+			TextWriter output;
+	#if JUDGE
+			output = new StreamWriter("output.txt");
+	#else
+			output = Console.Out;
+	#endif
+			output.WriteLine(string.Join("\n", outSums));
+			output.Close();
+
         }
 
 /* 
@@ -60,44 +77,56 @@ At 5:
 			(int l, int r, int inx)[] inspectors,
 			int[] outSums)
 		{
-			// TODO. Next. Can optimize by using heap. Collect seeds from garderners and dont update inspectors 
-			// each time a garderner start/ends. Only update when inspector ends. 
-			// Thus time: n*log(n) to sort, n+m to calc?
 			if (garderners.Length == 0 || inspectors.Length == 0)
 				return;
 			Array.Sort(garderners, ((int d, int l, int r) a, (int d, int l, int r) b)  => a.l.CompareTo(b.l));
 			Array.Sort(inspectors, ((int l, int r, int inx) a, (int l, int r, int inx) b)  => a.l.CompareTo(b.l));
 			int gInx = 0;
 			int iInx = 0;
-			var currentInspectors = new HashSet<(int l, int r, int inx)>();
-			var currentGarderners = new HashSet<(int d, int l, int r)>();
-			int sum = 0;
+			var currentInspectors = new SortedSet<(int l, int r, int inx)>(
+				Comparer<(int l, int r, int inx)>.Create(
+					((int l, int r, int inx) a, (int l, int r, int inx) b)  => a.r.CompareTo(b.r))
+				);
+			var currentGarderners = new SortedSet<(int d, int l, int r)>(
+				Comparer<(int d, int l, int r)>.Create(
+					((int d, int l, int r) a, (int d, int l, int r) b)  => a.r.CompareTo(b.r)));
+			int sum = 0; // Previous period sum of seeds per a flower bed.
 			int bed = -1;
 			int prev = -1;
 
-            int MoveNext() 
+            (int bed, int sum) MoveNext() 
             {
-                // Remove just finished inspectors / garderners.
-                currentGarderners.RemoveWhere(g => g.r < bed);
-                currentInspectors.RemoveWhere(ins => ins.r < bed);
+				// Remove just finished inspectors / garderners.
+				while (currentGarderners.Any() && currentGarderners.Min().r < bed)
+				{
+					sum -= currentGarderners.Min().d;
+					currentGarderners.Remove(currentGarderners.Min);
+				}
+
+				while (currentInspectors.Any() && currentInspectors.Min.r < bed)
+					currentInspectors.Remove(currentInspectors.Min);
 
                 // Add just started inspectors / garderners.
-				while (garderners.Any() && garderners[gInx].l == bed)
-					currentGarderners.Add(garderners[gInx++]);
-				while (inspectors.Any() && inspectors[iInx].l == bed)
-					currentInspectors.Add(inspectors[iInx++]);
+				while (gInx < garderners.Length && garderners[gInx].l == bed)
+				{
+					currentGarderners.Add(garderners[gInx]);
+					sum += garderners[gInx].d;
+					gInx++;
+				}
+				while (iInx < inspectors.Length && inspectors[iInx].l == bed)
+					currentInspectors.Add(inspectors[iInx++]);  // BUG ! It drops all except first: (1, 1, 0), (1, 1, 1), (1, 1, 2), etc. See input4.txt
 
                 // Get next bed: the closest start / end of inspector / garderner.
 				int nextBed  = gInx < garderners.Length ? garderners[gInx].l : int.MaxValue;
 				nextBed = Math.Min(nextBed, iInx < inspectors.Length ? inspectors[iInx].l : int.MaxValue);
-				nextBed = Math.Min(nextBed, currentGarderners.Any() ? currentGarderners.AsEnumerable().Min(g => g.r-1) : int.MaxValue);
-				nextBed = Math.Min(nextBed, currentInspectors.Any() ? currentInspectors.AsEnumerable().Min(i => i.r-1) : int.MaxValue);
-				return nextBed;
+				nextBed = Math.Min(nextBed, currentGarderners.Any() ? currentGarderners.Min().r + 1 : int.MaxValue);
+				nextBed = Math.Min(nextBed, currentInspectors.Any() ? currentInspectors.Min().r + 1 : int.MaxValue);
+				return (nextBed, sum);
             }
-			bed = MoveNext();
+			(bed, sum) = MoveNext();
 			while (bed != int.MaxValue)
 			{
-                // Count for passed period, [prev..bed-1] inclusive
+                // Count for previous period, [prev..bed-1] inclusive
                 if (sum > 0 && prev >= 0) 
                 {
                     int seeds = (bed - prev) * sum;
@@ -108,7 +137,7 @@ At 5:
                 }
 
                 prev = bed;
-                bed = MoveNext();
+                (bed, sum) = MoveNext();
 			}
 		}
 	}
