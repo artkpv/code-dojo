@@ -1,0 +1,23 @@
+5
+14
+1
+7
+14
+4
+2
+func func1() {
+maybethrow exc1
+try {
+maybethrow exc2
+maybethrow exc3
+
+} suppress exc1, exc2, exc3
+maybethrow exc4
+
+}
+
+func main() {
+try {
+func1()
+} suppress exc1
+}
