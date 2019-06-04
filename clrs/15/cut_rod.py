@@ -1,7 +1,5 @@
 
 import unittest
-import sys
-sys.setrecursionlimit(10000)
 
 
 def cut_rod_bottom_up(rod, prices):
@@ -25,10 +23,6 @@ class Tests(unittest.TestCase):
         self.assertEqual(cut_rod_bottom_up(5, prices), 13)
         self.assertEqual(cut_rod_bottom_up(6, prices), 17)
         self.assertEqual(cut_rod_bottom_up(7, prices), 18)
-        """
-        revenue = [0,1,5,8,9, 14, 17, 17 17+1 10+5 9 .. 18
-        cut 1 2 3 4 5 6 7
-        """
 
 
 
