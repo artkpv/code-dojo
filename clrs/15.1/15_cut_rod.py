@@ -5,8 +5,10 @@ Ex.15.1-3
 
 """
 
+import unittest
 import sys
 sys.setrecursionlimit(10000)
+
 
 def max_cut_rod(n, p):
     revenue = [0]
@@ -16,6 +18,7 @@ def max_cut_rod(n, p):
     cuts = []
     max_cut_rod_aux(n, p, revenue, cuts)
     return revenue[n]
+
 
 def max_cut_rod_aux(n, p, r, cuts):
     if r[n] < 0:
@@ -38,9 +41,15 @@ def cut_rod_bottom_up(n, p):
         r[j] = q
     return r[n]
 
+
 n = int(input().strip())
 prices = [int(i) for i in input().strip().split(' ')]
 print(max_cut_rod(4, prices))
 # TODO:
 # fails with "4`n1 5 8 9 10 17 17 20 24 30" | .\ch.15_cut_rod.py
 print(cut_rod_bottom_up(4, prices))
+
+
+class Tests(unittest.TestCase):
+    def test_1(self):
+
