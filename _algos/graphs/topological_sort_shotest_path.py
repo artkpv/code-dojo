@@ -127,6 +127,9 @@ class Tests(unittest.TestCase):
         self.assertEqual(sp.distanceto(0), 0)
 
     def test_tinyEWGraph(self):
+        """
+        From Algorithms, 4th, Sedgewick, p.658
+        """
         vertices = 8
         g = Graph(vertices)
         g.add(5, 4, 0.35)  # 13 edges
