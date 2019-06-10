@@ -1,0 +1,19 @@
+<h2 id="why-mergesort-is-not-sped-up-with-dp">15.3-2 Why Mergesort is not sped up with DP?</h2>
+<p>Example:</p>
+<pre><code>4 3 2 1 4 3 2 1 4 3 2 1 4 3 2 1
+4 3 2 1 4 3 2 1  4 3 2 1 4 3 2 1
+4 3 2 1  4 3 2 1  4 3 2 1 4 3 2 1
+4 3  2 1  4 3 2 1  4 3 2 1 4 3 2 1
+3 4  1 2  4 3 2 1  4 3 2 1 4 3 2 1
+1 2 3 4  4 3 2 1  4 3 2 1 4 3 2 1</code></pre>
+<p>4 the same subproblems. Overlapping. Independant subproblems?</p>
+<p>Next: think about how to memoize a solution to subproblem and then use it for another. It needs to iterate all elements to determine that it is the same subproblem. So if small number of the same subproblems then no speed up and even longer.</p>
+<h2 id="section">15.3-3</h2>
+<blockquote>
+<p>Consider a variant of the matrix-chain multiplication problem in which the goal is to parenthesize the sequence of matrices so as to maximize, rather than minimize, the number of scalar multiplications. Does this problem exhibit optimal substructure?</p>
+</blockquote>
+<p>Yes, because optimal solution will consist of optimal solutions to subproblems, i.e. <br /><span class="math display"><em>m</em>[<em>i</em>, <em>j</em>] = <em>m</em><em>a</em><em>x</em>{<em>m</em>[<em>i</em>,<em>k</em>]+<em>p</em><sub><em>i</em> − 1</sub><em>p</em><sub><em>j</em></sub><em>p</em><sub><em>k</em></sub>+<em>m</em>[<em>k</em>+1,<em>j</em>]}</span><br /> for <span class="math inline"><em>k</em> = <em>i</em>, .., <em>j</em> − 1</span></p>
+<h2 id="section-1">15.3-4</h2>
+<blockquote>
+<p>Can we find an optimal solution without solving subproblems before by choosing k with min <span class="math inline"><em>p</em><sub><em>i</em> − 1</sub><em>p</em><sub><em>k</em></sub><em>p</em><sub><em>j</em></sub></span> ? Contra-example?</p>
+</blockquote>
