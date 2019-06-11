@@ -1,13 +1,17 @@
-<h2 id="why-mergesort-is-not-sped-up-with-dp">15.3-2 Why Mergesort is not sped up with DP?</h2>
+<h2 id="why-mergesort-cant-be-sped-up-with-dp">15.3-2 Why Mergesort can’t be sped up with DP?</h2>
 <p>Example:</p>
 <pre><code>4 3 2 1 4 3 2 1 4 3 2 1 4 3 2 1
-4 3 2 1 4 3 2 1  4 3 2 1 4 3 2 1
-4 3 2 1  4 3 2 1  4 3 2 1 4 3 2 1
-4 3  2 1  4 3 2 1  4 3 2 1 4 3 2 1
-3 4  1 2  4 3 2 1  4 3 2 1 4 3 2 1
-1 2 3 4  4 3 2 1  4 3 2 1 4 3 2 1</code></pre>
-<p>4 the same subproblems. Overlapping. Independant subproblems?</p>
-<p>Next: think about how to memoize a solution to subproblem and then use it for another. It needs to iterate all elements to determine that it is the same subproblem. So if small number of the same subproblems then no speed up and even longer.</p>
+4 3 2 1 4 3 2 1 ...
+4 3 2 1  4 3 2 1 ...
+4 3  2 1  4 3 2 1 ...
+3 4  1 2  4 3 2 1 ...
+1 2 3 4  4 3 2 1 (memoization) ... 
+1 2 3 4  1 2 3 4 ...
+1 1 2 2 3 3 4 4  4 3 2 1 4 3 2 1 (memoization)
+1 1 2 2 3 3 4 4  1 1 2 2 3 3 4 4
+1 1 1 1 2 2 2 2 3 3 3 3 4 4 4 4 
+</code></pre>
+<p>Problem, memoization. How to store solutions to previously solved? How to compute hash? Key storage: O(n), value: O(n). Compute hash time: O(n). It needs to iterate subproblem elements before solving it recursively to determine that the same problem solved before. Space proposonal to <span class="math inline">(<em>n</em> + <em>n</em><em>l</em><em>o</em><em>g</em>(<em>n</em>))</span>.</p>
 <h2 id="section">15.3-3</h2>
 <blockquote>
 <p>Consider a variant of the matrix-chain multiplication problem in which the goal is to parenthesize the sequence of matrices so as to maximize, rather than minimize, the number of scalar multiplications. Does this problem exhibit optimal substructure?</p>
@@ -16,4 +20,11 @@
 <h2 id="section-1">15.3-4</h2>
 <blockquote>
 <p>Can we find an optimal solution without solving subproblems before by choosing k with min <span class="math inline"><em>p</em><sub><em>i</em> − 1</sub><em>p</em><sub><em>k</em></sub><em>p</em><sub><em>j</em></sub></span> ? Contra-example?</p>
+</blockquote>
+<p>Example: <span class="math inline"><em>A</em><sub>1</sub>, <em>A</em><sub>2</sub>, <em>A</em><sub>3</sub>, <em>A</em><sub>4</sub> = 1000, 100, 20, 10, 1000</span></p>
+<p>Greedy: <span class="math inline">((<em>A</em><sub>1</sub><em>A</em><sub>2</sub>)<em>A</em><sub>3</sub>)<em>A</em><sub>4</sub></span>. Total calculations = 1220e4.</p>
+<p>DP: <span class="math inline">(<em>A</em><sub>1</sub>(<em>A</em><sub>2</sub><em>A</em><sub>3</sub>))<em>A</em><sub>4</sub></span>. Total: 1102e4.</p>
+<h2 id="section-2">15.3-5</h2>
+<blockquote>
+<p>Suppose that in the rod-cutting problem of Section 15.1, we also had limit <span class="math inline"><em>l</em><sub><em>i</em></sub></span> on the number of pieces of length <span class="math inline"><em>i</em></span> that we are allowed to produce, for <span class="math inline"><em>i</em> = 1, 2, ..., <em>n</em></span>. Show that the optimal-substructure property described in Section 15.1 no longer holds.</p>
 </blockquote>
