@@ -110,7 +110,7 @@ inorder(NodePtr x, int level) {
 }
 
 
-void 
+int
 main() {
 	char *keys = "SEARCHMX";
 
@@ -129,4 +129,5 @@ main() {
 	root = tdelete(root, 'A');
 	printf("\ndel A:\n");
 	inorder(root, 0);
+    return 0;
 }
