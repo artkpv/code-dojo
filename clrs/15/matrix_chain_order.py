@@ -32,7 +32,10 @@ def matrix_chain_order(dimensions):
                 if m_i_j < m[i][j]:
                     m[i][j] = m_i_j
                     s[i][j] = k
-    # Construct solution:
+    return m[1][n], s
+
+
+def print_solution(solution):
     solution = []
     def build_solution(i, j):
         if i == j:
@@ -44,7 +47,7 @@ def matrix_chain_order(dimensions):
         build_solution(s[i][j]+1, j)
         solution.append(')')
     build_solution(1, n)
-    return m[1][n], ''.join(solution)
+    return ''.join(solution)
 
 
 class Tests(unittest.TestCase):
@@ -53,14 +56,15 @@ class Tests(unittest.TestCase):
         value, solution = matrix_chain_order(dimensions)
         print('test_simple', dimensions, value, solution)
         self.assertEqual(value, 15_125)
-        self.assertEqual(solution, '((1*(2*3))*((4*5)*6))')
+        self.assertEqual(print_solution(solution), '((1*(2*3))*((4*5)*6))')
 
     def test_15_2_1_exercies(self):
         dimensions = [5, 10, 3, 12, 5, 50, 6]
         value, solution = matrix_chain_order(dimensions)
         print('test_15.2-1', dimensions, value, solution)
         self.assertEqual(value, 2010)
-        self.assertEqual(solution, '((1*2)*((3*4)*(5*6)))')
+        self.assertEqual(print_solution(solution), '((1*2)*((3*4)*(5*6)))')
 
 
-unittest.main()
+if __name__ == '__main__':
+    unittest.main()
