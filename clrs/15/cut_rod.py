@@ -24,6 +24,10 @@ class Tests(unittest.TestCase):
         self.assertEqual(cut_rod_bottom_up(6, prices), 17)
         self.assertEqual(cut_rod_bottom_up(7, prices), 18)
 
+    def test_2(self):
+        prices = [5, 10, 10, 10, 45, 45, 45, 45, 45, 100]
+        self.assertEqual(cut_rod_bottom_up(10, prices), )
+
 
 
 unittest.main()
