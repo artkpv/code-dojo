@@ -13,55 +13,81 @@ I1
 2^n
 
 I2
-Dyn pr
+Greedy
 
-max_minus[n-1] * a[n] 
-or 
-max_plus[n-1] * a[n]
+a1 a2 a3 a4 a5
+
+all 0 -> -1
+minuses
+
+m
+z
+mo
+m` = m+z
+
+p = n-m+z+mo
+
+3 -1 -4 1
+
+-4 -1 -4 -2 = 32
+
+-1 1
 
 
-0 -1
-1 -2
-2 -3
--1 0
--2 1
--3 2
--4 3
  */
 
 public class Solver
 {
-	int GetMinus(int a)
-	{
-		if (-a-1 < 0)
-			return -a-1;
-		return a;
-	}
-	int GetPlus(int a)
-	{
-		if (-a-1 >= 0)
-			return -a-1;
-		return a;
-	}
+    public int[] Maximize(int[] a, int i, int j)
+    {
+        int x = a[i-1], y = a[i];
+        int max_ = int.MinValue;
+        int[] b = new int[2];
+        foreach (var v in new [] { 0, 1, 2, 3 })
+        {
+            int xx = v & 1 == 1 ? -x-1 : x;
+            int yy = v & 2 == 1 ? -y-1 : y;
+            if (xx*yy > max_)
+            {
+                b[0] = xx;
+                b[1] = yy;
+            }
+        }
+        return b;
+    }
+
     public void Solve()
     {
 		int n = ReadInt();
 		int[] a = ReadIntArray();
-		int[] minus = Init<int>(n);
-		int[] plus = Init<int>(n);
-		bool has_zero = a[0] == -1;
-		minus[0] = GetMinus(a[0]) == a[0] ? 0 : 1;
-		plus[0] = GetPlus(a[0]) == a[0] ? 0 : 1;
-		for (int i = 1; i < n; i++)
-		{
-			int p = GetPlus(a[i]);
-			int m = GetMinus(a[i]);
-			has_zero = has_zero || a[i] == -1;
-			// get optimal by comparing number of reverse operations.
-			if (())
-			
-		}
-		int product = Math.Max(plus[n-1], minus[n-1])
+        if (n == 1)
+        {
+            Write(Math.Max(a[0], -a[0]-1));
+            return;
+        }
+        int i = 1;
+        int end = n;
+        if (n > 2 && n % 2 == 1)
+        {
+            int[] b = Maximize(a[0], a[1]);
+            int[] bb = Maximize(a[n-2], a[n-1]);
+            if (b[0]*b[1] > bb[0]*b[1])
+            {
+                a[0] = b[0];
+                a[1] = b[1];
+                i = 3;
+            }
+            else 
+            {
+                a[0] = 
+            }
+        }
+        for (; i < end i += 2)
+        {
+            int[] b = Maximize(a, i-1, i);
+            a[i-1] = b[0];
+            a[i] = b[1];
+        }
     }
 
     #region Main

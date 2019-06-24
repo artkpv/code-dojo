@@ -54,6 +54,7 @@ HT * HT_ctor(int m) {
 	for (int i = 0; i < m; i++)
 		arr[i] = NULL;
 	ht->arr = arr;
+    return ht;
 }
 
 void HT_free(HT * ht) {
