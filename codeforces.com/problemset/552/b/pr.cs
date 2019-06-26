@@ -1,3 +1,21 @@
+/*
+1
+2
+3
+4
+5
+
+11
+12
+13
+14
+
+100
+101
+
+
+
+ */
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -5,12 +23,33 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Diagnostics;
 
 public class Solver
 {
     public void Solve()
     {
-        Conso   
+        long n = ReadInt();
+        int p = 0;
+        long t = n;
+        while (t > 0)
+        {
+            t /= 10;
+            p++;
+        }
+        long count = 0;
+        Trace.WriteLine($"{n} {p} {count}");
+        do
+        {
+            long labels = (n - (p > 1 ? (int)Math.Pow(10, p-1) : 0)  + 1);
+            count += labels * p;
+            n -= labels;
+            p--;
+            Trace.WriteLine($"{n} {p} {count}");
+
+        } while (n > 0);
+        count--;  // Don't count 0.
+        Write(count);
     }
 
     #region Main
@@ -20,6 +59,7 @@ public class Solver
     static void Main()
     {
 #if DEBUG
+        Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
         // reader = new StreamReader("..\\..\\input.txt");
         reader = new StreamReader(Console.OpenStandardInput());
         writer = Console.Out;

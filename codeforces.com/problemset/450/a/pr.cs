@@ -5,12 +5,27 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-
 public class Solver
 {
     public void Solve()
     {
-        Conso   
+        int n = ReadInt();
+        int m = ReadInt();
+        int[] a = ReadIntArray();
+        var q = new System.Collections.Generic.Queue<int>(a);
+        var numsQ = new System.Collections.Generic.Queue<int>(Enumerable.Range(1, a.Count()));
+        int last = -1;
+        while (q.Any())
+        {
+            last = numsQ.Dequeue();
+            int value = q.Dequeue();
+            if (value > m)
+            {
+                q.Enqueue(value - m);
+                numsQ.Enqueue(last);
+            }
+        }
+        Write(last);
     }
 
     #region Main
