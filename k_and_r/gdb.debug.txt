@@ -1,0 +1,1 @@
+http://stackoverflow.com/questions/9031554/gdb-input-redirection-using-cygwin

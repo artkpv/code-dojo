@@ -1,6 +1,22 @@
 #!python3
 import unittest
 
+def lcs_small(X, Y):
+    X, Y = (X, Y) if len(X) < len(Y) else (Y, X)
+    n = len(X)
+    m = len(Y)
+    C = [0] * n
+    for j in range(m):
+        a = 0
+        for i in range(n):
+            b = C[i]
+            if X[i] == Y[j]:
+                C[i] = a + 1
+            else:
+                C[i] = max(C[i-1] if i > 0 else 0, C[i])
+            a = b
+
+    return C[n-1]
 
 def lcs(X, Y):
     """ Longest common subsequence of X and Y. """
@@ -63,6 +79,14 @@ Answer: ab
         expected = "GTCGTCGGAAGCCGGCCGAA"
         self.assertEqual(s, expected)
         self.assertEqual(slen, len(expected))
+
+    def test_small(self):
+        self.assertEqual(lcs_small("abcbdab", "bdcaba"), 4)
+        self.assertEqual(
+                lcs_small(
+                    "ACCGGTCGAGTGCGCGGAAGCCGGCCGAA",
+                    "GTCGTTCGGAATGCCGTTGCTCTGTAAA"),
+                20)
 
 
 unittest.main()
