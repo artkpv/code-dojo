@@ -43,21 +43,20 @@ def graham_scan(points):
         return []
     points = list(set(points))
     bottom = min(points, key=lambda p: p.y)
-    ordered = list(sorted(
+    # Ascending angle dots.
+    asc = list(sorted(
         (p for p in points if p != bottom),
         key=lambda p: angle(bottom, p),
         reverse=True
     ))
     hull = [bottom]
-    while ordered:
+    while asc:
         if len(hull) < 2:
-            hull += [ordered.pop()]
+            hull += [asc.pop()]
         else:
-            c = ordered[-1]
-            a = hull[-2]
-            b = hull[-1]
-            if ccw(a, b, c) >= 0:
-                hull += [ordered.pop()]
+            # Is counterclockwise ?
+            if ccw(hull[-2], hull[-1], asc[-1]) >= 0:
+                hull += [asc.pop()]
             else:
                 hull.pop()
     return hull

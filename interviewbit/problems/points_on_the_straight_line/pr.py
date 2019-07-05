@@ -9,7 +9,6 @@ x2, y2
 
 """
 
-
 import unittest
 from collections import Counter
 
@@ -38,17 +37,29 @@ def maxline(points):
             elif dy == 0:
                 horizontal += 1
             else:
-                counter[round(dx/dy, 2)] += 1
+                counter[round(dx/dy, 5)] += 1
             j += 1
 
-        count = max(*counter.values(), vertical, horizontal) + same
+        count = max(vertical, horizontal) + same
+        for v in counter.values():
+            if count < v + same:
+                count = v + same
         if count > max_:
             max_ = count
     return max_
 
 
+class Solution:
+    # @param A : list of integers
+    # @param B : list of integers
+    # @return an integer
+    def maxPoints(self, A, B):
+        return maxline([(x, y) for x, y in zip(A, B)])
+
+
 class Tests(unittest.TestCase):
     def test_one(self):
+        return
         self.assertEqual(maxline([]), 0)
         self.assertEqual(maxline([(0, 0)]), 1)
         self.assertEqual(maxline([(1, 1)]), 1)
@@ -63,6 +74,12 @@ class Tests(unittest.TestCase):
         self.assertEqual(maxline(
             [(0, 0), (1, 1), (-1, -1), (-1, 1)]), 3
         )
+
+    def test_other(self):
+        A = [-6, -17, 5, -16, -18, -17]
+        B = [2, -4, 5, -13, -2, 20]
+        s = Solution().maxPoints(A, B)
+        self.assertEqual(s, 2)
 
 
 unittest.main()
