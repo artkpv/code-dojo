@@ -70,22 +70,26 @@ class BST:
 
     def _delete(self, n, key):
         """ Hibbard's eager deletion """
+        if not n:
+            return n
         if n.key > key:
             n.left = self._delete(n.left, key)
             return n
         elif n.key < key:
             n.right = self._delete(n.right, key)
             return n
+
         # Found. Delete:
         if not n.left and not n.right:
-            return None
+            n = None
         elif not n.left or not n.right:
-            return n.left or n.right
-        # Has left and right.
-        t = n
-        n = self.min(t.right)
-        n.right = self.delete_min(t.right)
-        n.left = t.left
+            n = n.left or n.right
+        else:
+            # Has left and right.
+            t = n
+            n = self.min(t.right)
+            n.right = self.delete_min(t.right)
+            n.left = t.left
         return n
 
     def min(self, n=None):
@@ -134,6 +138,8 @@ class Tests(unittest.TestCase):
         self.assertEqual(list(bst.preorder()), [1], repr(bst))
         bst.delete(1)
         self.assertEqual(list(bst.preorder()), [], repr(bst))
+        bst.delete(1)
+        bst.delete(1)
 
 
 unittest.main()
