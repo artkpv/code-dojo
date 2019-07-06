@@ -118,7 +118,6 @@ class Tests(unittest.TestCase):
         preorder = [5, 2, 1, 3, 7, 6, 10, 9, 11]
         for v in preorder:
             bst.put(v)
-        print('Before', bst)
         self.assertEqual(list(bst.preorder()), preorder)
         bst.delete(7)
         self.assertEqual(list(bst.preorder()), [5, 2, 1, 3, 9, 6, 10, 11], repr(bst))
