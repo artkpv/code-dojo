@@ -1,12 +1,14 @@
 #!python3
 
 import unittest
+from pdb import post_mortem
 # import pdb; pdb.set_trace()
 
 def solveNQueens(n):
     # Queens rows. For i-th col a queen on qrows[i]-th row.
     qrows = [0] * n
     def solutions(m):
+        list
         """
         Generates solutions by getting next position
         for m-th queen on n*n field.

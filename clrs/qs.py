@@ -3,6 +3,7 @@ from random import randrange as rand
 def qs(a):
     return _qs(a, 0, len(a)-1)
 
+
 def _qs(a, lo, hi):
     if lo < hi:  # > 1 elements
         mid = partition(a, lo, hi)

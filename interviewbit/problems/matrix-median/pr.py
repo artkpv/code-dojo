@@ -1,4 +1,5 @@
 from bisect import bisect_left
+import itertools
 
 INF = float('inf')
 class Solution:
@@ -9,6 +10,8 @@ class Solution:
             return None
         n = len(A)
         m = len(A[0])
+        return sorted(itertools.chain.from_iterable(A))[n*m//2]
+
         median = A[0][m//2]
         while median not in (INF, -INF):
             lt_num = 0
