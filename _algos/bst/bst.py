@@ -5,7 +5,6 @@ Binary Search Tree. With Hibbard's deletion. Not balanced.
 """
 
 import unittest
-from collections import namedtuple
 
 
 class Node(object):
