@@ -1,5 +1,4 @@
-/*
-
+﻿/*
 
  */
 using System;
@@ -15,11 +14,14 @@ public class Solver
 {
     public void Solve()
     {
-        int n = ReadInt(), m = ReadInt(), k = ReadInt();
-        if (Math.Min(m, k) >= n)
-            Write("Yes");
-        else
-            Write("No");
+        string s = ReadToken();
+        for (int i = 0; i < s.Length; i++)
+        {
+
+            
+        }
+
+
     }
 
     #region Main
@@ -30,10 +32,10 @@ public class Solver
     {
 #if DEBUG
         Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
-        // reader = new StreamReader("..\\..\\input.txt");
+        // reader = new StreamReader("..\..\input.txt");
         reader = new StreamReader(Console.OpenStandardInput());
         writer = Console.Out;
-        //writer = new StreamWriter("..\\..\\output.txt");
+        //writer = new StreamWriter("..\..\output.txt");
 #else
         reader = new StreamReader(Console.OpenStandardInput());
         writer = new StreamWriter(Console.OpenStandardOutput());
