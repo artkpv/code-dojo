@@ -17,21 +17,19 @@ public class Solver
         int n = ReadInt();
         int[] h1 = ReadIntArray();
         int[] h2 = ReadIntArray();
-        long[] mh1 = Init<long>(n);
-        long[] mh2 = Init<long>(n);
-        mh1[n-1] = h1[n-1];
-        mh2[n-1] = h2[n-1];
-        long max = Math.Max(mh1[n-1], mh2[n-1]);
-        for (int i = n-2; i >= 0; i--)
+        long dh1 = h1[0];
+        long dh2 = h2[0];
+        long dh3 = 0;
+        for (int i = 1; i < n; i++)
         {
-            for (int j = i + 1; j < n && j < i + 5; j++)
-            {
-                mh1[i] = Math.Max(mh2[j] + h1[i], mh1[i]);
-                mh2[i] = Math.Max(mh1[j] + h2[i], mh2[i]);
-            }
-            max = Math.Max(mh1[i], mh2[i]);
+            long dh3t = Math.Max(Math.Max(dh1, dh2), dh3);
+            long dh1t = Math.Max(dh2, dh3) + h1[i];
+            long dh2t = Math.Max(dh1, dh3) + h2[i];
+            dh3 = dh3t;
+            dh2 = dh2t;
+            dh1 = dh1t;
         }
-        Write(max);
+        Write(Math.Max(Math.Max(dh1, dh2), dh3));
     }
 
     #region Main
