@@ -34,6 +34,8 @@ w_num = floor(x*(a+b)/(x+y) - ceil(x/y) + 1
 
 w = hx/y   h = wy/x
 
+min =
+
 Ex
 17 15 5 3
 a b x y
@@ -57,16 +59,20 @@ Ex3
 1000000000000000000 1000000000000000000 999999866000004473 999999822000007597
 
 """
+from math import gcd
 
 a, b, x, y = read_int_array()
-# h_num = floor(y*(a+b)/(x+y))
-# w_num = floor(x*(a+b)/(x+y)) - ceil(x/y) + 1
-# m = min(h_num, w_num)
 
-if a-x < b - y:
-    print((a*x-x+1)//y)
-else:
-    print((b*y-y+1)//x)
+z = gcd(x, y)
+x = x//z
+y = y//z
 
+if b - a*y/x > 0:  # fills width
+    left = max(y, ceil(y/x))
+    right = min(floor(y*a/x), floor(b-a*y/x))
+    num = max(0, right - left + 1)
+    print(left, right, num)
+else:  # fills height
+    num = max(0, min(floor(b*x/y), floor(a - b*x/y) - max(x, ceil(x/y)) + 1))
 
-
+print(num)
