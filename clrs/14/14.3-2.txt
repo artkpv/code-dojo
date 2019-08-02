@@ -1,8 +1,0 @@
-
-open intervals overlap (i1, i2):
-"""
-      1:   2:    3:     4:
-i1    ---   -      ---  ---
-i2     -   ---   ---      ---
-"""
-  return i1.low < i2.high and i2.low < i1.high
