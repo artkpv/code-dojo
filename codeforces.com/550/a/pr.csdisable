@@ -1,0 +1,26 @@
+using System;
+
+public static class A {
+    public static bool HasAB_BA(string s) {
+        int n = s.Length;
+        for (int i = 0; i < n-1; i++)
+        {
+            if (s[i] == 'A' && s[i+1] == 'B')
+                for (int j = i+2; j < n-1; j++)
+                    if (s[j] == 'B' && s[j+1] == 'A')
+                        return true;
+            if (s[i] == 'B' && s[i+1] == 'A')
+                for (int j = i+2; j < n-1; j++)
+                    if (s[j] == 'A' && s[j+1] == 'B')
+                        return true;
+        }
+        return false;
+    }
+
+    public static void Main() {
+        string s = Console.ReadLine().Trim();
+        Console.WriteLine(HasAB_BA(s) ? "YES" : "NO");
+    }
+}
+
+    
