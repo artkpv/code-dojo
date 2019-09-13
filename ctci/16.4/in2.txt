@@ -1,4 +1,4 @@
-3
-XOO
-XOO
-OXX
+2
+O
+O.
+X.

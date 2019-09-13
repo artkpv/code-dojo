@@ -1,5 +1,6 @@
 3
+X
 OXX
-OXX
-XOX
+...
+X.X
 
