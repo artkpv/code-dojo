@@ -32,9 +32,6 @@ void put (NodePtr ht[], int m, char * s, int n) {
 	int inx = (hash & bits31) % m;
 
 	NodePtr np = ht[inx];
-
-
-
     
 	while (np != NULL) {
 		if (hash == np->key) {
