@@ -22,70 +22,49 @@ public class Solver
         for (int _ = 0; _ < tests; _++)
         {
             int n = ReadInt();
-            // Console.WriteLine("Input: " + input);
             int[] a = ReadToken().ToCharArray().Select(c => (int)(c - '0')).ToArray();
-            var left = new LinkedList<int>();
-            var right = new LinkedList<int>();
-            for (int i = 0; i < n; i++)
+            bool isFound = false;
+            var sb = new StringBuilder();
+            for (int x = 0; x <= 9 && !isFound; x++) 
             {
-                int e = a[i];
-                if (right.Any() && a[right.Last()] <= e)
+                int? ll = null; // left first
+                int? rl = null; // right first
+                isFound = true;
+                sb.Clear();
+                for (int j = 0; isFound && j < n; j++)
                 {
-                    right.AddLast(i);
-                    //Console.WriteLine("right " + i + " " + a[right.Last()]);
-                }
-                else if (!left.Any() || (
-                        a[left.Last()] <= e && (!right.Any() || e <= a[right.First()])
-                        )
-                   )
-                {
-                    left.AddLast(i);
-                    //Console.WriteLine("left " + i + " " + a[left.Last()]);
-                }
-                else if (!right.Any())
-                {
-                    //Console.WriteLine("shift " + i);
-                    while (left.Any() && e < a[left.Last()])
+                    int y = a[j];
+                    if (y < x && (ll == null || ll <= y))
                     {
-                        right.AddFirst(left.Last());
-                        left.RemoveLast();
-                    }
-                    left.AddLast(i);
-                }
-                else
-                {
-                    //Console.WriteLine("not possible " + i);
-                    // Not possible into two:
-                    break;
-                }
-            }
-            // Print result.
-            if (n == left.Count + right.Count)
-            {
-                LinkedListNode<int> leftp = left.First;
-                LinkedListNode<int> rightp = right.Any() ? right.First : null;
-                var sb = new StringBuilder();
-                for (int i = 0; i < n; i++) 
-                {
-                    // Console.WriteLine(i);
-                    if (rightp == null || (leftp != null && leftp.Value == i))
-                    {
+                        ll = y;
                         sb.Append("1");
-                        leftp = leftp.Next;
                     }
-                    else
+                    else if (x < y && (rl == null || rl <= y))
                     {
+                        rl = y;
                         sb.Append("2");
-                        rightp = rightp.Next;
+                    }
+                    else if (x == y && (rl == null || rl == y))
+                    {
+                        rl = y;
+                        sb.Append("2");
+                    }
+                    else if (x == y && (ll == null || ll <= y))
+                    {
+                        ll = y;
+                        sb.Append("1");
+                    }
+                    else {
+                        isFound = false;
+                        break;
                     }
                 }
-                Write(sb.ToString());
             }
+            if (isFound)
+                Write(sb.ToString());
             else
                 Write("-");
-            
         }
-        
     }
 
     #region Main
