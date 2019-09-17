@@ -22,60 +22,67 @@ public class Solver
         for (int _ = 0; _ < tests; _++)
         {
             int n = ReadInt();
-            int[] a = ReadToken().ToCharArray().Select(c => (int)('0' - c)).ToArray();
-            var left = new List<int>();
-            var right = new List<int>();
-            left.Add(0);
-            int nexti = 1;
-            while (nexti < n && a[nexti-1] <= a[nexti])
+            // Console.WriteLine("Input: " + input);
+            int[] a = ReadToken().ToCharArray().Select(c => (int)(c - '0')).ToArray();
+            var left = new LinkedList<int>();
+            var right = new LinkedList<int>();
+            for (int i = 0; i < n; i++)
             {
-                left.Add(nexti);
-                nexti++;
-            }
-            if (nexti < n) 
-            {
-                int div_i = Array.BinarySearch(a, 0, nexti, a[nexti]);
-                if (div_i < 0)
-                    div_i = ~div_i;
-                else {
-                    while(div_i + 1 < nexti && a[div_i] == a[div_i+1])
-                        div_i++;
-                }
-                right.AddRange(left.Skip(div_i+1));
-                right.Add(nexti);
-                nexti++;
-                left.RemoveRange(div_i+1, left.Count - div_i - 1);
-                Debug.Assert(left.Count > 0 && right.Count > 0);
-                while (nexti < n) 
+                int e = a[i];
+                if (right.Any() && a[right.Last()] <= e)
                 {
-                    int x = a[nexti];
-                    if (x < a[left.Last()] 
-                        || (a[left.Last()] < x && a[right.Last()] < x) 
-                        || (a[left.Last()] <= x && a[right.First()] <= x)
+                    right.AddLast(i);
+                    //Console.WriteLine("right " + i + " " + a[right.Last()]);
+                }
+                else if (!left.Any() || (
+                        a[left.Last()] <= e && (!right.Any() || e <= a[right.First()])
                         )
-                        break;
-                    if (a[right.Last()] <= x) 
-                        right.Add(nexti);
-                    else 
-                        left.Add(nexti);
-                    nexti++;
+                   )
+                {
+                    left.AddLast(i);
+                    //Console.WriteLine("left " + i + " " + a[left.Last()]);
+                }
+                else if (!right.Any())
+                {
+                    //Console.WriteLine("shift " + i);
+                    while (left.Any() && e < a[left.Last()])
+                    {
+                        right.AddFirst(left.Last());
+                        left.RemoveLast();
+                    }
+                    left.AddLast(i);
+                }
+                else
+                {
+                    //Console.WriteLine("not possible " + i);
+                    // Not possible into two:
+                    break;
                 }
             }
-            if (left.Count + right.Count < a.Length)
-                Write('-');
-            else {
-                int lefti = 0;
-                int righti = 0;
+            // Print result.
+            if (n == left.Count + right.Count)
+            {
+                LinkedListNode<int> leftp = left.First;
+                LinkedListNode<int> rightp = right.Any() ? right.First : null;
                 var sb = new StringBuilder();
                 for (int i = 0; i < n; i++) 
                 {
-                    if (righti >= right.Count || (lefti < left.Count && i == left[lefti]))
-                        sb.Append('1');
+                    // Console.WriteLine(i);
+                    if (rightp == null || (leftp != null && leftp.Value == i))
+                    {
+                        sb.Append("1");
+                        leftp = leftp.Next;
+                    }
                     else
-                        sb.Append('2');
+                    {
+                        sb.Append("2");
+                        rightp = rightp.Next;
+                    }
                 }
                 Write(sb.ToString());
             }
+            else
+                Write("-");
             
         }
         
