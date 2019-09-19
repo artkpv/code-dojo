@@ -31,39 +31,44 @@ def read_int_array():
 ######################################################
 
 n, k = read_int_array()
-adj = [[] for _ in range(k)]
+adj = [[] for _ in range(n)]
 edges = set()
-vertices = set()
 for _ in range(k):
     x, y = read_int_array()
     x, y = (y, x) if y < x else (x, y)
     if (x,y) not in edges:
-        vertices.add(x)
-        edges.add((x,y))
+        edges.add((x, y))
         adj[x-1] += [y-1]
         adj[y-1] += [x-1]
 
 marked = set()
-count = 0
-def getpaths(v):
-    marked.add(v)
-    visitednum = 1
-    for w in adj[v]:
-        if w in marked:
+
+def bfs(s):
+    queue = [s]
+    count = 0
+    while queue:
+        v = queue.pop()
+        if v in marked:
             continue
-        other = getpaths(w)
-        if visitednum == 1:
-            visitednum += 1 + other
-        elif other > 1:
-            visitednum += other
-    return visitednum
+        count += 1
+        marked.add(v)
+        for w in adj[v]:
+            if w not in marked:
+                queue += [w]
+    return count
 
+count = 0
+for v in range(n):
+    if v not in marked:
+        m = bfs(v)
+        count += m - 1
 
-while vertices:
-    v = vertices.pop()
-    count = getpaths(v)
-    # if len(adj[v]) > 1:
-        # count += 1
-print(n - count)
+print(k - count)
 
+"""
+0 1
+3 2
+0 3
+2 3
+"""
 
