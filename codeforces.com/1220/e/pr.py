@@ -18,41 +18,79 @@ def read_int_array():
 ######################################################
 
 vn, en = read_int_array()
-wl = read_int_array()
-al = [[] for _ in range(vn)]
-
+vertex_weights = read_int_array()
+def vweight(v):
+    return vertex_weights[v]
+graph_adj_l = [[] for _ in range(vn)]
 for _ in range(en):
     v, w = read_int_array()
-    al[v-1] += [w-1]
-    al[w-1] += [v-1]
+    graph_adj_l[v-1] += [w-1]
+    graph_adj_l[w-1] += [v-1]
 
-s = read_int()-1
+def graph_adj(v):
+    return graph_adj_l[v]
+source_vertex = read_int()-1
 
-def adj(v):
-    return al[v]
-def weight(w):
-    return wl[w]
+class Solution(object):
+    def build_dg(self):
+        """ Build directed graph. """
+        # Reversed graph from DFS.
+        self.rg = [[] for _ in range(vn)]
+        # Reversed post order of DFS.
+        self.rpo = []
+        marked = set()
+        def dfs(v, p):
+            marked.add(v)
+            for w in graph_adj(v):
+                if w != p:
+                    self.rg[w] += [v]
+                if w in marked:
+                    continue
+                dfs(w, v)
+            self.rpo += [v]
 
-def LazyPrimsMST():
-    q = []  # min queue
-    marked = set()
-    def visit(v):
-        marked.add(v)
-        for w in adj(v):
-            if w not in marked:
-                heappush(q, (-weight(w), v, w))
-        return weight(v)
+        dfs(source_vertex, None)
+        self.rpo.reverse()
 
-    count = visit(s)
-    while q:
-        weightvw, v, w = heappop(q)
-        if w in marked and v in marked:
-            continue
-        print(v+1, w+1, -weightvw)
-        if w not in marked:
-            count += visit(w)
-        if v not in marked:
-            count += visit(v)
-    return count
+    def get_score(self):
+        cctov = []  # # CC to vertices.
+        ccsize = []  # Sizes of CCs.
+        # Merge CCs into one vertex but 1 size CCs.
+        marked = set()
+        count = 0
+        def visit(v, c):  # Vertex, Count
+            marked.add(v)
+            cctov[c] += [v]
+            ccsize[c] += 1
+            for w in self.rg[v]:
+                if w in marked:
+                    continue
+                visit(w, c)
 
-print(LazyPrimsMST())
+        score = 0
+        max_end_w = 0
+        i = 0
+        while i < len(self.rpo):
+            v = self.rpo[i]
+            if v not in marked:
+                cctov.append([])
+                ccsize.append(0)
+                visit(v, count)
+                if ccsize[-1] > 1 or i == 0:
+                    for w in cctov[-1]:
+                        score += vweight(w)
+                else:
+                    max_end_w = max(max_end_w, vweight(v))
+                # print('cctov', cctov)
+                # print('ccsize', ccsize)
+                # print('score, max_end_w', score, max_end_w)
+                count += 1
+            i += 1
+        return score + max_end_w
+
+    def solve(self):
+        self.build_dg()
+        return self.get_score()
+
+
+print(Solution().solve())
