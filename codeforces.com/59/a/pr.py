@@ -15,24 +15,8 @@ def read_int_array():
     return [int(i) for i in input().strip().split(' ')]
 
 ######################################################
-from math import ceil, floor
-"""
-a+b+c
 
-a + c1
-b + c2
-
-a+c1 == b+c-c1
-(b+c-a)/2 = c1
-
-a+c-c2 = b+c2
-c2 = (a+c-b)/2
-
-"""
-
-for query in range(read_int()):
-    a, b, c = sorted(read_int_array())
-    print((a+b+c)//2)
-
-
+s = input().strip()
+uc = sum(1 for c in s if c.isupper())
+print(s.upper() if uc > len(s) - uc else s.lower())
 

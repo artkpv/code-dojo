@@ -53,40 +53,33 @@ class Solution(object):
         self.rpo.reverse()
 
     def get_score(self):
-        cctov = []  # # CC to vertices.
-        ccsize = []  # Sizes of CCs.
+        vtocc = [None] * vn  # # CC to vertices.
         # Merge CCs into one vertex but 1 size CCs.
         marked = set()
-        count = 0
-        def visit(v, c):  # Vertex, Count
+        cweight = []  # Weights of CCs.
+        def visit(v, cid):  # Vertex, component id
             marked.add(v)
-            cctov[c] += [v]
-            ccsize[c] += 1
+            vtocc[v] = cid
+            weight = vweight(v)
             for w in self.rg[v]:
                 if w in marked:
+                    if vtocc[w] and vtocc[w] != cid:
+                        weight += cweight[vtocc[w]]
                     continue
-                visit(w, c)
+                wweight = visit(w, cid)
+                weight += wweight
+            return weight
 
+        cid = 0  # component id
         score = 0
-        max_end_w = 0
-        i = 0
-        while i < len(self.rpo):
-            v = self.rpo[i]
+        for v in self.rpo:
             if v not in marked:
-                cctov.append([])
-                ccsize.append(0)
-                visit(v, count)
-                if ccsize[-1] > 1 or i == 0:
-                    for w in cctov[-1]:
-                        score += vweight(w)
-                else:
-                    max_end_w = max(max_end_w, vweight(v))
-                # print('cctov', cctov)
-                # print('ccsize', ccsize)
-                # print('score, max_end_w', score, max_end_w)
-                count += 1
-            i += 1
-        return score + max_end_w
+                cweight.append(visit(v, cid))
+                score = max(score, cweight[-1])
+                cid += 1
+        print('cweight', cweight)
+        print('vtocc', vtocc)
+        return score
 
     def solve(self):
         self.build_dg()

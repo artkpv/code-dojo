@@ -15,24 +15,15 @@ def read_int_array():
     return [int(i) for i in input().strip().split(' ')]
 
 ######################################################
-from math import ceil, floor
-"""
-a+b+c
 
-a + c1
-b + c2
-
-a+c1 == b+c-c1
-(b+c-a)/2 = c1
-
-a+c-c2 = b+c2
-c2 = (a+c-b)/2
-
-"""
-
-for query in range(read_int()):
-    a, b, c = sorted(read_int_array())
-    print((a+b+c)//2)
-
-
+n = read_int()
+a = [(i,e) for i,e in enumerate(read_int_array())]
+a.sort(key=lambda x: x[1], reverse=True)
+x = 0
+j = 0
+for i, e in a:
+    x += e*j + 1
+    j += 1
+print(x)
+print(' '.join(str(i+1) for i, e in a))
 

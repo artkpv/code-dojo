@@ -3,16 +3,21 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+public class P
+{
+    public int P1;
+    public int P2;
+}
 class Solution {
     private const int MOD = 1000000007;
     
-    private Dictionary<Tuple<int, int>, int> dp = new Dictionary<Tuple<int, int>, int>();
+    private Dictionary<P, int> dp = new Dictionary<P, int>();
     
     private int _solve(int N, int S)
     {
         if (N == 1 && S/10 == 0)
             return 1;
-        var p = Tuple(N, S);
+        var p = new P { P1 = N, P2 = S};
         if (!dp.ContainsKey(p))
         {
             int res = 0;

@@ -15,24 +15,20 @@ def read_int_array():
     return [int(i) for i in input().strip().split(' ')]
 
 ######################################################
-from math import ceil, floor
-"""
-a+b+c
 
-a + c1
-b + c2
+a, b, c = read_int_array()
 
-a+c1 == b+c-c1
-(b+c-a)/2 = c1
+x = 0
+if a < b:
+    x += a
+    x += min(c, a+b)
+    x += min(b, c+a)
+else:
+    x += b
+    x += min(c, a+b)
+    x += min(a, c+b)
+print(x)
 
-a+c-c2 = b+c2
-c2 = (a+c-b)/2
-
-"""
-
-for query in range(read_int()):
-    a, b, c = sorted(read_int_array())
-    print((a+b+c)//2)
 
 
 
