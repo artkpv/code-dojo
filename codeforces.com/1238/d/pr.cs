@@ -1,15 +1,4 @@
 /*
-s = 1e9
-
-n*(n+1)/2 = 1e9
-n^2 + n - 2e9 = 0
-
-n^2 + n + 1/4 = 2e9 + 1/4
-(n + 1/2) (n + 1/2) = (2e9 + 1/4)
-
-n + 1/2 = +- (2e9 + 1/4)^.5
-n ~= 45 000 
-
 
  */
 using System;
@@ -23,67 +12,32 @@ using System.Diagnostics;
 
 public class Solver
 {
+    public int Count(string s, int lo, int hi)
+    {
+        int count = 0;
+        while (0 <= lo && hi < s.Length && s[lo] == s[hi])
+        {
+            count++;
+            lo--;
+            hi++;
+        }
+        return count;
+    }
+
     public void Solve()
     {
-        const int TMAX = 1000000000;
-        const int AMAX = 100000;
-        byte[] a = Init<byte>(AMAX);
-        int[] alen = Init<int>(AMAX);
-        int alenn = 0;
-        int x = 1;
-        int ai = 0;
-        int counter = TMAX;
-        int digitlen = 1;
-        int digitleninc = 10;
-        while (counter > 0 && ai + 100 < AMAX) 
+        int n = ReadInt();
+        string s = ReadToken();
+        int count = 0;
+        int end = -1;
+        for (int i = 1; i < n; i++)
         {
-            int y = x;
-            int xlen = digitlen;
-            while (y > 0)
-            {
-                a[ai+xlen-1] = (byte) (y % 10);
-                y /= 10;
-                xlen--;
-            }
-            ai += digitlen;
-            alen[alenn++] = ai;
-            counter -= ai;
-            x++;
-            if (x == digitleninc) 
-            {
-                digitlen++;
-                digitleninc *= 10;
-            }
+            count += Count(s, i-1, i);
+            Write(count);
+            count += Count(s, i-1, i+1);
+            Write(count);
         }
-        //for (int i = 0; i < 100; i++)
-        //{
-            //Console.Write(alen[i] + " ");
-        //}
-        //Console.Write("\n");
-        //for (int i = 0; i < 100; i++)
-        //{
-            //Console.Write(a[i] + " ");
-        //}
-        //Console.Write("\n");
-        //Console.WriteLine(alenn);
-        //Console.WriteLine(x);
-
-        int queries = ReadInt();
-        for (int qi = 0; qi < queries; qi++)
-        {
-            int k = ReadInt();
-            int aleni = 0; 
-            while (aleni < alenn)
-            {
-                if (k - 1 < alen[aleni])
-                {
-                    Write(a[k-1]);
-                    break;
-                }
-                k -= alen[aleni++];
-            }
-        }
-
+        Write(count);
     }
 
     #region Main
@@ -92,10 +46,10 @@ public class Solver
     protected static TextWriter writer;
     static void Main()
     {
-        //Debug.Listeners.Clear();
-        //Debug.Listeners.Add(new ConsoleTraceListener());
-        //Trace.Listeners.Clear();
-        //Trace.Listeners.Add(new ConsoleTraceListener());
+        Debug.Listeners.Clear();
+        Debug.Listeners.Add(new ConsoleTraceListener());
+        Trace.Listeners.Clear();
+        Trace.Listeners.Add(new ConsoleTraceListener());
 
         reader = new StreamReader(Console.OpenStandardInput());
         writer = new StreamWriter(Console.OpenStandardOutput());

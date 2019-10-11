@@ -25,19 +25,19 @@ public class Solver
 {
     public void Solve()
     {
-        const int TMAX = 1000000000;
-        const int AMAX = 100000;
+        const long TMAX = (long)1e18;
+        const int AMAX = (int)1e9;
         byte[] a = Init<byte>(AMAX);
-        int[] alen = Init<int>(AMAX);
-        int alenn = 0;
-        int x = 1;
-        int ai = 0;
-        int counter = TMAX;
+        long[] alen = Init<long>(AMAX);
+        long alenn = 0;
+        long x = 1;
+        long ai = 0;
+        long counter = TMAX;
         int digitlen = 1;
         int digitleninc = 10;
         while (counter > 0 && ai + 100 < AMAX) 
         {
-            int y = x;
+            long y = x;
             int xlen = digitlen;
             while (y > 0)
             {
@@ -71,8 +71,8 @@ public class Solver
         int queries = ReadInt();
         for (int qi = 0; qi < queries; qi++)
         {
-            int k = ReadInt();
-            int aleni = 0; 
+            long k = ReadLong();
+            long aleni = 0; 
             while (aleni < alenn)
             {
                 if (k - 1 < alen[aleni])

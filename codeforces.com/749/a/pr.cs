@@ -1,15 +1,4 @@
 /*
-s = 1e9
-
-n*(n+1)/2 = 1e9
-n^2 + n - 2e9 = 0
-
-n^2 + n + 1/4 = 2e9 + 1/4
-(n + 1/2) (n + 1/2) = (2e9 + 1/4)
-
-n + 1/2 = +- (2e9 + 1/4)^.5
-n ~= 45 000 
-
 
  */
 using System;
@@ -25,65 +14,23 @@ public class Solver
 {
     public void Solve()
     {
-        const int TMAX = 1000000000;
-        const int AMAX = 100000;
-        byte[] a = Init<byte>(AMAX);
-        int[] alen = Init<int>(AMAX);
-        int alenn = 0;
-        int x = 1;
-        int ai = 0;
-        int counter = TMAX;
-        int digitlen = 1;
-        int digitleninc = 10;
-        while (counter > 0 && ai + 100 < AMAX) 
+        int n = ReadInt();
+        int m = 0;
+        var res = new List<int>();
+        if (n % 2 != 0)
         {
-            int y = x;
-            int xlen = digitlen;
-            while (y > 0)
-            {
-                a[ai+xlen-1] = (byte) (y % 10);
-                y /= 10;
-                xlen--;
-            }
-            ai += digitlen;
-            alen[alenn++] = ai;
-            counter -= ai;
-            x++;
-            if (x == digitleninc) 
-            {
-                digitlen++;
-                digitleninc *= 10;
-            }
+            m += 1;
+            res.Add(3);            
+            n -= 3;
         }
-        //for (int i = 0; i < 100; i++)
-        //{
-            //Console.Write(alen[i] + " ");
-        //}
-        //Console.Write("\n");
-        //for (int i = 0; i < 100; i++)
-        //{
-            //Console.Write(a[i] + " ");
-        //}
-        //Console.Write("\n");
-        //Console.WriteLine(alenn);
-        //Console.WriteLine(x);
-
-        int queries = ReadInt();
-        for (int qi = 0; qi < queries; qi++)
+        if (n > 0)
         {
-            int k = ReadInt();
-            int aleni = 0; 
-            while (aleni < alenn)
-            {
-                if (k - 1 < alen[aleni])
-                {
-                    Write(a[k-1]);
-                    break;
-                }
-                k -= alen[aleni++];
-            }
+            m += n / 2;
+            res.AddRange(Enumerable.Repeat(2, n / 2));
         }
-
+        res.Sort();
+        Write(m);
+        Write(String.Join(' ', res));
     }
 
     #region Main
@@ -92,10 +39,10 @@ public class Solver
     protected static TextWriter writer;
     static void Main()
     {
-        //Debug.Listeners.Clear();
-        //Debug.Listeners.Add(new ConsoleTraceListener());
-        //Trace.Listeners.Clear();
-        //Trace.Listeners.Add(new ConsoleTraceListener());
+        Debug.Listeners.Clear();
+        Debug.Listeners.Add(new ConsoleTraceListener());
+        Trace.Listeners.Clear();
+        Trace.Listeners.Add(new ConsoleTraceListener());
 
         reader = new StreamReader(Console.OpenStandardInput());
         writer = new StreamWriter(Console.OpenStandardOutput());

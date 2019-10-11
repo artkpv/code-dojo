@@ -17,12 +17,12 @@ def read_int_array():
 
 ######################################################
 
-vn, en = read_int_array()
+verticesnum, edgesnum = read_int_array()
 vertex_weights = read_int_array()
 def vweight(v):
     return vertex_weights[v]
-graph_adj_l = [[] for _ in range(vn)]
-for _ in range(en):
+graph_adj_l = [[] for _ in range(verticesnum)]
+for _ in range(edgesnum):
     v, w = read_int_array()
     graph_adj_l[v-1] += [w-1]
     graph_adj_l[w-1] += [v-1]
@@ -31,59 +31,88 @@ def graph_adj(v):
     return graph_adj_l[v]
 source_vertex = read_int()-1
 
+class UF(object):
+    def __init__(self, verticesnum):
+        self.p = list(verticesnum)
+        self.size = [1] * verticesnum
+        self.score = [vweight(v) for v in range(verticesnum)]
+
+    def find(self, v):
+        if self.p[v] != v:
+            self.p[v] = self.find(p[v])
+        return self.p[v]
+
+    def union(self, v, w):
+        pv = self.find(v)
+        pw = self.find(w)
+
+        if self.size[pv] > self.size[pw]:
+            self.p[pw] = pv
+            self.size[pw] += self.size[pv]
+            self.score[pw] += self.score[pv]
+        else:
+            self.p[pv] = pw
+            self.size[pv] += self.size[pw]
+            self.score[pv] += self.score[pw]
+
 class Solution(object):
-    def build_dg(self):
-        """ Build directed graph. """
+    def get_ccs(self):
+        """ Get connected components and their scores. """
         # Reversed graph from DFS.
-        self.rg = [[] for _ in range(vn)]
+        rg = [[] for _ in range(verticesnum)]
         # Reversed post order of DFS.
-        self.rpo = []
+        rpo = []
         marked = set()
         def dfs(v, p):
             marked.add(v)
             for w in graph_adj(v):
                 if w != p:
-                    self.rg[w] += [v]
+                    rg[w] += [v]
                 if w in marked:
                     continue
                 dfs(w, v)
-            self.rpo += [v]
+            rpo += [v]
 
         dfs(source_vertex, None)
-        self.rpo.reverse()
+        rpo.reverse()
 
-    def get_score(self):
-        vtocc = [None] * vn  # # CC to vertices.
-        # Merge CCs into one vertex but 1 size CCs.
-        marked = set()
-        cweight = []  # Weights of CCs.
-        def visit(v, cid):  # Vertex, component id
+        uf = UF(verticesnum)
+        marked.clear()
+        def visit(v):  # v - vertex
+            """ DFS to get CCs. """
             marked.add(v)
-            vtocc[v] = cid
-            weight = vweight(v)
-            for w in self.rg[v]:
+            for w in rg[v]:
                 if w in marked:
-                    if vtocc[w] and vtocc[w] != cid:
-                        weight += cweight[vtocc[w]]
                     continue
-                wweight = visit(w, cid)
-                weight += wweight
-            return weight
+                uf.union(v, w)
+                visit(w)
 
-        cid = 0  # component id
-        score = 0
-        for v in self.rpo:
+        for v in rpo:
             if v not in marked:
-                cweight.append(visit(v, cid))
-                score = max(score, cweight[-1])
-                cid += 1
-        print('cweight', cweight)
-        print('vtocc', vtocc)
+                visit(v)
+        return uf
+
+    def get_score(self, uf):
+        # TODO. How to get score now?
+        # 1 Idea. DFS? With DP on score? But that fails as we visit a leave close to
+        # source first and then CCs hence score for the leave is less.
+        marked = set()
+        vscore = [0] * verticesnum
+        max_score = -float('inf')
+        q = deque()
+        q += [source_vertex]
+        while q:
+            v = q.popleft()
+            if v in marked:
+                continue
+            marked.add(v)
+            for w in graph_adj(v):
+
         return score
 
     def solve(self):
-        self.build_dg()
-        return self.get_score()
+        uf = self.get_ccs()
+        return self.get_score(uf)
 
 
 print(Solution().solve())

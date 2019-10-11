@@ -1,5 +1,15 @@
 /*
 
+3
+25 57 0 0 1 1
+-4 -7 0 0 1 0
+50 -66 0 1 0 1
+
+25+  57-
+-4+  -7
+50 -66+-
+
+
  */
 using System;
 using System.Collections.Generic;
@@ -20,16 +30,23 @@ public class Rect
         this.y2 = y2;
     }
     public int x1, y1, x2, y2;
+
+    public override string ToString() 
+    {
+        return $"({x1} {y1} {x2} {y2})";
+    }
 }
 
 public class Solver
 {
-    public Rect F(Rect r, Rect r2) 
+    public Rect GetIntersection(Rect r, Rect r2) 
     {
+        if (r == null || r2 == null)
+            return null;
         int left = Math.Max(r.x1, r2.x1);
-        int top = Math.Min(r.y2, r2.y2);
-        int right = Math.Min(r.x2, r2.x2);
         int bottom = Math.Max(r.y1, r2.y1);
+        int right = Math.Min(r.x2, r2.x2);
+        int top = Math.Min(r.y2, r2.y2);
         if (right - left < 0 || top - bottom < 0)
             return null;
         return new Rect(left, bottom, right, top);
@@ -42,7 +59,7 @@ public class Solver
         for (int query = 0; query < queries; query++)
         {
             int n = ReadInt();
-            Rect interception = new Rect( -MAX,-MAX, MAX, MAX);
+            Rect intersection = new Rect( -MAX,-MAX, MAX, MAX);
             for (int i = 0; i < n; i++)
             {
                 int x = ReadInt();
@@ -56,15 +73,14 @@ public class Solver
                 if (l) rrect.x1 = -MAX;
                 if (u) rrect.y2 = MAX;
                 if (r) rrect.x2 = MAX;
-                interception = F(interception, rrect);
-                if (interception == null)
-                {
-                    Write(0);
-                    break;
-                }
+                intersection = GetIntersection(intersection, rrect);
             }
-            if (interception != null)
-                Write(1, interception.x1, interception.y1);           
+            if (intersection != null)
+                Write(1, intersection.x1, intersection.y1);           
+            else
+                Write(0);
+
+            writer.Flush();
         }
     }
 

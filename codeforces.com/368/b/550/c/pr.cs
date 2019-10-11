@@ -1,15 +1,4 @@
 /*
-s = 1e9
-
-n*(n+1)/2 = 1e9
-n^2 + n - 2e9 = 0
-
-n^2 + n + 1/4 = 2e9 + 1/4
-(n + 1/2) (n + 1/2) = (2e9 + 1/4)
-
-n + 1/2 = +- (2e9 + 1/4)^.5
-n ~= 45 000 
-
 
  */
 using System;
@@ -25,65 +14,53 @@ public class Solver
 {
     public void Solve()
     {
-        const int TMAX = 1000000000;
-        const int AMAX = 100000;
-        byte[] a = Init<byte>(AMAX);
-        int[] alen = Init<int>(AMAX);
-        int alenn = 0;
-        int x = 1;
-        int ai = 0;
-        int counter = TMAX;
-        int digitlen = 1;
-        int digitleninc = 10;
-        while (counter > 0 && ai + 100 < AMAX) 
+        string s = ReadToken();
+        int n = s.Length;
+        if (n >= 3)
         {
-            int y = x;
-            int xlen = digitlen;
-            while (y > 0)
+            for (int i = n-1; 2 <= i; i--)
             {
-                a[ai+xlen-1] = (byte) (y % 10);
-                y /= 10;
-                xlen--;
-            }
-            ai += digitlen;
-            alen[alenn++] = ai;
-            counter -= ai;
-            x++;
-            if (x == digitleninc) 
-            {
-                digitlen++;
-                digitleninc *= 10;
-            }
-        }
-        //for (int i = 0; i < 100; i++)
-        //{
-            //Console.Write(alen[i] + " ");
-        //}
-        //Console.Write("\n");
-        //for (int i = 0; i < 100; i++)
-        //{
-            //Console.Write(a[i] + " ");
-        //}
-        //Console.Write("\n");
-        //Console.WriteLine(alenn);
-        //Console.WriteLine(x);
-
-        int queries = ReadInt();
-        for (int qi = 0; qi < queries; qi++)
-        {
-            int k = ReadInt();
-            int aleni = 0; 
-            while (aleni < alenn)
-            {
-                if (k - 1 < alen[aleni])
+                for (int j = i-1; 1 <= j; j--)
                 {
-                    Write(a[k-1]);
-                    break;
+                    for (int k = j-1; 0 <= k; k--)
+                    {
+                        int x = int.Parse(s[k].ToString() + s[j] + s[i]);
+                        if (x == 0 || x % 8 == 0)
+                        {
+                            Write("YES");
+                            var sb = new StringBuilder();
+                            for (int p = 0; p <= k; p++)
+                            {
+                                sb.Append(s[p]);
+                            }
+                            sb.Append(s[j]);
+                            sb.Append(s[i]);
+                            Write(sb);
+                            return;
+                        }
+                    }
                 }
-                k -= alen[aleni++];
             }
         }
-
+        else
+        {
+            if (int.Parse(s) % 8 == 0)
+            {
+                Write("YES");
+                Write(s);
+                return;
+            }
+            for (int i = 0; i < n; i++)
+            {
+                if (int.Parse(s[i].ToString()) % 8 == 0)
+                {
+                    Write("YES");
+                    Write(s[i]);
+                    return;
+                }
+            }
+        }
+        Write("NO");
     }
 
     #region Main
@@ -92,10 +69,10 @@ public class Solver
     protected static TextWriter writer;
     static void Main()
     {
-        //Debug.Listeners.Clear();
-        //Debug.Listeners.Add(new ConsoleTraceListener());
-        //Trace.Listeners.Clear();
-        //Trace.Listeners.Add(new ConsoleTraceListener());
+        Debug.Listeners.Clear();
+        Debug.Listeners.Add(new ConsoleTraceListener());
+        Trace.Listeners.Clear();
+        Trace.Listeners.Add(new ConsoleTraceListener());
 
         reader = new StreamReader(Console.OpenStandardInput());
         writer = new StreamWriter(Console.OpenStandardOutput());

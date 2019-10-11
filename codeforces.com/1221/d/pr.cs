@@ -14,6 +14,7 @@ using System.Diagnostics;
 public class Solver
 {
     const int CASES = 3;
+    const ulong INF = System.Int64.MaxValue; 
 
     public ulong MinOC(ulong[] oc, ulong h)
     {
@@ -22,6 +23,13 @@ public class Solver
             .Where(c => oc[c*2] != h)
             .Select(c => oc[c*2 + 1])
             .Min();
+    }
+
+    public ulong SumCheck(ulong a, ulong b)
+    {
+        if (a >= INF || b >= INF || a+b >= INF)
+            return INF;
+        return a + b; 
     }
 
     public void Solve()
@@ -37,13 +45,13 @@ public class Solver
                 A[i*2 + 1] = (uint) ReadInt();
             }
 
-            ulong[] oc = Init<ulong>(n*2);
+            ulong[] oc = Init<ulong>(CASES*2);
             for (uint i = 0; i < CASES; i++)
             {
                 oc[i*2] = A[0] + i;
                 oc[i*2+1] = A[1] * i;
             }
-            ulong[] nextoc = Init<ulong>(n*2);
+            ulong[] nextoc = Init<ulong>(CASES*2);
             for (int i = 1; i < n; i++)
             {
                 ulong a = A[i*2];
@@ -51,7 +59,7 @@ public class Solver
                 for (uint c = 0; c < CASES; c++)
                 {
                     nextoc[c*2] = a + c;
-                    nextoc[c*2 + 1] = MinOC(oc, a + c) + c*b;
+                    nextoc[c*2 + 1] = SumCheck(MinOC(oc, a + c), c*b);
                 }
                 ulong[] t = oc;
                 oc = nextoc;
