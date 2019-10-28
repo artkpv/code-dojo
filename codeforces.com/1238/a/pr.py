@@ -21,3 +21,5 @@ for test in range(t):
     x, y = read_int_array()
     print('YES' if x - y > 1 else 'NO')
 
+
+

@@ -1,24 +1,5 @@
 /*
 
-   8 
-   8 7 6 5 3 2
-   1
-
-   8 0 
-   6 0
-   4 1  5 1
-   2 1  3 1 
-   0 1  1 2  2 2
-        0 2  0 2
-
-   9 8 5 4 3 1
-
-   8 1    7 1
-   6 2..  6 1
-          4 1
-          2 2
-          0 2
-
  */
 using System;
 using System.Collections.Generic;
@@ -33,39 +14,43 @@ public class Solver
 {
     public void Solve()
     {
-        int queries = ReadInt();
-        while (queries-- > 0)
+		int n = ReadInt();
+        int[] A = ReadIntArray();
+        int i = 1;
+        int left = n-1;
+        int right = n-1;
+        bool ispossible = true;
+        while (i < n && ispossible) 
         {
-            int h = ReadInt();
-            int n = ReadInt();
-            int[] P = ReadIntArray();
-            int crystals = 0;
-            int i = 1;
-            while (0 < h)
+            if (A[i-1] > A[i])
             {
-                if (i < n && P[i] + 1 == h)
+                if (left < i) // Second found.
                 {
-                    if (h == 2 || i + 1 < n && P[i+1] + 2 == h)
-                    {
-                        i += 2;
-                    }
-                    else
-                    {
-                        i++;
-                        crystals++;
-                    }
-                    h -= 2;
+                    ispossible = false;
+                    break;
                 }
-                else
-                {
-                    h = i < n ? P[i] + 1 : 0;
-                }
-                //Write(h, crystals);
-                //writer.Flush();
-                // Thread.Sleep(500);
+                int j = i;
+                i--;
+                while (0 <= i - 1 && A[i-1] == A[i])
+                    i--;
+                while (j + 1 < n && A[j] >= A[j+1])
+                    j++;
+                if (0 <= i - 1 && !(A[i-1] <= A[j]))
+                    ispossible = false;
+                if (j + 1 < n && !(A[i] <= A[j+1]))
+                    ispossible = false;
+                left = i;
+                right = j;
+                i = right+1;
             }
-            Write(crystals);
+            else 
+            {
+                i++;
+            }
         }
+        Write(ispossible ? "yes" : "no");
+        if (ispossible)
+            Write(left+1, right+1);
     }
 
     #region Main

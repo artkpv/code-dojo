@@ -1,24 +1,5 @@
 /*
 
-   8 
-   8 7 6 5 3 2
-   1
-
-   8 0 
-   6 0
-   4 1  5 1
-   2 1  3 1 
-   0 1  1 2  2 2
-        0 2  0 2
-
-   9 8 5 4 3 1
-
-   8 1    7 1
-   6 2..  6 1
-          4 1
-          2 2
-          0 2
-
  */
 using System;
 using System.Collections.Generic;
@@ -33,39 +14,24 @@ public class Solver
 {
     public void Solve()
     {
-        int queries = ReadInt();
-        while (queries-- > 0)
-        {
-            int h = ReadInt();
-            int n = ReadInt();
-            int[] P = ReadIntArray();
-            int crystals = 0;
-            int i = 1;
-            while (0 < h)
-            {
-                if (i < n && P[i] + 1 == h)
-                {
-                    if (h == 2 || i + 1 < n && P[i+1] + 2 == h)
-                    {
-                        i += 2;
-                    }
-                    else
-                    {
-                        i++;
-                        crystals++;
-                    }
-                    h -= 2;
-                }
-                else
-                {
-                    h = i < n ? P[i] + 1 : 0;
-                }
-                //Write(h, crystals);
-                //writer.Flush();
-                // Thread.Sleep(500);
-            }
-            Write(crystals);
+        int n = ReadInt();
+        int d = ReadInt();
+        if (d == 0) {
+            Write(0);
+            return;
         }
+        var Won = new Func<string, bool>((string day) => day.Count(e => e == '1') != n);
+        int count = Won(ReadToken()) ? 1 : 0;
+        int maxCount = count;
+        for (int i = 1; i < d; i++) 
+        {
+            if (Won(ReadToken()))
+                count++;
+            else
+                count = 0;
+            maxCount = Math.Max(count, maxCount);
+        }
+        Write(maxCount);
     }
 
     #region Main

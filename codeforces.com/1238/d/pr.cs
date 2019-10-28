@@ -1,4 +1,32 @@
 /*
+5
+5 + 4 + 3 + 2 + 1,  6*5/2 = 15
+5 1 2 1 = 9
+
+
+
+AAABABB
+aa
+ aa
+aaa
+  aba
+ aaba
+aaaba
+   bab
+  abab
+ aabab
+aaabab
+   babb
+  ababb
+ aababb
+aaababb
+     bb
+2332221
+
+01
+02
+12
+
 
  */
 using System;
@@ -14,14 +42,12 @@ public class Solver
 {
     public int Count(string s, int lo, int hi)
     {
-        int count = 0;
         while (0 <= lo && hi < s.Length && s[lo] == s[hi])
         {
-            count++;
+            yield return (int lo, int hi);
             lo--;
             hi++;
         }
-        return count;
     }
 
     public void Solve()
@@ -30,14 +56,12 @@ public class Solver
         string s = ReadToken();
         int count = 0;
         int end = -1;
+        var P = new List<(int a, int b)>();
         for (int i = 1; i < n; i++)
         {
-            count += Count(s, i-1, i);
-            Write(count);
-            count += Count(s, i-1, i+1);
-            Write(count);
+            P.AddRange(Extract(s, i-1, i));
+            P.AddRange(Extract(s, i-1, i+1));
         }
-        Write(count);
     }
 
     #region Main

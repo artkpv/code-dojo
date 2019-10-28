@@ -1,24 +1,5 @@
 /*
 
-   8 
-   8 7 6 5 3 2
-   1
-
-   8 0 
-   6 0
-   4 1  5 1
-   2 1  3 1 
-   0 1  1 2  2 2
-        0 2  0 2
-
-   9 8 5 4 3 1
-
-   8 1    7 1
-   6 2..  6 1
-          4 1
-          2 2
-          0 2
-
  */
 using System;
 using System.Collections.Generic;
@@ -34,37 +15,22 @@ public class Solver
     public void Solve()
     {
         int queries = ReadInt();
-        while (queries-- > 0)
+        for (int query = 0; query < queries; query++)
         {
-            int h = ReadInt();
             int n = ReadInt();
-            int[] P = ReadIntArray();
-            int crystals = 0;
-            int i = 1;
-            while (0 < h)
+            int r = ReadInt();
+            int[] X = ReadIntArray();
+            Array.Sort(X);
+            int i = n-1;
+            int count = 0;
+            while (0 <= i && 0 < X[i] - r*count)
             {
-                if (i < n && P[i] + 1 == h)
-                {
-                    if (h == 2 || i + 1 < n && P[i+1] + 2 == h)
-                    {
-                        i += 2;
-                    }
-                    else
-                    {
-                        i++;
-                        crystals++;
-                    }
-                    h -= 2;
-                }
-                else
-                {
-                    h = i < n ? P[i] + 1 : 0;
-                }
-                //Write(h, crystals);
-                //writer.Flush();
-                // Thread.Sleep(500);
+                count++;
+                while (0 <= i - 1 && X[i-1] == X[i])
+                    i--;
+                i--;
             }
-            Write(crystals);
+            Write(count);
         }
     }
 
