@@ -1,0 +1,15 @@
+2 3
+
+Ways:
+p p p
+p r l
+r p l
+r l p
+
+
+pn
+1 1
+2 2
+4 4
+
+

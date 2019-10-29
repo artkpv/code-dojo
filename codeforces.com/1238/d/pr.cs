@@ -40,28 +40,38 @@ using System.Diagnostics;
 
 public class Solver
 {
-    public int Count(string s, int lo, int hi)
-    {
-        while (0 <= lo && hi < s.Length && s[lo] == s[hi])
-        {
-            yield return (int lo, int hi);
-            lo--;
-            hi++;
-        }
-    }
-
     public void Solve()
     {
-        int n = ReadInt();
+        long n = ReadInt();
         string s = ReadToken();
-        int count = 0;
-        int end = -1;
-        var P = new List<(int a, int b)>();
+        long cntBad = n;
         for (int i = 1; i < n; i++)
         {
-            P.AddRange(Extract(s, i-1, i));
-            P.AddRange(Extract(s, i-1, i+1));
+            if (s[i-1] != s[i]) 
+            {
+                int j = i+1;
+                cntBad++;
+                while (j < n && s[i] == s[j])
+                {
+                    j++;
+                    cntBad++;
+                }
+            }
         }
+        for (int i = (int)n-2; 0 <= i; i--)
+        {
+            if (s[i] != s[i+1]) 
+            {
+                int j = i-1;
+                while (0 <= j && s[j] == s[i])
+                {
+                    j--;
+                    cntBad++;
+                }
+            }
+        }
+        // Write(cntBad);
+        Write((n * (n + 1)) / 2 - cntBad);
     }
 
     #region Main
