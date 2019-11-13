@@ -13,47 +13,59 @@ using System.Diagnostics;
 
 public class Solver
 {
+    private int F(
+        int[] l,
+        int[] lPay,
+        int[] r,
+        int[] rPay,
+        int lo,
+        int hi)
+    {
+    }
+
     public void Solve()
     {
         int tests = ReadInt();
         for (int test = 0; test < tests; test++)
         {
-            int workers = ReadInt();
+            int n = ReadInt();
             int money = ReadInt();
-            var L = new int[workers];
-            var R = new int[workers];
-            for (int worker = 0; worker < workers; worker++)
+            int[] l = new int[n];
+            int[] r = new int[n];
+            int[] rToL = new int[n];
+            for (int worker = 0; worker < n; worker++)
             {
-                L[worker] = ReadInt();
-                R[worker] = ReadInt();
+                l[worker] = ReadInt();
+                r[worker] = ReadInt();
+                rToL[worker] = l[worker];
             }
-            Array.Sort(L);
-            Array.Sort(R);
-            int i = 0;
-            for (; i < workers; i++)
+            Array.Sort(l);
+            Array.Sort(r, rToL);
+            int[] lPay = new int[n];
+
+            lPay[0] = l[0];
+            for (int i = 1; i < n; i++)
+                lPay[i] = lPay[i - 1] + l[i];
+
+            int[] rPay = new int[n];
+            rPay[n - 1] = rToL[n - 1];
+            for (int i = n - 2; 0 <= i; i--)
+                rPay[i] = rPay[i + 1] + rToL[i];
+
+            // TODO
+            int median = r[n-1];
+            while (true) 
             {
-                money -= lr[i].Item1;
+                int countL = Array.BinarySearch(l, median);
+                int cmp = count - (n+1)/2;
+                if (cmp == 0)
+                    break;
+                else if (cmp < 0)
+                {
+                }
             }
 
-            int mid = workers/2;
-            i = mid;
-            const int INF = int.MaxValue;
-            int max = lr[i].Item2;
-            int level = lr[i].Item1;
-            Debug.WriteLine($" mon={money} i={i} lvl={level}");
-            while (0 < money && i < workers) 
-            {
-                max = Math.Min(max, lr[i].Item2);
-                int x = i - mid + 1;
-                int y = (i + 1 < workers ? lr[i+1].Item1 : INF);
-                y = Math.Min(y, max);
-                y = Math.Min(y, level + money / x);
-                money -= (level - y) * x;
-                level = y;
-                i++;
-                Debug.WriteLine($"  mon={money} i={i} lvl={level} x={x} y={y}");
-            }
-            Write(level);
+            Write(median);
         }
     }
 
@@ -80,23 +92,24 @@ public class Solver
     #region Read / Write
     private static Queue<string> currentLineTokens = new Queue<string>();
     private static string[] ReadAndSplitLine() { return reader.ReadLine().Split(new[] { ' ', '\t', }, StringSplitOptions.RemoveEmptyEntries); }
-    public static string ReadToken() { while (currentLineTokens.Count == 0)currentLineTokens = new Queue<string>(ReadAndSplitLine()); return currentLineTokens.Dequeue(); }
+    public static string ReadToken() { while (currentLineTokens.Count == 0) currentLineTokens = new Queue<string>(ReadAndSplitLine()); return currentLineTokens.Dequeue(); }
     public static int ReadInt() { return int.Parse(ReadToken()); }
     public static long ReadLong() { return long.Parse(ReadToken()); }
     public static double ReadDouble() { return double.Parse(ReadToken(), CultureInfo.InvariantCulture); }
     public static int[] ReadIntArray() { return ReadAndSplitLine().Select(int.Parse).ToArray(); }
     public static long[] ReadLongArray() { return ReadAndSplitLine().Select(long.Parse).ToArray(); }
     public static double[] ReadDoubleArray() { return ReadAndSplitLine().Select(s => double.Parse(s, CultureInfo.InvariantCulture)).ToArray(); }
-    public static int[][] ReadIntMatrix(int numberOfRows) { int[][] matrix = new int[numberOfRows][]; for (int i = 0; i < numberOfRows; i++)matrix[i] = ReadIntArray(); return matrix; }
+    public static int[][] ReadIntMatrix(int numberOfRows) { int[][] matrix = new int[numberOfRows][]; for (int i = 0; i < numberOfRows; i++) matrix[i] = ReadIntArray(); return matrix; }
     public static int[][] ReadAndTransposeIntMatrix(int numberOfRows)
     {
         int[][] matrix = ReadIntMatrix(numberOfRows); int[][] ret = new int[matrix[0].Length][];
-        for (int i = 0; i < ret.Length; i++) { ret[i] = new int[numberOfRows]; for (int j = 0; j < numberOfRows; j++)ret[i][j] = matrix[j][i]; } return ret;
+        for (int i = 0; i < ret.Length; i++) { ret[i] = new int[numberOfRows]; for (int j = 0; j < numberOfRows; j++) ret[i][j] = matrix[j][i]; }
+        return ret;
     }
-    public static string[] ReadLines(int quantity) { string[] lines = new string[quantity]; for (int i = 0; i < quantity; i++)lines[i] = reader.ReadLine().Trim(); return lines; }
+    public static string[] ReadLines(int quantity) { string[] lines = new string[quantity]; for (int i = 0; i < quantity; i++) lines[i] = reader.ReadLine().Trim(); return lines; }
     public static void WriteArray<T>(IEnumerable<T> array) { writer.WriteLine(string.Join(" ", array)); }
     public static void Write(params object[] array) { WriteArray(array); }
-    public static void WriteLines<T>(IEnumerable<T> array) { foreach (var a in array)writer.WriteLine(a); }
+    public static void WriteLines<T>(IEnumerable<T> array) { foreach (var a in array) writer.WriteLine(a); }
     private class SDictionary<TKey, TValue> : Dictionary<TKey, TValue>
     {
         public new TValue this[TKey key]
@@ -105,6 +118,6 @@ public class Solver
             set { base[key] = value; }
         }
     }
-    private static T[] Init<T>(int size) where T : new() { var ret = new T[size]; for (int i = 0; i < size; i++)ret[i] = new T(); return ret; }
+    private static T[] Init<T>(int size) where T : new() { var ret = new T[size]; for (int i = 0; i < size; i++) ret[i] = new T(); return ret; }
     #endregion
 }
