@@ -1,5 +1,23 @@
-#define DEBUG
+#undef DEBUG
 /*
+ RUN!
+t <= 10^5
+for all t, sum n+m <= 10^5
+
+I1
+BF
+For each monsters set iter over heroes.
+O(n^3)
+
+I2
+Precomp p s: max power for i. 
+(p, i)
+
+E1
+2 3 11 14 1 8
+3 2
+100 1
+
 
  */
 using System;
@@ -17,53 +35,64 @@ public class Solver
     public void Solve()
     {
         int tests = ReadInt();
+        const int MAXN = 200000;
+        int[] mA = new int[MAXN];
+        int[] powers = new int[MAXN];
+        int[] stamina = new int[MAXN];
         for (int test = 0; test < tests; test++)
         {
-            int n = ReadInt();
-            int[] a = ReadIntArray();
-            int m = ReadInt();
-            int[] p = Init<int>(m);
-            int[] s = Init<int>(m);
-            for (int i = 0; i < m; i++)
+            int mNum = ReadInt();
+            for (int i = 0; i < mNum; i++)
+                mA[i] = ReadInt();
+            int hNum = ReadInt();
+            for (int i = 0; i < hNum; i++)
             {
-                p[i] = ReadInt();
-                s[i] = ReadInt();
+                powers[i] = ReadInt();
+                stamina[i] = ReadInt();
             }
-            int[] c = new int[n+1];
-            c[0] = 0;
-
-            Func<int, int, int> Kills = (hero, mon) =>
+            Array.Sort(stamina, powers, 0, hNum);
+            for (int i = hNum-2; i >= 0; i--)
             {
-                int killed = 0;
-                int hs = s[hero-1];
-                while (mon - killed > 0 && killed <= hs)
+                if (powers[i+1] > powers[i])
+                    powers[i] = powers[i+1];
+            }
+            Debug.WriteLine(string.Join(" ", powers.Take(hNum)));
+            Debug.WriteLine(string.Join(" ", stamina.Take(hNum)));
+            int deadM = 0;
+            int days = 0;
+            Debug.WriteLine($"deadM={deadM} days={days}");
+            while (deadM < mNum) 
+            {
+                // Two pointers: h for heroes, i for monsters.
+                int i = 0;
+                int h = 0;
+                int minPower = mA[deadM];
+                while (true) 
                 {
-                    int i = n - (mon - killed);
-                    if (a[i] > p[hero-1])
+                    if (deadM + i >= mNum) // No more monsters.
                         break;
-                    killed++;
-                }
-                return killed;
-            };
-            const int INF = int.MaxValue-1;
-            for (int monNum = 1; monNum <= n; monNum++) 
-            {
-                c[monNum] = INF;
-                for (int h = 1; h <= m; h++)
-                {
-                    int kills = Kills(h, monNum);
-                    if (kills > 0)
-                    c[monNum] = M.Min(c[monNum],
-                        c[monNum - kills] + 1
-                    );
-                }
-            }
-            // Debug.WriteLine(string.Join(" ", c));
+                    if (h >= hNum)  // No more heroes.
+                        break;
+                    minPower = Math.Max(minPower, mA[deadM + i]);
+                    if (minPower > powers[h])  // Too powerful.
+                        break;
 
-            if (c[n] == INF)
-                Write(-1);
-            else
-                Write(c[n]);
+                    if (i + 1 > stamina[h])  // Not enough stamina.
+                        h++;
+                    else  // Can kill more.
+                        i++;
+                }
+                Debug.WriteLine($" days={days} i={i} h={h}");
+                // Now h <= hNum, 0 <= i <= mNum.
+                if (i == 0) // Too powerful.
+                {
+                    days = -1;
+                    break;
+                }
+                days++;
+                deadM += i;
+            }
+            Write(days);
         }
     }
 

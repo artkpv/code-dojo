@@ -1,0 +1,7 @@
+1
+100000
+
+zsh:1: command not found: printf '199999 in100.txt.0s' {1..100000}
+
+zsh:1: command not found: printf '199999 in100.txt.0s' {1..10}
+zsh:1: command not found: printf '199999 %.0s' {1..10}
