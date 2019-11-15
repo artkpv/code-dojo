@@ -14,34 +14,28 @@ public class Solver
 {
     public void Solve()
     {
-        int queries = ReadInt();
-        for (int query = 0; query < queries; query++)
-        {
-            int n = ReadInt();
-            int zeros = 0;
-            int ones = 0;
-            int even = 0;
-            int evenLength = 0;
-            for (int i = 0; i < n; i++)
-            {
-                string s = ReadToken();
-                if (s.Length % 2 == 0)
-                {
-                    even++;
-                    evenLength += s.Length;
-                }
-                for (int j = 0; j < s.Length; j++)
-                {
-                    if (s[j] == '0')
-                        zeros++;
-                    else
-                        ones++;
-            }
-                }
-            
+       int tests = ReadInt();
+       for (int test = 0; test < tests; test++)
+       {
+           int n = ReadInt();
+           int x = ReadInt();
+           int a = ReadInt();
+           int b = ReadInt();
 
-        }
+           if (a > b)
+           {
+               int t = b; 
+               b = a;
+               a = t;
+           }
 
+           int left = Math.Max(1, a - x);
+           x -= a - left;
+           a = left;
+           int right = Math.Min(n, b + x);
+           b = right;
+           Write(b - a);
+       }
     }
 
     #region Main

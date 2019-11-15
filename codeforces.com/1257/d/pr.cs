@@ -1,3 +1,4 @@
+#define DEBUG
 /*
 
  */
@@ -9,39 +10,61 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Diagnostics;
+using M = System.Math;
 
 public class Solver
 {
     public void Solve()
     {
-        int queries = ReadInt();
-        for (int query = 0; query < queries; query++)
+        int tests = ReadInt();
+        for (int test = 0; test < tests; test++)
         {
             int n = ReadInt();
-            int zeros = 0;
-            int ones = 0;
-            int even = 0;
-            int evenLength = 0;
-            for (int i = 0; i < n; i++)
+            int[] a = ReadIntArray();
+            int m = ReadInt();
+            int[] p = Init<int>(m);
+            int[] s = Init<int>(m);
+            for (int i = 0; i < m; i++)
             {
-                string s = ReadToken();
-                if (s.Length % 2 == 0)
-                {
-                    even++;
-                    evenLength += s.Length;
-                }
-                for (int j = 0; j < s.Length; j++)
-                {
-                    if (s[j] == '0')
-                        zeros++;
-                    else
-                        ones++;
+                p[i] = ReadInt();
+                s[i] = ReadInt();
             }
+            int[] c = new int[n+1];
+            c[0] = 0;
+
+            Func<int, int, int> Kills = (hero, mon) =>
+            {
+                int killed = 0;
+                int hs = s[hero-1];
+                while (mon - killed > 0 && killed <= hs)
+                {
+                    int i = n - (mon - killed);
+                    if (a[i] > p[hero-1])
+                        break;
+                    killed++;
                 }
-            
+                return killed;
+            };
+            const int INF = int.MaxValue-1;
+            for (int monNum = 1; monNum <= n; monNum++) 
+            {
+                c[monNum] = INF;
+                for (int h = 1; h <= m; h++)
+                {
+                    int kills = Kills(h, monNum);
+                    if (kills > 0)
+                    c[monNum] = M.Min(c[monNum],
+                        c[monNum - kills] + 1
+                    );
+                }
+            }
+            // Debug.WriteLine(string.Join(" ", c));
 
+            if (c[n] == INF)
+                Write(-1);
+            else
+                Write(c[n]);
         }
-
     }
 
     #region Main
@@ -93,5 +116,5 @@ public class Solver
         }
     }
     private static T[] Init<T>(int size) where T : new() { var ret = new T[size]; for (int i = 0; i < size; i++)ret[i] = new T(); return ret; }
-    #endregion
 }
+    #endregion

@@ -1,5 +1,7 @@
 #define DEBUG
 /*
+n salaries with r_i, l_i
+Find max median salary
 
  */
 using System;
@@ -13,14 +15,20 @@ using System.Diagnostics;
 
 public class Solver
 {
-    private int F(
-        int[] l,
-        int[] lPay,
-        int[] r,
-        int[] rPay,
-        int lo,
-        int hi)
+    public int BinarySearchLeft<T>(IList<T> array, T element) 
+        where T : IComparable
     {
+        int lo = 0;
+        int hi = array.Count() - 1;
+        while (lo < hi)
+        {
+            int mid = (lo+hi) / 2;
+            if (array[mid].CompareTo(element) < 0)
+                lo = mid + 1;
+            else
+                hi = mid;
+        }
+        return lo;
     }
 
     public void Solve()
@@ -29,10 +37,10 @@ public class Solver
         for (int test = 0; test < tests; test++)
         {
             int n = ReadInt();
-            int money = ReadInt();
-            int[] l = new int[n];
-            int[] r = new int[n];
-            int[] rToL = new int[n];
+            long money = ReadLong();
+            long[] l = new long[n];
+            long[] r = new long[n];
+            long[] rToL = new long[n];
             for (int worker = 0; worker < n; worker++)
             {
                 l[worker] = ReadInt();
@@ -41,32 +49,59 @@ public class Solver
             }
             Array.Sort(l);
             Array.Sort(r, rToL);
-            int[] lPay = new int[n];
+            long[] lPay = new long[n];
 
             lPay[0] = l[0];
             for (int i = 1; i < n; i++)
                 lPay[i] = lPay[i - 1] + l[i];
 
-            int[] rPay = new int[n];
+            long[] rPay = new long[n];
             rPay[n - 1] = rToL[n - 1];
             for (int i = n - 2; 0 <= i; i--)
                 rPay[i] = rPay[i + 1] + rToL[i];
 
-            // TODO
-            int median = r[n-1];
-            while (true) 
+            Debug.WriteLine(string.Join(" ", l));
+            Debug.WriteLine(string.Join(" ", r));
+            Debug.WriteLine(string.Join(" ", lPay));
+            Debug.WriteLine(string.Join(" ", rPay));
+            int half = (n+1) / 2;  // Always odd.
+
+            Func<long, long> F = (long mid) => {
+                // Get minimal money amount so that median salary is equal or higher than mid and number of those.
+                // 1. r_i < mid
+                int leftNum = BinarySearchLeft(r, mid);
+                // 2. mid <= l_i included.
+                int rightNum = n - BinarySearchLeft(l, mid);
+                // 3. l_i <= mid < r_i: make l_i or mid for them. 
+                int middleNum = n - leftNum - rightNum;
+
+                if (half <= leftNum)
+                    return -1; // Not possible.
+                if (half <= rightNum)
+                    return money;
+
+                long rightPay = rightNum > 0 ? rPay[n - rightNum] : 0;
+                long middleMidPay = half - rightNum;
+                long minMoney = lPay[half - 2] + (middleMidPay * mid) + rightPay;
+                return minMoney;
+            };
+
+            long lo = l[0];
+            long hi = r[n-1];
+            while (lo < hi) 
             {
-                int countL = Array.BinarySearch(l, median);
-                int cmp = count - (n+1)/2;
-                if (cmp == 0)
-                    break;
-                else if (cmp < 0)
-                {
-                }
+                long median = (lo + hi) / 2;
+                long minMoney = F(median);
+                Debug.Write($" {lo} {hi} {median} {minMoney}\n");
+                if (minMoney == -1)
+                    hi = median;
+                else
+                    lo = median + 1;
             }
 
-            Write(median);
+            Write(lo - 1);
         }
+
     }
 
     #region Main

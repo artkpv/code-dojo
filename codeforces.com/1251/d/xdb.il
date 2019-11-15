@@ -3419,3 +3419,540 @@ IL_0014: call      <(wrapper remoting-invoke) System.IO.StringReader:.ctor (stri
 IL_0019: ret       
 IL_001a: call      <System.IO.StringReader:.ctor (string)>
 IL_001f: ret       
+// (wrapper managed-to-native) System.Security.SecurityManager:get_SecurityEnabled ()
+IL_0000: mono_ldptr2
+IL_0006: calli     <>
+IL_000b: mono_ldptr_int_req_flag
+IL_000d: ldind.u4  
+IL_000e: brfalse   IL_002f
+IL_0013: mono_not_taken
+IL_0015: mono_icall <mono_thread_interruption_checkpoint>
+IL_001b: dup       
+IL_001c: brfalse   IL_002e
+IL_0021: dup       
+IL_0022: mono_objaddr
+IL_0024: ldc.i4    136
+IL_0029: add       
+IL_002a: ldc.i4.1  
+IL_002b: stind.i4  
+IL_002c: mono_rethrow
+IL_002e: pop       
+IL_002f: ret       
+// (wrapper remoting-invoke-with-check) System.Diagnostics.TraceListener:SetAttributes (System.Collections.Hashtable)
+IL_0000: ldarg.0   
+IL_0001: ldarg.1   
+IL_0002: ldarg.0   
+IL_0003: mono_objaddr
+IL_0005: ldind.i   
+IL_0006: ldc.i4.0  
+IL_0007: add       
+IL_0008: ldind.i   
+IL_0009: mono_classconst <TransparentProxy>
+IL_000f: bne.un    IL_0033
+IL_0014: ldarg.0   
+IL_0015: mono_objaddr
+IL_0017: ldc.i4.s  16
+IL_0019: add       
+IL_001a: ldind.ref 
+IL_001b: mono_objaddr
+IL_001d: ldc.i4.s  40
+IL_001f: add       
+IL_0020: ldind.i4  
+IL_0021: ldc.i4.m1 
+IL_0022: beq       IL_002d
+IL_0027: call      <(wrapper xdomain-invoke) System.Diagnostics.TraceListener:SetAttributes (System.Collections.Hashtable)>
+IL_002c: ret       
+IL_002d: call      <(wrapper remoting-invoke) System.Diagnostics.TraceListener:SetAttributes (System.Collections.Hashtable)>
+IL_0032: ret       
+IL_0033: call      <System.Diagnostics.TraceListener:SetAttributes (System.Collections.Hashtable)>
+IL_0038: ret       
+// (wrapper remoting-invoke-with-check) System.Diagnostics.TraceListener:set_TraceOutputOptions (System.Diagnostics.TraceOptions)
+IL_0000: ldarg.0   
+IL_0001: ldarg.1   
+IL_0002: ldarg.0   
+IL_0003: mono_objaddr
+IL_0005: ldind.i   
+IL_0006: ldc.i4.0  
+IL_0007: add       
+IL_0008: ldind.i   
+IL_0009: mono_classconst <TransparentProxy>
+IL_000f: bne.un    IL_0033
+IL_0014: ldarg.0   
+IL_0015: mono_objaddr
+IL_0017: ldc.i4.s  16
+IL_0019: add       
+IL_001a: ldind.ref 
+IL_001b: mono_objaddr
+IL_001d: ldc.i4.s  40
+IL_001f: add       
+IL_0020: ldind.i4  
+IL_0021: ldc.i4.m1 
+IL_0022: beq       IL_002d
+IL_0027: call      <(wrapper xdomain-invoke) System.Diagnostics.TraceListener:set_TraceOutputOptions (System.Diagnostics.TraceOptions)>
+IL_002c: ret       
+IL_002d: call      <(wrapper remoting-invoke) System.Diagnostics.TraceListener:set_TraceOutputOptions (System.Diagnostics.TraceOptions)>
+IL_0032: ret       
+IL_0033: call      <System.Diagnostics.TraceListener:set_TraceOutputOptions (System.Diagnostics.TraceOptions)>
+IL_0038: ret       
+// (wrapper remoting-invoke-with-check) System.Diagnostics.TraceListener:set_IndentSize (int)
+IL_0000: ldarg.0   
+IL_0001: ldarg.1   
+IL_0002: ldarg.0   
+IL_0003: mono_objaddr
+IL_0005: ldind.i   
+IL_0006: ldc.i4.0  
+IL_0007: add       
+IL_0008: ldind.i   
+IL_0009: mono_classconst <TransparentProxy>
+IL_000f: bne.un    IL_0033
+IL_0014: ldarg.0   
+IL_0015: mono_objaddr
+IL_0017: ldc.i4.s  16
+IL_0019: add       
+IL_001a: ldind.ref 
+IL_001b: mono_objaddr
+IL_001d: ldc.i4.s  40
+IL_001f: add       
+IL_0020: ldind.i4  
+IL_0021: ldc.i4.m1 
+IL_0022: beq       IL_002d
+IL_0027: call      <(wrapper xdomain-invoke) System.Diagnostics.TraceListener:set_IndentSize (int)>
+IL_002c: ret       
+IL_002d: call      <(wrapper remoting-invoke) System.Diagnostics.TraceListener:set_IndentSize (int)>
+IL_0032: ret       
+IL_0033: call      <System.Diagnostics.TraceListener:set_IndentSize (int)>
+IL_0038: ret       
+// (wrapper remoting-invoke-with-check) System.Diagnostics.TraceListener:set_IndentLevel (int)
+IL_0000: ldarg.0   
+IL_0001: ldarg.1   
+IL_0002: ldarg.0   
+IL_0003: mono_objaddr
+IL_0005: ldind.i   
+IL_0006: ldc.i4.0  
+IL_0007: add       
+IL_0008: ldind.i   
+IL_0009: mono_classconst <TransparentProxy>
+IL_000f: bne.un    IL_0033
+IL_0014: ldarg.0   
+IL_0015: mono_objaddr
+IL_0017: ldc.i4.s  16
+IL_0019: add       
+IL_001a: ldind.ref 
+IL_001b: mono_objaddr
+IL_001d: ldc.i4.s  40
+IL_001f: add       
+IL_0020: ldind.i4  
+IL_0021: ldc.i4.m1 
+IL_0022: beq       IL_002d
+IL_0027: call      <(wrapper xdomain-invoke) System.Diagnostics.TraceListener:set_IndentLevel (int)>
+IL_002c: ret       
+IL_002d: call      <(wrapper remoting-invoke) System.Diagnostics.TraceListener:set_IndentLevel (int)>
+IL_0032: ret       
+IL_0033: call      <System.Diagnostics.TraceListener:set_IndentLevel (int)>
+IL_0038: ret       
+// (wrapper remoting-invoke-with-check) System.Diagnostics.ConsoleTraceListener:.ctor ()
+IL_0000: ldarg.0   
+IL_0001: ldarg.0   
+IL_0002: mono_objaddr
+IL_0004: ldind.i   
+IL_0005: ldc.i4.0  
+IL_0006: add       
+IL_0007: ldind.i   
+IL_0008: mono_classconst <TransparentProxy>
+IL_000e: bne.un    IL_0019
+IL_0013: call      <(wrapper remoting-invoke) System.Diagnostics.ConsoleTraceListener:.ctor ()>
+IL_0018: ret       
+IL_0019: call      <System.Diagnostics.ConsoleTraceListener:.ctor ()>
+IL_001e: ret       
+// (wrapper managed-to-native) System.Text.EncodingHelper:InternalCodePage (int&)
+IL_0000: ldarg.0   
+IL_0001: ldloca.s  0
+IL_0003: mono_ldptr2
+IL_0009: calli     <int&,RuntimeStructs/MonoError&>
+IL_000e: mono_ldptr_int_req_flag
+IL_0010: ldind.u4  
+IL_0011: brfalse   IL_0032
+IL_0016: mono_not_taken
+IL_0018: mono_icall <mono_thread_interruption_checkpoint>
+IL_001e: dup       
+IL_001f: brfalse   IL_0031
+IL_0024: dup       
+IL_0025: mono_objaddr
+IL_0027: ldc.i4    136
+IL_002c: add       
+IL_002d: ldc.i4.1  
+IL_002e: stind.i4  
+IL_002f: mono_rethrow
+IL_0031: pop       
+IL_0032: ret       
+// (wrapper managed-to-native) System.IO.MonoIO:get_ConsoleOutput ()
+IL_0000: mono_ldptr2
+IL_0006: calli     <>
+IL_000b: mono_ldptr_int_req_flag
+IL_000d: ldind.u4  
+IL_000e: brfalse   IL_002f
+IL_0013: mono_not_taken
+IL_0015: mono_icall <mono_thread_interruption_checkpoint>
+IL_001b: dup       
+IL_001c: brfalse   IL_002e
+IL_0021: dup       
+IL_0022: mono_objaddr
+IL_0024: ldc.i4    136
+IL_0029: add       
+IL_002a: ldc.i4.1  
+IL_002b: stind.i4  
+IL_002c: mono_rethrow
+IL_002e: pop       
+IL_002f: ret       
+// (wrapper managed-to-native) System.ConsoleDriver:Isatty (intptr)
+IL_0000: ldarg.0   
+IL_0001: ldloca.s  0
+IL_0003: mono_ldptr2
+IL_0009: calli     <intptr,RuntimeStructs/MonoError&>
+IL_000e: mono_ldptr_int_req_flag
+IL_0010: ldind.u4  
+IL_0011: brfalse   IL_0032
+IL_0016: mono_not_taken
+IL_0018: mono_icall <mono_thread_interruption_checkpoint>
+IL_001e: dup       
+IL_001f: brfalse   IL_0031
+IL_0024: dup       
+IL_0025: mono_objaddr
+IL_0027: ldc.i4    136
+IL_002c: add       
+IL_002d: ldc.i4.1  
+IL_002e: stind.i4  
+IL_002f: mono_rethrow
+IL_0031: pop       
+IL_0032: ret       
+// (wrapper managed-to-native) System.IO.MonoIO:get_ConsoleInput ()
+IL_0000: mono_ldptr2
+IL_0006: calli     <>
+IL_000b: mono_ldptr_int_req_flag
+IL_000d: ldind.u4  
+IL_000e: brfalse   IL_002f
+IL_0013: mono_not_taken
+IL_0015: mono_icall <mono_thread_interruption_checkpoint>
+IL_001b: dup       
+IL_001c: brfalse   IL_002e
+IL_0021: dup       
+IL_0022: mono_objaddr
+IL_0024: ldc.i4    136
+IL_0029: add       
+IL_002a: ldc.i4.1  
+IL_002b: stind.i4  
+IL_002c: mono_rethrow
+IL_002e: pop       
+IL_002f: ret       
+// (wrapper remoting-invoke-with-check) System.IO.FileStream:.ctor (intptr,System.IO.FileAccess,bool,int,bool,bool)
+IL_0000: ldarg.0   
+IL_0001: ldarg.1   
+IL_0002: ldarg.2   
+IL_0003: ldarg.3   
+IL_0004: ldarg.s   4
+IL_0006: ldarg.s   5
+IL_0008: ldarg.s   6
+IL_000a: ldarg.0   
+IL_000b: mono_objaddr
+IL_000d: ldind.i   
+IL_000e: ldc.i4.0  
+IL_000f: add       
+IL_0010: ldind.i   
+IL_0011: mono_classconst <TransparentProxy>
+IL_0017: bne.un    IL_0022
+IL_001c: call      <(wrapper remoting-invoke) System.IO.FileStream:.ctor (intptr,System.IO.FileAccess,bool,int,bool,bool)>
+IL_0021: ret       
+IL_0022: call      <System.IO.FileStream:.ctor (intptr,System.IO.FileAccess,bool,int,bool,bool)>
+IL_0027: ret       
+// (wrapper remoting-invoke-with-check) System.IO.UnexceptionalStreamReader:.ctor (System.IO.Stream,System.Text.Encoding)
+IL_0000: ldarg.0   
+IL_0001: ldarg.1   
+IL_0002: ldarg.2   
+IL_0003: ldarg.0   
+IL_0004: mono_objaddr
+IL_0006: ldind.i   
+IL_0007: ldc.i4.0  
+IL_0008: add       
+IL_0009: ldind.i   
+IL_000a: mono_classconst <TransparentProxy>
+IL_0010: bne.un    IL_001b
+IL_0015: call      <(wrapper remoting-invoke) System.IO.UnexceptionalStreamReader:.ctor (System.IO.Stream,System.Text.Encoding)>
+IL_001a: ret       
+IL_001b: call      <System.IO.UnexceptionalStreamReader:.ctor (System.IO.Stream,System.Text.Encoding)>
+IL_0020: ret       
+// (wrapper remoting-invoke-with-check) System.IO.TextReader/SyncTextReader:.ctor (System.IO.TextReader)
+IL_0000: ldarg.0   
+IL_0001: ldarg.1   
+IL_0002: ldarg.0   
+IL_0003: mono_objaddr
+IL_0005: ldind.i   
+IL_0006: ldc.i4.0  
+IL_0007: add       
+IL_0008: ldind.i   
+IL_0009: mono_classconst <TransparentProxy>
+IL_000f: bne.un    IL_001a
+IL_0014: call      <(wrapper remoting-invoke) System.IO.TextReader/SyncTextReader:.ctor (System.IO.TextReader)>
+IL_0019: ret       
+IL_001a: call      <System.IO.TextReader/SyncTextReader:.ctor (System.IO.TextReader)>
+IL_001f: ret       
+// (wrapper remoting-invoke-with-check) System.IO.UnexceptionalStreamWriter:.ctor (System.IO.Stream,System.Text.Encoding)
+IL_0000: ldarg.0   
+IL_0001: ldarg.1   
+IL_0002: ldarg.2   
+IL_0003: ldarg.0   
+IL_0004: mono_objaddr
+IL_0006: ldind.i   
+IL_0007: ldc.i4.0  
+IL_0008: add       
+IL_0009: ldind.i   
+IL_000a: mono_classconst <TransparentProxy>
+IL_0010: bne.un    IL_001b
+IL_0015: call      <(wrapper remoting-invoke) System.IO.UnexceptionalStreamWriter:.ctor (System.IO.Stream,System.Text.Encoding)>
+IL_001a: ret       
+IL_001b: call      <System.IO.UnexceptionalStreamWriter:.ctor (System.IO.Stream,System.Text.Encoding)>
+IL_0020: ret       
+// (wrapper remoting-invoke-with-check) System.IO.StreamWriter:.ctor (System.IO.Stream,System.Text.Encoding,int,bool)
+IL_0000: ldarg.0   
+IL_0001: ldarg.1   
+IL_0002: ldarg.2   
+IL_0003: ldarg.3   
+IL_0004: ldarg.s   4
+IL_0006: ldarg.0   
+IL_0007: mono_objaddr
+IL_0009: ldind.i   
+IL_000a: ldc.i4.0  
+IL_000b: add       
+IL_000c: ldind.i   
+IL_000d: mono_classconst <TransparentProxy>
+IL_0013: bne.un    IL_001e
+IL_0018: call      <(wrapper remoting-invoke) System.IO.StreamWriter:.ctor (System.IO.Stream,System.Text.Encoding,int,bool)>
+IL_001d: ret       
+IL_001e: call      <System.IO.StreamWriter:.ctor (System.IO.Stream,System.Text.Encoding,int,bool)>
+IL_0023: ret       
+// (wrapper remoting-invoke-with-check) System.IO.TextWriter/SyncTextWriter:.ctor (System.IO.TextWriter)
+IL_0000: ldarg.0   
+IL_0001: ldarg.1   
+IL_0002: ldarg.0   
+IL_0003: mono_objaddr
+IL_0005: ldind.i   
+IL_0006: ldc.i4.0  
+IL_0007: add       
+IL_0008: ldind.i   
+IL_0009: mono_classconst <TransparentProxy>
+IL_000f: bne.un    IL_001a
+IL_0014: call      <(wrapper remoting-invoke) System.IO.TextWriter/SyncTextWriter:.ctor (System.IO.TextWriter)>
+IL_0019: ret       
+IL_001a: call      <System.IO.TextWriter/SyncTextWriter:.ctor (System.IO.TextWriter)>
+IL_001f: ret       
+// (wrapper managed-to-native) System.Globalization.CultureInfo:get_current_locale_name ()
+IL_0000: ldloca.s  0
+IL_0002: mono_ldptr2
+IL_0008: calli     <RuntimeStructs/MonoError&>
+IL_000d: mono_ldptr_int_req_flag
+IL_000f: ldind.u4  
+IL_0010: brfalse   IL_0031
+IL_0015: mono_not_taken
+IL_0017: mono_icall <mono_thread_interruption_checkpoint>
+IL_001d: dup       
+IL_001e: brfalse   IL_0030
+IL_0023: dup       
+IL_0024: mono_objaddr
+IL_0026: ldc.i4    136
+IL_002b: add       
+IL_002c: ldc.i4.1  
+IL_002d: stind.i4  
+IL_002e: mono_rethrow
+IL_0030: pop       
+IL_0031: ret       
+// (wrapper managed-to-native) System.Globalization.CultureInfo:construct_internal_locale_from_name (System.Globalization.CultureInfo,string)
+IL_0000: ldarg.0   
+IL_0001: brtrue    IL_000c
+IL_0006: newobj    <System.NullReferenceException:.ctor ()>
+IL_000b: throw     
+IL_000c: ldarg.0   
+IL_000d: ldarg.1   
+IL_000e: mono_ldptr3
+IL_0014: calli     <CultureInfo,string>
+IL_0019: mono_ldptr_int_req_flag
+IL_001b: ldind.u4  
+IL_001c: brfalse   IL_003d
+IL_0021: mono_not_taken
+IL_0023: mono_icall <mono_thread_interruption_checkpoint>
+IL_0029: dup       
+IL_002a: brfalse   IL_003c
+IL_002f: dup       
+IL_0030: mono_objaddr
+IL_0032: ldc.i4    136
+IL_0037: add       
+IL_0038: ldc.i4.1  
+IL_0039: stind.i4  
+IL_003a: mono_rethrow
+IL_003c: pop       
+IL_003d: ret       
+// (wrapper managed-to-native) System.Globalization.CultureData:fill_culture_data (System.Globalization.CultureData,int)
+IL_0000: ldarg.0   
+IL_0001: brtrue    IL_000c
+IL_0006: newobj    <System.NullReferenceException:.ctor ()>
+IL_000b: throw     
+IL_000c: ldarg.0   
+IL_000d: ldarg.1   
+IL_000e: mono_ldptr3
+IL_0014: calli     <CultureData,int>
+IL_0019: mono_ldptr_int_req_flag
+IL_001b: ldind.u4  
+IL_001c: brfalse   IL_003d
+IL_0021: mono_not_taken
+IL_0023: mono_icall <mono_thread_interruption_checkpoint>
+IL_0029: dup       
+IL_002a: brfalse   IL_003c
+IL_002f: dup       
+IL_0030: mono_objaddr
+IL_0032: ldc.i4    136
+IL_0037: add       
+IL_0038: ldc.i4.1  
+IL_0039: stind.i4  
+IL_003a: mono_rethrow
+IL_003c: pop       
+IL_003d: ret       
+// (wrapper managed-to-native) System.IO.MonoIO:get_ConsoleError ()
+IL_0000: mono_ldptr2
+IL_0006: calli     <>
+IL_000b: mono_ldptr_int_req_flag
+IL_000d: ldind.u4  
+IL_000e: brfalse   IL_002f
+IL_0013: mono_not_taken
+IL_0015: mono_icall <mono_thread_interruption_checkpoint>
+IL_001b: dup       
+IL_001c: brfalse   IL_002e
+IL_0021: dup       
+IL_0022: mono_objaddr
+IL_0024: ldc.i4    136
+IL_0029: add       
+IL_002a: ldc.i4.1  
+IL_002b: stind.i4  
+IL_002c: mono_rethrow
+IL_002e: pop       
+IL_002f: ret       
+// System.Diagnostics.Trace:.cctor ()
+IL_0000: ret       
+// (wrapper remoting-invoke-with-check) System.IO.StreamReader:.ctor (System.IO.Stream)
+IL_0000: ldarg.0   
+IL_0001: ldarg.1   
+IL_0002: ldarg.0   
+IL_0003: mono_objaddr
+IL_0005: ldind.i   
+IL_0006: ldc.i4.0  
+IL_0007: add       
+IL_0008: ldind.i   
+IL_0009: mono_classconst <TransparentProxy>
+IL_000f: bne.un    IL_001a
+IL_0014: call      <(wrapper remoting-invoke) System.IO.StreamReader:.ctor (System.IO.Stream)>
+IL_0019: ret       
+IL_001a: call      <System.IO.StreamReader:.ctor (System.IO.Stream)>
+IL_001f: ret       
+// (wrapper remoting-invoke-with-check) System.IO.StreamWriter:.ctor (System.IO.Stream)
+IL_0000: ldarg.0   
+IL_0001: ldarg.1   
+IL_0002: ldarg.0   
+IL_0003: mono_objaddr
+IL_0005: ldind.i   
+IL_0006: ldc.i4.0  
+IL_0007: add       
+IL_0008: ldind.i   
+IL_0009: mono_classconst <TransparentProxy>
+IL_000f: bne.un    IL_001a
+IL_0014: call      <(wrapper remoting-invoke) System.IO.StreamWriter:.ctor (System.IO.Stream)>
+IL_0019: ret       
+IL_001a: call      <System.IO.StreamWriter:.ctor (System.IO.Stream)>
+IL_001f: ret       
+// (wrapper castclass) object:__isinst_with_cache (object,intptr,intptr)
+IL_0000: ldarg.0   
+IL_0001: brfalse   IL_0034
+IL_0006: ldarg.0   
+IL_0007: mono_objaddr
+IL_0009: ldind.i   
+IL_000a: stloc.0   
+IL_000b: ldarg.2   
+IL_000c: ldind.i   
+IL_000d: stloc.1   
+IL_000e: ldloc.1   
+IL_000f: ldc.i4    -2
+IL_0014: conv.i    
+IL_0015: and       
+IL_0016: ldloc.0   
+IL_0017: bne.un    IL_002a
+IL_001c: ldloc.1   
+IL_001d: ldc.i4.1  
+IL_001e: conv.u    
+IL_001f: and       
+IL_0020: brtrue    IL_0034
+IL_0025: br        IL_0036
+IL_002a: ldarg.0   
+IL_002b: ldarg.1   
+IL_002c: ldarg.2   
+IL_002d: mono_icall <mono_marshal_isinst_with_cache>
+IL_0033: ret       
+IL_0034: ldnull    
+IL_0035: ret       
+IL_0036: ldarg.0   
+IL_0037: ret       
+// (wrapper managed-to-native) object:__icall_wrapper_mono_marshal_isinst_with_cache (object,intptr,intptr)
+IL_0000: ldarg.0   
+IL_0001: ldarg.1   
+IL_0002: ldarg.2   
+IL_0003: mono_jit_icall_addr2
+IL_0009: calli     <object,intptr,intptr>
+IL_000e: mono_ldptr_int_req_flag
+IL_0010: ldind.u4  
+IL_0011: brfalse   IL_0032
+IL_0016: mono_not_taken
+IL_0018: mono_icall <mono_thread_interruption_checkpoint>
+IL_001e: dup       
+IL_001f: brfalse   IL_0031
+IL_0024: dup       
+IL_0025: mono_objaddr
+IL_0027: ldc.i4    136
+IL_002c: add       
+IL_002d: ldc.i4.1  
+IL_002e: stind.i4  
+IL_002f: mono_rethrow
+IL_0031: pop       
+IL_0032: ret       
+// (wrapper managed-to-native) System.Globalization.CultureData:fill_number_data (System.Globalization.NumberFormatInfo,int)
+IL_0000: ldarg.0   
+IL_0001: ldarg.1   
+IL_0002: mono_ldptr2
+IL_0008: calli     <NumberFormatInfo,int>
+IL_000d: mono_ldptr_int_req_flag
+IL_000f: ldind.u4  
+IL_0010: brfalse   IL_0031
+IL_0015: mono_not_taken
+IL_0017: mono_icall <mono_thread_interruption_checkpoint>
+IL_001d: dup       
+IL_001e: brfalse   IL_0030
+IL_0023: dup       
+IL_0024: mono_objaddr
+IL_0026: ldc.i4    136
+IL_002b: add       
+IL_002c: ldc.i4.1  
+IL_002d: stind.i4  
+IL_002e: mono_rethrow
+IL_0030: pop       
+IL_0031: ret       
+// System.Collections.Generic.ArraySortHelper`1<int>:.ctor ()
+IL_0000: ldarg.0   
+IL_0001: call      <object:.ctor ()>
+IL_0006: ret       
+// System.Collections.Generic.GenericComparer`1<int>:.ctor ()
+IL_0000: ldarg.0   
+IL_0001: call      <System.Collections.Generic.Comparer`1<!0>:.ctor ()>
+IL_0006: ret       
+// System.Collections.Generic.ArraySortHelper`2<int, int>:.ctor ()
+IL_0000: ldarg.0   
+IL_0001: call      <object:.ctor ()>
+IL_0006: ret       
+// (wrapper managed-to-managed) int[]:System.Collections.Generic.IList`1.get_Item (int)
+IL_0000: ldarg.0   
+IL_0001: ldarg.1   
+IL_0002: call      <System.Array:InternalArray__get_Item<int> (int)>
+IL_0007: ret       

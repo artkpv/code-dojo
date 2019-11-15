@@ -14,34 +14,28 @@ public class Solver
 {
     public void Solve()
     {
-        int queries = ReadInt();
-        for (int query = 0; query < queries; query++)
+        int tests = ReadInt();
+        for (int test = 0; test < tests; test++)
         {
             int n = ReadInt();
-            int zeros = 0;
-            int ones = 0;
-            int even = 0;
-            int evenLength = 0;
+            int[] a = ReadIntArray();
+            var d = new Dictionary<int, List<int>>();
             for (int i = 0; i < n; i++)
             {
-                string s = ReadToken();
-                if (s.Length % 2 == 0)
-                {
-                    even++;
-                    evenLength += s.Length;
-                }
-                for (int j = 0; j < s.Length; j++)
-                {
-                    if (s[j] == '0')
-                        zeros++;
-                    else
-                        ones++;
+                if (!d.ContainsKey(a[i])) 
+                    d[a[i]] = new List<int>();
+                d[a[i]].Add(i);
             }
+            int min = int.MaxValue;
+            foreach (var key in d.Keys) 
+            {
+                for (int i = 1; i < d[key].Count(); i++) 
+                {
+                    min = Math.Min(min, d[key][i] - d[key][i-1] + 1);
                 }
-            
-
+            }
+            Write(min == int.MaxValue ? -1 : min);
         }
-
     }
 
     #region Main
