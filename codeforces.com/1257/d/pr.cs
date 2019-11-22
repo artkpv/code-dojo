@@ -1,6 +1,6 @@
 #undef DEBUG
 /*
- RUN!
+ RUN2!
 t <= 10^5
 for all t, sum n+m <= 10^5
 
@@ -35,26 +35,28 @@ public class Solver
     public void Solve()
     {
         int tests = ReadInt();
-        const int MAXN = 200000;
+        const int MAXN = 200009;
         int[] mA = new int[MAXN];
         int[] powers = new int[MAXN];
         int[] stamina = new int[MAXN];
+        int[] bst = new int[MAXN];
         for (int test = 0; test < tests; test++)
         {
             int mNum = ReadInt();
             for (int i = 0; i < mNum; i++)
                 mA[i] = ReadInt();
             int hNum = ReadInt();
+            int maxS = 0;
             for (int i = 0; i < hNum; i++)
             {
                 powers[i] = ReadInt();
                 stamina[i] = ReadInt();
+                maxS = Math.Max(stamina[i], maxS);
+                bst[stamina[i]] = Math.Max(bst[stamina[i]], powers[i]);
             }
-            Array.Sort(stamina, powers, 0, hNum);
-            for (int i = hNum-2; i >= 0; i--)
+            for (int i = maxS-1; i >= 0; i--)
             {
-                if (powers[i+1] > powers[i])
-                    powers[i] = powers[i+1];
+                bst[i] = Math.Max(bst[i], bst[i+1]);
             }
             Debug.WriteLine(string.Join(" ", powers.Take(hNum)));
             Debug.WriteLine(string.Join(" ", stamina.Take(hNum)));
@@ -63,28 +65,22 @@ public class Solver
             Debug.WriteLine($"deadM={deadM} days={days}");
             while (deadM < mNum) 
             {
-                // Two pointers: h for heroes, i for monsters.
                 int i = 0;
-                int h = 0;
                 int minPower = mA[deadM];
                 while (true) 
                 {
                     if (deadM + i >= mNum) // No more monsters.
                         break;
-                    if (h >= hNum)  // No more heroes.
+                    if (i + 1 > maxS)
                         break;
                     minPower = Math.Max(minPower, mA[deadM + i]);
-                    if (minPower > powers[h])  // Too powerful.
+                    if (minPower > bst[i])  // Too powerful.
                         break;
-
-                    if (i + 1 > stamina[h])  // Not enough stamina.
-                        h++;
-                    else  // Can kill more.
+                    else
                         i++;
                 }
-                Debug.WriteLine($" days={days} i={i} h={h}");
-                // Now h <= hNum, 0 <= i <= mNum.
-                if (i == 0) // Too powerful.
+                Debug.WriteLine($" days={days} i={i}");
+                if (i == 0)
                 {
                     days = -1;
                     break;

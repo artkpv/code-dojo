@@ -19,7 +19,7 @@ public class Solver
         where T : IComparable
     {
         int lo = 0;
-        int hi = array.Count() - 1;
+        int hi = array.Count();
         while (lo < hi)
         {
             int mid = (lo+hi) / 2;
@@ -60,13 +60,13 @@ public class Solver
             for (int i = n - 2; 0 <= i; i--)
                 rPay[i] = rPay[i + 1] + rToL[i];
 
-            Debug.WriteLine(string.Join(" ", l));
-            Debug.WriteLine(string.Join(" ", r));
-            Debug.WriteLine(string.Join(" ", lPay));
-            Debug.WriteLine(string.Join(" ", rPay));
+            Debug.WriteLine("l="+ string.Join(" ", l));
+            Debug.WriteLine("r="+string.Join(" ", r));
+            Debug.WriteLine("lPay="+string.Join(" ", lPay));
+            Debug.WriteLine("rPay="+string.Join(" ", rPay));
             int half = (n+1) / 2;  // Always odd.
 
-            Func<long, long> F = (long mid) => {
+            Func<long, bool> IsPossible = (long mid) => {
                 // Get minimal money amount so that median salary is equal or higher than mid and number of those.
                 // 1. r_i < mid
                 int leftNum = BinarySearchLeft(r, mid);
@@ -74,16 +74,21 @@ public class Solver
                 int rightNum = n - BinarySearchLeft(l, mid);
                 // 3. l_i <= mid < r_i: make l_i or mid for them. 
                 int middleNum = n - leftNum - rightNum;
+                Debug.Assert(middleNum >= 0);
 
+                Debug.WriteLine($" IsPossible mid={mid} {half} left={leftNum} r={rightNum} m={middleNum}");
                 if (half <= leftNum)
-                    return -1; // Not possible.
+                    return false;
                 if (half <= rightNum)
-                    return money;
+                    return true;
 
                 long rightPay = rightNum > 0 ? rPay[n - rightNum] : 0;
-                long middleMidPay = half - rightNum;
-                long minMoney = lPay[half - 2] + (middleMidPay * mid) + rightPay;
-                return minMoney;
+                int middleRightNum = half - rightNum;
+                Debug.Assert(middleRightNum > 0);
+                int middleLeftNum = middleNum - middleRightNum;
+                long minMoney = (middleLeftNum > 1 ? lPay[leftNum + middleLeftNum - 1] : 0) + (middleRightNum * mid) + rightPay;
+                Debug.WriteLine($" minMoney={minMoney} mp={middleRightNum} rp={rightPay}");
+                return minMoney >= money;
             };
 
             long lo = l[0];
@@ -91,15 +96,13 @@ public class Solver
             while (lo < hi) 
             {
                 long median = (lo + hi) / 2;
-                long minMoney = F(median);
-                Debug.Write($" {lo} {hi} {median} {minMoney}\n");
-                if (minMoney == -1)
-                    hi = median;
+                if (IsPossible(median))
+                    lo = median-1;
                 else
-                    lo = median + 1;
+                    hi = median;
             }
 
-            Write(lo - 1);
+            Write(lo-1);
         }
 
     }
