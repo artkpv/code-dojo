@@ -3,6 +3,25 @@
 n salaries with r_i, l_i
 Find max median salary
 
+3
+3 26
+10 12
+1 4
+10 11
+1 1337
+1 1000000000
+5 26
+4 4
+2 4
+6 8
+5 6
+2 7
+
+26
+10 12
+1 4
+10 11
+
  */
 using System;
 using System.Collections.Generic;
@@ -38,71 +57,73 @@ public class Solver
         {
             int n = ReadInt();
             long money = ReadLong();
-            long[] l = new long[n];
-            long[] r = new long[n];
-            long[] rToL = new long[n];
+            long[] bottom = new long[n];
+            long[] top = new long[n];
+            long[] tToB = new long[n]; // Top to bottom.
             for (int worker = 0; worker < n; worker++)
             {
-                l[worker] = ReadInt();
-                r[worker] = ReadInt();
-                rToL[worker] = l[worker];
+                bottom[worker] = ReadInt();
+                top[worker] = ReadInt();
+                tToB[worker] = bottom[worker];
             }
-            Array.Sort(l);
-            Array.Sort(r, rToL);
-            long[] lPay = new long[n];
+            Array.Sort(bottom);
+            Array.Sort(top, tToB);
+            long[] leftOrderPay = new long[n];
 
-            lPay[0] = l[0];
+            leftOrderPay[0] = bottom[0];
             for (int i = 1; i < n; i++)
-                lPay[i] = lPay[i - 1] + l[i];
+                leftOrderPay[i] = leftOrderPay[i - 1] + bottom[i];
 
-            long[] rPay = new long[n];
-            rPay[n - 1] = rToL[n - 1];
+            long[] rightOrderPay = new long[n];
+            rightOrderPay[n - 1] = tToB[n - 1];
             for (int i = n - 2; 0 <= i; i--)
-                rPay[i] = rPay[i + 1] + rToL[i];
+                rightOrderPay[i] = rightOrderPay[i + 1] + tToB[i];
 
-            Debug.WriteLine("l="+ string.Join(" ", l));
-            Debug.WriteLine("r="+string.Join(" ", r));
-            Debug.WriteLine("lPay="+string.Join(" ", lPay));
-            Debug.WriteLine("rPay="+string.Join(" ", rPay));
+            //Debug.WriteLine("bottom="+ string.Join(" ", bottom));
+            //Debug.WriteLine("top="+string.Join(" ", top));
+            //Debug.WriteLine("leftOrderPay="+string.Join(" ", leftOrderPay));
+            //Debug.WriteLine("rightOrderPay="+string.Join(" ", rightOrderPay));
             int half = (n+1) / 2;  // Always odd.
 
-            Func<long, bool> IsPossible = (long mid) => {
-                // Get minimal money amount so that median salary is equal or higher than mid and number of those.
-                // 1. r_i < mid
-                int leftNum = BinarySearchLeft(r, mid);
-                // 2. mid <= l_i included.
-                int rightNum = n - BinarySearchLeft(l, mid);
-                // 3. l_i <= mid < r_i: make l_i or mid for them. 
-                int middleNum = n - leftNum - rightNum;
-                Debug.Assert(middleNum >= 0);
+            Func<long, bool> IsPossible = (long median) => {
+                int left = BinarySearchLeft(top, median);
+                int right = n - BinarySearchLeft(bottom, median);
+                int middle = n - left - right;
 
-                Debug.WriteLine($" IsPossible mid={mid} {half} left={leftNum} r={rightNum} m={middleNum}");
-                if (half <= leftNum)
+                //Debug.WriteLine(
+                        //$" IsPossible median={median} {half} left={left} top={right} m={middle}");
+                if (half <= left)
                     return false;
-                if (half <= rightNum)
+                if (half <= right)
                     return true;
 
-                long rightPay = rightNum > 0 ? rPay[n - rightNum] : 0;
-                int middleRightNum = half - rightNum;
-                Debug.Assert(middleRightNum > 0);
-                int middleLeftNum = middleNum - middleRightNum;
-                long minMoney = (middleLeftNum > 1 ? lPay[leftNum + middleLeftNum - 1] : 0) + (middleRightNum * mid) + rightPay;
-                Debug.WriteLine($" minMoney={minMoney} mp={middleRightNum} rp={rightPay}");
+                long rightPay = right > 0 ? rightOrderPay[n - right] : 0;
+                int middleRight = half - right;
+                Debug.Assert(middleRight > 0);
+                int middleLeft = middle - middleRight;
+                long minMoney = 
+                    (middleLeft > 0 ? leftOrderPay[left + middleLeft - 1] : 0) 
+                    + (middleRight * median) 
+                    + rightPay;
+                //Debug.WriteLine($" minMoney={minMoney} mp={middleRight} rp={rightPay}");
                 return minMoney >= money;
             };
 
-            long lo = l[0];
-            long hi = r[n-1];
+            long lo = bottom[0];
+            long hi = top[n-1];
+            long x = -1;
             while (lo < hi) 
             {
-                long median = (lo + hi) / 2;
-                if (IsPossible(median))
-                    lo = median-1;
+                x = (lo + hi) / 2 + 1;
+                bool isPos = IsPossible(x);
+                Debug.WriteLine($" x={x} lo={lo} hi={hi} isp={isPos}");
+                if (isPos)
+                    lo = x;
                 else
-                    hi = median;
+                    hi = x - 1;
             }
 
-            Write(lo-1);
+            Write(x);
         }
 
     }

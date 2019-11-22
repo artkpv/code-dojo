@@ -13,10 +13,21 @@ I2
 Precomp p s: max power for i. 
 (p, i)
 
+
 E1
 2 3 11 14 1 8
-3 2
-100 1
+
+best:
+0 100
+1 3    
+2 -1   maxS
+
+0 0   deadM days
+ 0 2  i mPower
+ 1 3 
+ 2 11 break
+2 1
+ 0 11
 
 
  */
@@ -39,25 +50,22 @@ public class Solver
         int[] mA = new int[MAXN];
         int[] powers = new int[MAXN];
         int[] stamina = new int[MAXN];
-        int[] bst = new int[MAXN];
         for (int test = 0; test < tests; test++)
         {
             int mNum = ReadInt();
             for (int i = 0; i < mNum; i++)
                 mA[i] = ReadInt();
             int hNum = ReadInt();
-            int maxS = 0;
+            int[] best = new int[mNum+1];
             for (int i = 0; i < hNum; i++)
             {
                 powers[i] = ReadInt();
                 stamina[i] = ReadInt();
-                maxS = Math.Max(stamina[i], maxS);
-                bst[stamina[i]] = Math.Max(bst[stamina[i]], powers[i]);
+                best[stamina[i]] = Math.Max(best[stamina[i]], powers[i]);
             }
-            for (int i = maxS-1; i >= 0; i--)
-            {
-                bst[i] = Math.Max(bst[i], bst[i+1]);
-            }
+            for (int i = mNum-1; i > 0; i--)
+                best[i] = Math.Max(best[i], best[i+1]);
+
             Debug.WriteLine(string.Join(" ", powers.Take(hNum)));
             Debug.WriteLine(string.Join(" ", stamina.Take(hNum)));
             int deadM = 0;
@@ -66,15 +74,12 @@ public class Solver
             while (deadM < mNum) 
             {
                 int i = 0;
-                int minPower = mA[deadM];
-                while (true) 
+                int mPower = mA[deadM];
+                // There are more monsters. There is a powerful hero.
+                while (deadM + i < mNum)
                 {
-                    if (deadM + i >= mNum) // No more monsters.
-                        break;
-                    if (i + 1 > maxS)
-                        break;
-                    minPower = Math.Max(minPower, mA[deadM + i]);
-                    if (minPower > bst[i])  // Too powerful.
+                    mPower = Math.Max(mPower, mA[deadM + i]);
+                    if (mPower > best[i+1])
                         break;
                     else
                         i++;
