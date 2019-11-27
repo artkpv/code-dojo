@@ -1,4 +1,4 @@
-#define DEBUG
+#undef DEBUG
 /*
 n salaries with r_i, l_i
 Find max median salary
@@ -79,10 +79,10 @@ public class Solver
             for (int i = n - 2; 0 <= i; i--)
                 rightOrderPay[i] = rightOrderPay[i + 1] + tToB[i];
 
-            //Debug.WriteLine("bottom="+ string.Join(" ", bottom));
-            //Debug.WriteLine("top="+string.Join(" ", top));
-            //Debug.WriteLine("leftOrderPay="+string.Join(" ", leftOrderPay));
-            //Debug.WriteLine("rightOrderPay="+string.Join(" ", rightOrderPay));
+            Debug.WriteLine("bottom="+ string.Join(" ", bottom));
+            Debug.WriteLine("top="+string.Join(" ", top));
+            Debug.WriteLine("leftOrderPay="+string.Join(" ", leftOrderPay));
+            Debug.WriteLine("rightOrderPay="+string.Join(" ", rightOrderPay));
             int half = (n+1) / 2;  // Always odd.
 
             Func<long, bool> IsPossible = (long median) => {
@@ -105,25 +105,25 @@ public class Solver
                     (middleLeft > 0 ? leftOrderPay[left + middleLeft - 1] : 0) 
                     + (middleRight * median) 
                     + rightPay;
-                //Debug.WriteLine($" minMoney={minMoney} mp={middleRight} rp={rightPay}");
-                return minMoney >= money;
+                Debug.WriteLine($" mm={minMoney} mp={middleRight} rp={rightPay} l={left} m={middle} r={right}");
+                return minMoney <= money;
             };
 
             long lo = bottom[0];
             long hi = top[n-1];
             long x = -1;
-            while (lo < hi) 
+            while (lo <= hi) 
             {
-                x = (lo + hi) / 2 + 1;
+                x = (lo + hi) / 2;
                 bool isPos = IsPossible(x);
                 Debug.WriteLine($" x={x} lo={lo} hi={hi} isp={isPos}");
                 if (isPos)
-                    lo = x;
+                    lo = x + 1;
                 else
                     hi = x - 1;
             }
 
-            Write(x);
+            Write(hi);
         }
 
     }
