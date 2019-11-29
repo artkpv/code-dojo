@@ -17,10 +17,30 @@ Find max median salary
 5 6
 2 7
 
+
 26
 10 12
 1 4
 10 11
+
+1 10 10
+ 1 11 21
+
+4 11 12  1 10 10
+ 1 11 21
+
+Is possible with m median?
+
+Possible iif, cnt >= n+1/2
+
+ r_i < m          always less than median
+ l_i <= m <= r_i  median cross
+ m < l_i          always greater than median
+
+num in 2nd >= max(0, (n+1)/2 - num in 3rd)
+
+
+ 
 
  */
 using System;
@@ -57,73 +77,63 @@ public class Solver
         {
             int n = ReadInt();
             long money = ReadLong();
-            long[] bottom = new long[n];
-            long[] top = new long[n];
-            long[] tToB = new long[n]; // Top to bottom.
+            long[] wl = new long[n]; // Worker bottom possible salary, left.
+            long[] wr = new long[n]; // Worker top possible salary, right.
             for (int worker = 0; worker < n; worker++)
             {
-                bottom[worker] = ReadInt();
-                top[worker] = ReadInt();
-                tToB[worker] = bottom[worker];
+                wl[worker] = ReadInt();
+                wr[worker] = ReadInt();
             }
-            Array.Sort(bottom);
-            Array.Sort(top, tToB);
-            long[] leftOrderPay = new long[n];
+            Array.Sort(wl, wr);
 
-            leftOrderPay[0] = bottom[0];
-            for (int i = 1; i < n; i++)
-                leftOrderPay[i] = leftOrderPay[i - 1] + bottom[i];
+            int half = (n+1) / 2;
+            Func<long, bool> IsPossible = (long m) => {
+                var middleW = new List<int>();
+                long spent = 0;
+                int count = 0;
+                for (int i = 0; i < n; i++)
+                {
+                    if (wr[i] < m)
+                    {
+                        spent += wl[i];
+                    }
+                    else if (wl[i] >= m)
+                    {
+                        count++;
+                        spent += wl[i];
+                    }
+                    else // Middle.
+                    {
+                        middleW.Add(i);
+                    }
+                }
 
-            long[] rightOrderPay = new long[n];
-            rightOrderPay[n - 1] = tToB[n - 1];
-            for (int i = n - 2; 0 <= i; i--)
-                rightOrderPay[i] = rightOrderPay[i + 1] + tToB[i];
-
-            Debug.WriteLine("bottom="+ string.Join(" ", bottom));
-            Debug.WriteLine("top="+string.Join(" ", top));
-            Debug.WriteLine("leftOrderPay="+string.Join(" ", leftOrderPay));
-            Debug.WriteLine("rightOrderPay="+string.Join(" ", rightOrderPay));
-            int half = (n+1) / 2;  // Always odd.
-
-            Func<long, bool> IsPossible = (long median) => {
-                int left = BinarySearchLeft(top, median);
-                int right = n - BinarySearchLeft(bottom, median);
-                int middle = n - left - right;
-
-                //Debug.WriteLine(
-                        //$" IsPossible median={median} {half} left={left} top={right} m={middle}");
-                if (half <= left)
+                if (count + middleW.Count() < half)
                     return false;
-                if (half <= right)
-                    return true;
 
-                long rightPay = right > 0 ? rightOrderPay[n - right] : 0;
-                int middleRight = half - right;
-                Debug.Assert(middleRight > 0);
-                int middleLeft = middle - middleRight;
-                long minMoney = 
-                    (middleLeft > 0 ? leftOrderPay[left + middleLeft - 1] : 0) 
-                    + (middleRight * median) 
-                    + rightPay;
-                Debug.WriteLine($" mm={minMoney} mp={middleRight} rp={rightPay} l={left} m={middle} r={right}");
-                return minMoney <= money;
+                int rem = Math.Max(0, half - count);
+
+                spent += rem * m;
+                for (int i = 0; i < middleW.Count() - rem; i++)
+                    spent += wl[middleW[i]];
+                return spent <= money;
             };
 
-            long lo = bottom[0];
-            long hi = top[n-1];
-            long x = -1;
-            while (lo <= hi) 
+            const int MAX = (int) 1e9+1;
+            long lo = 0;
+            long hi = MAX;
+            while (lo < hi) 
             {
-                x = (lo + hi) / 2;
-                bool isPos = IsPossible(x);
-                Debug.WriteLine($" x={x} lo={lo} hi={hi} isp={isPos}");
+                long mid = (lo + hi) / 2;
+                bool isPos = IsPossible(mid);
+                Debug.WriteLine($" mid={mid} isPos={isPos} lo={lo} hi={hi}");
                 if (isPos)
-                    lo = x + 1;
+                    lo = mid+1;
                 else
-                    hi = x - 1;
+                    hi = mid;
             }
 
-            Write(hi);
+            Write(lo-1);
         }
 
     }
