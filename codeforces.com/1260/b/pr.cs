@@ -1,4 +1,7 @@
 /*
+6 9
+
+jj
 
  */
 using System;
@@ -14,6 +17,19 @@ public class Solver
 {
     public void Solve()
     {
+        int tests = ReadInt();
+        Func<int, int, bool> Check = (int a, int b) =>
+        {
+            (a, b) = a < b ? (a, b) : (b, a);
+            return (a+b) % 3 == 0 && 2*a >= b;
+        };
+
+        for (int test = 0; test < tests; test++)
+        {
+            int a = ReadInt();
+            int b = ReadInt();
+            Write(Check(a, b) ? "YES" : "NO");
+        }
         
     }
 
