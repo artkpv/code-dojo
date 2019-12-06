@@ -59,6 +59,7 @@ public class Solver
         string input = ReadToken();
         int cI = 0; // Cursor index.
         const int INF = int.MaxValue;
+        var ans = new List<int>();
         for (int inputInx = 0; inputInx < n; inputInx++)
         {
             char c = input[inputInx];
@@ -100,9 +101,9 @@ public class Solver
                         rB.Push(b);
                         if (b.t) // ')'
                         {
-                            rO.Push(rO.TryPeek(out var rONum) ? rONum + 1 : 1);
+                            rC.Push(rC.TryPeek(out var rCNum) ? rCNum + 1 : 1);
                             rD.Push(rD.TryPeek(out var rDNum) ? rDNum : 0);
-                            lC.Pop();
+                            lO.Pop();
                             lD.Pop();
                         }
                         else // '('
@@ -112,47 +113,23 @@ public class Solver
                             if(rC.TryPeek(out var rCNum))
                                 rCNum = 0;
                             rD.Push(Max(
-                                !rD.TryPeek(out var rDNum) ? rDNum : 0,
+                                rD.TryPeek(out var rDNum) ? rDNum : 0,
                                 lONum == rCNum ? lONum : INF
                             ));
                             rC.Push(rCNum);
                         }
                     }
                     break;
-                case '(' || ')':
-                    if (rB.TryPeek(out var rBb) && rBb.i == cI)
+                case '(':
+                case ')': 
                     {
-                        // Rewrite right stack.
-                        rB.Pop();
-                        rC.Pop();
-                        rD.Pop();
-                        rB.Push((c == '(', cI));
-                        if (rBb.t && (c == ')')) 
-                        { 
-                            // From '(' to ')'.
-                            var rDNum = rD.Pop();
-                            rD.Push(rD.TryPeek(out var rDPrevNum) ? rDPrevNum : 0);
-                            var rCNum = rC.Pop();
-                            rC.Push(rCNum + 1);
-                        }
-                        else if (!rBb.t && (c == '(')) 
-                        { 
-                            // From ')' to '('.
-                            var rCNum = rC.Pop();
-                            rCNum--;
-                            rC.Push(rCNum);
-                            if(!lO.TryPop(out var lONum))
-                                lONum = 0;
+                        if (rB.TryPeek(out var rBb) && rBb.i == cI)
+                        {
+                            // Rewrite right stack.
+                            rB.Pop();
+                            rC.Pop();
                             rD.Pop();
-                            rD.Push(Max(
-                                rD.TryPeek(out var rDPrevNum) ? rDPrevNum : 0,
-                                lONum == rCNum ? lONum : INF
-                            ));
                         }
-                        // Else the same braket.
-                    }
-                    else 
-                    {
                         // Add to right stack.
                         rB.Push((c == '(', cI));
                         if (c == '(')
@@ -162,10 +139,8 @@ public class Solver
                             lONum++;
                             if(rC.TryPeek(out var rCNum))
                                 rCNum = 0;
-                            if (!rD.TryPeek(out var rDNum))
-                                rDNum = 0;
                             rD.Push(Max(
-                                rDNum,
+                                rD.TryPeek(out var rDNum) ? rDNum : 0,
                                 lONum == rCNum ? lONum : INF
                             ));
                             rC.Push(rCNum);
@@ -175,19 +150,20 @@ public class Solver
                             rD.Push(rD.TryPeek(out var rDNum) ? rDNum : 0);
                             rC.Push(rC.TryPeek(out var rCNum) ? rCNum + 1 : 1);
                         }
-                        
+                        break;
                     }
-                    break;
                 default:
-                    // Rewrite if on a braket.
-                    if (cI == (rB.TryPeek(out var rBb) ? rBb.i : -1))
                     {
-                        // Delete braket at right stack.
-                        rB.Pop();
-                        rD.Pop();
-                        rC.Pop();
+                        // Rewrite if on a braket.
+                        if (cI == (rB.TryPeek(out var rBb) ? rBb.i : -1))
+                        {
+                            // Delete braket at right stack.
+                            rB.Pop();
+                            rD.Pop();
+                            rC.Pop();
+                        }
+                        break;
                     }
-                    break;
             }
             // Get max:
             {
@@ -199,9 +175,10 @@ public class Solver
                     rCNum = 0;
                 localMax = Max(localMax, lONum == rCNum ? lONum : INF);
 
-                Write(localMax == INF ? -1 : localMax);
+                ans.Add(localMax == INF ? -1 : localMax);
             }
         }
+        Write(string.Join(" ", ans));
     }
 
     #region Main
