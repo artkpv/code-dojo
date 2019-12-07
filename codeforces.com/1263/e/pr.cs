@@ -1,3 +1,4 @@
+#undef DEBUG
 /*
  *
 
@@ -18,20 +19,8 @@ Stacks for left and right:
 O(N)
 
 
-(RaRbR)L)L(
--1 -1 -1 -1 -1 -1 1 1 -1 -1 2 
-
-L:
-,
-,
-0
-
-R:
-( 0, 
-,
--1
-
-
+TODO:
+- Problem. How to detect that left is invalid? Eq ))(()) 
 
 
  */
@@ -44,6 +33,20 @@ using System.Text;
 using System.Threading;
 using System.Diagnostics;
 using static System.Math;
+
+public static class StackExtensions
+{
+    public static bool TryPeek<T>(this Stack<T> stack, out T res) 
+    {
+        if (stack.Any())
+        {
+            res = stack.Peek();
+            return true;
+        }
+        res = default (T);
+        return false;
+    }
+}
 
 public class Solver
 {
@@ -60,6 +63,55 @@ public class Solver
         int cI = 0; // Cursor index.
         const int INF = int.MaxValue;
         var ans = new List<int>();
+
+        Action<(bool t, int i)> PushLeft = (br) =>
+        {
+            lB.Push(br);
+            if (br.t) // '('
+            {
+                lD.Push(lD.TryPeek(out var lDNum) ? lDNum : 0);
+                lO.Push(lO.TryPeek(out var lONum) ? lONum + 1 : 1);
+            }
+            else // ')'
+            {
+                if(!lO.TryPeek(out var lONum))
+                    lONum = 0;
+                if(!rC.TryPeek(out var rCNum))
+                    rCNum = 0;
+                rCNum++;
+                lD.Push(Max(Max(
+                    lD.TryPeek(out var lDNum) ? lDNum : 0,
+                    lONum),
+                    lONum - 1 < 0 ? INF : 0  // To signal left stack is invalid.
+                ));
+                lO.Push(Max(0, lONum - 1));  // Only opened without pair.
+            }
+        };
+
+        Action<(bool t, int i)> PushRight = (br) =>
+        {
+            rB.Push(br);
+            if (br.t) // '('
+            {
+                if(!lO.TryPeek(out var lONum))
+                    lONum = 0;
+                lONum++;
+                if(!rC.TryPeek(out var rCNum))
+                    rCNum = 0;
+                rD.Push(Max(Max(
+                    rD.TryPeek(out var rDNum) ? rDNum : 0,
+                    rCNum),
+                    rCNum - 1 < 0 ? INF : 0  // To signal right stack is invalid.
+                ));
+                rC.Push(Max(0, rCNum - 1)); // Only closed w/o pair.
+            }
+            else // ')'
+            {
+                rD.Push(rD.TryPeek(out var rDNum) ? rDNum : 0);
+                rC.Push(rC.TryPeek(out var rCNum) ? rCNum + 1 : 1);
+            }
+        };
+
         for (int inputInx = 0; inputInx < n; inputInx++)
         {
             char c = input[inputInx];
@@ -67,62 +119,31 @@ public class Solver
             switch (c)
             {
                 case 'R':
-                    if (rB.Any() && rB.Peek().i == cI)
+                    if ( rB.Any() && rB.Peek().i == cI)
                     {
+                        rD.Pop();
+                        rC.Pop();
                         (bool t, int i) b = rB.Pop();
-                        lB.Push(b);
-                        if (b.t) // '('
-                        {
-                            lO.Push(lO.TryPeek(out var lONum) ? lONum + 1 : 1);
-                            lD.Push(lD.TryPeek(out var lDNum) ? lDNum : 0);
-                            rC.Pop();
-                            rD.Pop();
-                        }
-                        else // ')'
-                        {
-                            if (!lO.TryPeek(out var lONum))
-                               lONum = 0;
-                            var rCNum = rC.Pop();
-                            lD.Push(Max(
-                                lD.TryPeek(out var lDNum) ? lDNum : 0,
-                                lONum == rCNum ? lONum : INF
-                            ));
-                            lO.Push(lONum);
-                            rD.Pop();
-                        }
+                        PushLeft(b);
                     }
                     cI++;
                     break;
                 case 'L':
-                    cI--;
-                    if (lB.Any() && lB.Peek().i == cI)
+                    if (0 < cI)
                     {
-                        (bool t, int i) b = lB.Pop();
-                        rB.Push(b);
-                        if (b.t) // ')'
+                        cI--;
+                        if (lB.Any() && lB.Peek().i == cI)
                         {
-                            rC.Push(rC.TryPeek(out var rCNum) ? rCNum + 1 : 1);
-                            rD.Push(rD.TryPeek(out var rDNum) ? rDNum : 0);
-                            lO.Pop();
                             lD.Pop();
-                        }
-                        else // '('
-                        {
-                            if(!lO.TryPop(out var lONum))
-                                lONum = 0;
-                            if(rC.TryPeek(out var rCNum))
-                                rCNum = 0;
-                            rD.Push(Max(
-                                rD.TryPeek(out var rDNum) ? rDNum : 0,
-                                lONum == rCNum ? lONum : INF
-                            ));
-                            rC.Push(rCNum);
+                            lO.Pop();
+                            (bool t, int i) b = lB.Pop();
+                            PushRight(b);
                         }
                     }
                     break;
-                case '(':
-                case ')': 
+                default:
                     {
+                        Trace.Assert(c == '(' || c == ')' || ('a' <= c && c <= 'z'));
                         if (rB.TryPeek(out var rBb) && rBb.i == cI)
                         {
                             // Rewrite right stack.
@@ -130,55 +151,41 @@ public class Solver
                             rC.Pop();
                             rD.Pop();
                         }
-                        // Add to right stack.
-                        rB.Push((c == '(', cI));
-                        if (c == '(')
-                        {
-                            if(!lO.TryPop(out var lONum))
-                                lONum = 0;
-                            lONum++;
-                            if(rC.TryPeek(out var rCNum))
-                                rCNum = 0;
-                            rD.Push(Max(
-                                rD.TryPeek(out var rDNum) ? rDNum : 0,
-                                lONum == rCNum ? lONum : INF
-                            ));
-                            rC.Push(rCNum);
-                        }
-                        else // ')'
-                        {
-                            rD.Push(rD.TryPeek(out var rDNum) ? rDNum : 0);
-                            rC.Push(rC.TryPeek(out var rCNum) ? rCNum + 1 : 1);
-                        }
-                        break;
-                    }
-                default:
-                    {
-                        // Rewrite if on a braket.
-                        if (cI == (rB.TryPeek(out var rBb) ? rBb.i : -1))
-                        {
-                            // Delete braket at right stack.
-                            rB.Pop();
-                            rD.Pop();
-                            rC.Pop();
-                        }
+                        if (c == '(' || c == ')')
+                            PushRight((c == '(', cI));
                         break;
                     }
             }
             // Get max:
             {
-                int localMax = lD.TryPeek(out var lDNum) ? lDNum : 0;
-                localMax = Max(localMax, rD.TryPeek(out var rDNum) ? rDNum : 0);
-                if (lO.TryPeek(out var lONum))
+                int max = lD.TryPeek(out var lDNum) ? lDNum : 0;
+                max = Max(max, rD.TryPeek(out var rDNum) ? rDNum : 0);
+                if (!lO.TryPeek(out int lONum))
                     lONum = 0;
-                if (rC.TryPeek(out var rCNum))
+                if (!rC.TryPeek(out int rCNum))
                     rCNum = 0;
-                localMax = Max(localMax, lONum == rCNum ? lONum : INF);
 
-                ans.Add(localMax == INF ? -1 : localMax);
+                max = Max(max, lONum == rCNum ? lONum : INF);
+
+                Debug.WriteLine($@" '{c}' {inputInx} cI={cI} max={max} lONum={lONum} rCNum={rCNum}
+  L:{ToString(lB, reverse:true)}, de={string.Join(" ", lD)}, op={string.Join(" ", lO)}
+  R:{ToString(rB)}, de={string.Join(" ", rD)}, cl={string.Join(" ", rC)}");
+                ans.Add(max == INF ? -1 : max);
             }
         }
         Write(string.Join(" ", ans));
+    }
+
+    private string ToString(Stack<(bool t, int i)> s, bool reverse=false)
+    {
+        var sb = new StringBuilder();
+
+        foreach((bool t, int i) b in reverse ? s.Reverse() : s)
+        {
+            char c = b.t ? '(' : ')';
+            sb.Append($"{c}-{b.i} ");
+        }
+        return sb.ToString();
     }
 
     #region Main
