@@ -93,7 +93,7 @@ public class Solver
             inx += 1;
         }
 
-        return crc ^ 0xFFFFFFFF;
+        return crc;
     }
 
     private uint CrcOnWord(uint data, uint crc)
@@ -109,7 +109,7 @@ public class Solver
             inx += 1;
         }
 
-        return crc ^ 0xFFFFFFFF; // TODO. Why XOR here?
+        return crc;
     } 
 
     private uint? HackBytes(uint crcIn, uint crcOut)
@@ -168,7 +168,7 @@ public class Solver
             data[xPos+2] = x[2];
             data[xPos+3] = x[3];
             uint crcIn = Crc(data, 0, xPos+3);
-            uint? ans = HackBytes(crcIn ^ 0xFFFFFFFF, crc);
+            uint? ans = HackBytes(crcIn, crc);
             if (ans != null)
             {
                 Write(CrcToString(ans.Value));
