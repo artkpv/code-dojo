@@ -1,4 +1,4 @@
-#define DEBUG
+#undef DEBUG
 #define TRACE
 /*
 
@@ -26,10 +26,13 @@ public class Solver
             byte first = (byte)(crcTable[i] >> (BITS * (WORD - 1)));
             Debug.Assert(first == 0 || crcTableReverse[first] == 0);
             crcTableReverse[first] = i;
+
+            crcTableRR[crcTable[i]] = i;
         }
     }
 
     static int[] crcTableReverse = new int[byte.MaxValue + 1];
+    static Dictionary<uint, int> crcTableRR = new Dictionary<uint, int>();
 
 #region Crc table
 
@@ -138,9 +141,9 @@ public class Solver
         return crc;
     }
 
-    private uint CrcOnWord(uint data, uint crc)
+    private uint CrcOnWordMinus(uint data, uint crc)
     {
-        int inx = 0;
+        int inx = 1;
         while (inx < WORD)
         {
             int shift = (WORD - inx - 1) * BITS;
@@ -152,23 +155,61 @@ public class Solver
         return crc;
     } 
 
-    private uint CrcOnWordReverse(uint data, uint crc)
+    byte? GetByte(uint crcLeft, uint crc)
     {
-        int inx = WORD - 1;
-        while (inx >= 0)
+        // crc2 = crcTable[(crc1 & 0xFF) ^ b] ^ (crc1 >> 8);
+        // crc2 ^ (crc1 >> 8) == crcTable[(crc1 & FF) ^ b]
+        
+        uint tableValue = crc ^ (crcLeft >> 8);
+        if (crcTableRR.ContainsKey(tableValue))
         {
-            int shift = (WORD - inx - 1) * BITS;
-            byte b = (byte)((data >> shift) & 0xFF);
-            crc = NextCrcReverse(crc, b);
-            inx -= 1;
+            int tableInx = crcTableRR[tableValue];
+            return (byte) (tableInx ^ (crcLeft & 0xFF));
         }
-        return crc;
-
+        return null;
     }
 
     private uint? HackBytes(uint crcLeft, uint crcRight)
     {
-        long found = -1;
+        // crc2 = crcTable[(crc1 & 0xFF) ^ b] ^ (crc1 >> 8);
+        // crc2 ^ (crc1 >> 8) == crcTable[(crc1 & FF) ^ b]
+        // (crc1 >> 8) == crcTable[(crc1 & FF) ^ b] ^ crc2
+
+        // Backward:
+        int crc4TableInx = crcTableReverse[(int)(crcRight >> 24)];
+        uint shortCrc3 = (crcTable[crc4TableInx] ^ crcRight) << 8;
+        // shortCrc3 has 24 valid
+        int crc3TableInx = crcTableReverse[(int)(shortCrc3 >> 24)];
+        uint shortCrc2 = (crcTable[crc3TableInx] ^ shortCrc3) << 8;
+        // shortCrc2 has 16 valid
+        int crc2TableInx = crcTableReverse[(int)(shortCrc2 >> 24)];
+        uint shortCrc1 = (crcTable[crc2TableInx] ^ shortCrc2) << 8;
+        // shortCrc1 has 8 valid
+        int crc1TableInx = crcTableReverse[(int)(shortCrc1 >> 24)]; 
+
+        // Forward:
+        int b1 = crc1TableInx ^ (byte)(crcLeft & 0xFF);
+        uint crc1 = crcTable[crc1TableInx] ^ (crcLeft >> 8);
+
+        int b2 = crc2TableInx ^ (byte)(crc1 & 0xFF);
+        uint crc2 = crcTable[crc2TableInx] ^ (crc1 >> 8);
+
+        int b3 = crc3TableInx ^ (byte)(crc2 & 0xFF);
+        uint crc3 = crcTable[crc3TableInx] ^ (crc2 >> 8);
+
+        int b4 = crc4TableInx ^ (byte)(crc3 & 0xFF);
+        uint crc4 = crcTable[crc4TableInx] ^ (crc3 >> 8);
+        
+        if (crc4 == crcRight)
+            return (uint) ((b1 << 24) | (b2 << 16) | (b3 << 8) | b4);
+        else
+        {
+            uint mybyte = (uint) ((b1 << 24) | (b2 << 16) | (b3 << 8) | b4);
+            Debug.WriteLine(CrcToLString(mybyte));
+            Debug.WriteLine($" no solution? crc4={crc4} crcRight={crcRight}");
+            return (uint?) null;
+        }
+
         //for (uint hB = 0; hB <= 0xFFFFFFFF; hB++)
         //{
             //uint crcCheck = CrcOnWord(hB, crcLeft);
@@ -178,18 +219,21 @@ public class Solver
         //}
         //return null;
 
-        Parallel.For((long)0, (long)0xFFFFFFFF+1, 
-            (Action<long, ParallelLoopState>) ((hB, loop) =>
-            {
-                uint crcCheck = CrcOnWord((uint)hB, crcLeft);
-                if (crcCheck == crcRight)
-                {
-                    Debug.WriteLine($" found: left={crcLeft:x} right={crcRight:x} check={crcCheck:x} bytes={(uint)hB:x}" );
-                    loop.Break();
-                    Interlocked.CompareExchange(ref found, (long)hB, -1);
-                }
-            }));
-        return found == -1 ? (uint?)null : (uint) found;
+        //long found = -1;
+
+        //Parallel.For(0, 0xFFFFFF+1, 
+            //(Action<int, ParallelLoopState>) ((threeB, loop) =>
+            //{
+                //uint crcThird = CrcOnWordMinus((uint)threeB, crcLeft);
+                //byte? lastByte = GetByte(crcThird, crcRight);
+                //if (lastByte.HasValue)
+                //{
+                    //long hB = (long)(threeB << BITS) | (long)lastByte;
+                    //Interlocked.CompareExchange(ref found, hB, -1);
+                    //loop.Break();
+                //}
+            //}));
+        //return found == -1 ? (uint?)null : (uint) found;
     }
 
     private string CrcToLString(uint crc)
@@ -212,17 +256,8 @@ public class Solver
 
     public void Solve()
     {
-        //Write(@"68 253 245 168
-//234 32 77 81
-//224 85 248 205
-//140 7 85 167
-//15 177 37 114
-//138 46 86 24
-//31 219 177 93
-//254 236 227 46");
-        //return;
 
-        UnitTests();
+        // UnitTests();
         // return;
 
         ////////////////// 
@@ -231,6 +266,7 @@ public class Solver
         int queriesNum = ReadInt();
 
         byte[] data = ReadIntArray().Select(e => (byte)e).ToArray();
+        uint crcData = Crc(data, 0, data.Length-1);
         for (int query = 0; query < queriesNum; query++)
         {
             int[] inLine = ReadIntArray();
@@ -249,7 +285,6 @@ public class Solver
                 crcLeft = Crc(data, 0, hackPos-1);
             }
 
-            uint crcData = Crc(data, 0, data.Length-1);  // Can optimize by using crcRight or crcLeft
             byte[] tempData = data.Skip(xPos).Take(WORD).ToArray();
             ChangeData(data, x, xPos);
             if(xPos < hackPos)
