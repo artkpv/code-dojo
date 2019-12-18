@@ -15,53 +15,27 @@ public class Solver
 {
     public void Solve()
     {
+        // 1 6 -7  +14
+        // 5 2 -7
+        // 4 3 -7
+        //
+        // Up: 20 19 18 17 16 15
+        //
+        // 21 sum
+
         int tests = ReadInt();
-        for (int test = 0; test < tests; test++)
+        long[] a = ReadLongArray();
+        foreach (long x in a)
         {
-            int sNum = ReadInt();
-            var lZ = new List<int>();
-            var rZ = new List<int>();
-            int all0 = 0;
-            int all1 = 0;
-
-
-
-            for (int i = 0; i < sNum; i++)
-            {
-                string s = ReadToken();
-                if (s[0] != s[s.Length-1])
-                {
-                    if (s[0] == '0')
-                        lZ.Add(i);
-                    else
-                        rZ.Add(i);
-                }
-                else if (s[0] == '1')
-                    all1++;
-                else if (s[0] == '0')
-                    all0++;
-            }
-            if (lZ.Count == 0 && rZ.Count == 0)
-            {
-                if (all1 == 0 || all0 == 0)
-                    Write(0);
-                else
-                    Write(-1);
-            }
+            if (x < 15 || x % 14 == 0)
+                Write("NO");
             else
             {
-                var k = (lZ.Count + rZ.Count) / 2 - (Min(lZ.Count, rZ.Count));
-                Write(k);
-                if (k == 0)
-                    Write("");
-                else
-                {
-                    int skipN = Max(rZ.Count(), lZ.Count());
-                    WriteArray((rZ.Count < lZ.Count ? lZ : rZ).Skip(Max(0, skipN-1-k)).Take(k).Select(i => i + 1));
-
-                }
+                int y = 14 + (int)(x % 14);
+                Write(y <= 20 ? "YES" : "NO");
             }
         }
+
     }
 
     #region Main

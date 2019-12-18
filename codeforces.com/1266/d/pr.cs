@@ -13,55 +13,55 @@ using static System.Math;
 
 public class Solver
 {
+    Dictionary<(int f, int t), long> weights = new Dictionary<(int f, int t), long>();
+    List<List<int>> adj = new List<List<int>>();
+    void Decrease(int f, int t)
+    {
+        if (weights[(t, f)] < weights[(f,t)])
+        {
+            weights[(f,t)] -= weights[(t,f)];
+            weights.Remove((t,f));
+            adj[t].Remove(f);
+        }
+        else
+        {
+            weights[(t,f)] -= weights[(f,t)];
+            weights.Remove((f,t));
+            adj[f].Remove(t);
+        }
+    }
+
+    void Relax(int v)
+    {
+
+    }
+
     public void Solve()
     {
-        int tests = ReadInt();
-        for (int test = 0; test < tests; test++)
+        int vNum = ReadInt();
+        int eNum = ReadInt();
+        for (int einx = 0; einx < eNum; vinx++)
         {
-            int sNum = ReadInt();
-            var lZ = new List<int>();
-            var rZ = new List<int>();
-            int all0 = 0;
-            int all1 = 0;
-
-
-
-            for (int i = 0; i < sNum; i++)
+            int f = ReadInt()-1;
+            int t = ReadInt()-1;
+            int w = ReadInt();
+            if (weights.ContainsKey((f, t)))
             {
-                string s = ReadToken();
-                if (s[0] != s[s.Length-1])
-                {
-                    if (s[0] == '0')
-                        lZ.Add(i);
-                    else
-                        rZ.Add(i);
-                }
-                else if (s[0] == '1')
-                    all1++;
-                else if (s[0] == '0')
-                    all0++;
-            }
-            if (lZ.Count == 0 && rZ.Count == 0)
-            {
-                if (all1 == 0 || all0 == 0)
-                    Write(0);
-                else
-                    Write(-1);
+                weights[(f, t)] = weights.GetValueOrDefault((f, t), 0) + w;
             }
             else
             {
-                var k = (lZ.Count + rZ.Count) / 2 - (Min(lZ.Count, rZ.Count));
-                Write(k);
-                if (k == 0)
-                    Write("");
-                else
-                {
-                    int skipN = Max(rZ.Count(), lZ.Count());
-                    WriteArray((rZ.Count < lZ.Count ? lZ : rZ).Skip(Max(0, skipN-1-k)).Take(k).Select(i => i + 1));
-
-                }
+                weights[(f, t)] = w;
+                adj[f].Add(t);
             }
+            if (weights.ContainsKey((t, f)))
+                Decrease(t, f);
         }
+        for (int vInx = 0; vInx < vNum; vInx++)
+        {
+            Relax(vInx);
+        }
+
     }
 
     #region Main

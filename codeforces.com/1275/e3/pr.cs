@@ -254,11 +254,18 @@ public class Solver
         data[i+3] = x[3];
     }
 
+    private uint NextCrc(uint crc, byte b)
+    {
+        return crcTable[(crc & 0xFF) ^ b] ^ (crc >> 8);
+    }
+
+    private Dictionary<string, string> Cache = new Dictionary<string, string>();
+
     public void Solve()
     {
 
-        // UnitTests();
-        // return;
+        UnitTests();
+        return;
 
         ////////////////// 
 
@@ -266,10 +273,32 @@ public class Solver
         int queriesNum = ReadInt();
 
         byte[] data = ReadIntArray().Select(e => (byte)e).ToArray();
-        uint crcData = Crc(data, 0, data.Length-1);
+        uint[] crcs = new uint[bytesLen];
+        const uint crcZero = 0xFFFFFFFF;
+        crcs[0] = NextCrc(crcZero, data[0]);
+        for (int i = 1; i < bytesLen; i++)
+        {
+            crcs[i] = NextCrc(crcs[i-1], data[i]);
+        }
+        //byte[][] shortData = new byte[bytesLen][];
+        //for (int i = 0; i < bytesLen - 1; i++)
+        //{
+            //shortData = new byte[bytesLen];
+            //for (int j = i + 1; i < bytesLen - 4; i++)
+            //{
+            //}
+        //}
+
         for (int query = 0; query < queriesNum; query++)
         {
-            int[] inLine = ReadIntArray();
+            string inputS = reader.ReadLine();
+            if (Cache.ContainsKey(inputS))
+            {
+                Write(Cache[inputS]);
+                continue;
+            }
+            int[] inLine = inputS.Split(' ').Select(e => int.Parse(e)).ToArray();
+            
             int xPos = inLine[0];
             int hackPos = inLine[1];
             Debug.WriteLine($"Query xPos={xPos} hackPos={hackPos}");
@@ -278,47 +307,79 @@ public class Solver
             uint? crcLeft = null;
             if(xPos < hackPos)
             {
-                crcRight = Crc(data, 0, hackPos + WORD - 1);
+                crcRight = crcs[hackPos + WORD - 1];
             }
             else
             {
-                crcLeft = Crc(data, 0, hackPos-1);
+                crcLeft = hackPos == 0 ? crcZero : crcs[hackPos-1];
             }
 
             byte[] tempData = data.Skip(xPos).Take(WORD).ToArray();
             ChangeData(data, x, xPos);
             if(xPos < hackPos)
             {
-                crcLeft = Crc(data, 0, hackPos - 1);  // Can optimize by using crc at xPos-1
+                crcLeft = xPos == 0 ? crcZero : crcs[xPos-1];
+                for (int i = xPos; i <= hackPos - 1; i++)
+                {
+                    crcLeft = NextCrc(crcLeft.Value, data[i]);
+                }
             }
             else
             {
-                crcRight = CrcReverse(data, hackPos+WORD, data.Length-1, crcData);
+                crcRight = crcs[xPos + 3];
+                for (int i = xPos + 3; i >= hackPos + 4; i--)
+                { 
+                    crcRight = NextCrcReverse(crcRight.Value, data[i]);
+                }
             }
 
             uint? ans = HackBytes(crcLeft.Value, crcRight.Value);
+            string ansStr;
             if (ans != null)
             {
-                Write(WordToString(ans.Value));
+                ansStr = WordToString(ans.Value);
             }
             else
-                Write("No solution");
+                ansStr = "No solution";
             ChangeData(data, tempData, xPos);
+
+            Write(ansStr);
+            Cache[inputS] = ansStr;
         }
     }
 
     private void UnitTests()
     {
-        Trace.Assert(crcTable[crcTableReverse[0x99]] == 0x990951BA);
-        Trace.Assert(crcTable[crcTableReverse[0x70]] == 0x706AF48F);
+        // Can we shorten data into one byte? 
 
+        // crc2 = crcTable[(crc1 & 0xFF) ^ b] ^ (crc1 >> 8);
+        // crc2 ^ (crc1 >> 8) == crcTable[(crc1 & FF) ^ b]
+        // (crc1 >> 8) == crcTable[(crc1 & FF) ^ b] ^ crc2
 
         var data = new byte[] {109, 107, 106, 105};
         uint crcOriginal = 0xFFFFFFFF;
         uint crc = Crc(data, 0, data.Length-1, crcOriginal);
         uint crcR = CrcReverse(data, 0, data.Length-1, crc);
-        Debug.WriteLine($" Test: orig={crcOriginal:x} crc={crc:x} crcR={crcR:x}");
-        Trace.Assert(crcR == crcOriginal);
+
+        uint tableVal = crc ^ (crcOriginal >> 8);
+        int tableInx = crcTableRR[tableVal];  // TODO Breaks here as no such value in the table. Then it is not possible?
+        byte specialByte = (byte) (tableInx ^ (crcOriginal ^ 0xFF));
+        uint crcExpected = Crc(data, 0, data.Length - 1, 0xFF00FF00);
+        uint crcActual = Crc(new[] {specialByte}, 0, 0, 0xFF00FF00);
+        Debug.WriteLine($"{crcExpected} == {crcActual}");
+        Trace.Assert(crcExpected == crcActual);
+
+        //Trace.Assert(crcR == crcOriginal);
+        //Trace.Assert(crcTable[crcTableReverse[0x99]] == 0x990951BA);
+        //Trace.Assert(crcTable[crcTableReverse[0x70]] == 0x706AF48F);
+
+
+        //var data = new byte[] {109, 107, 106, 105};
+        //uint crcOriginal = 0xFFFFFFFF;
+        //uint crc = Crc(data, 0, data.Length-1, crcOriginal);
+        //uint crcR = CrcReverse(data, 0, data.Length-1, crc);
+        //Debug.WriteLine($" Test: orig={crcOriginal:x} crc={crc:x} crcR={crcR:x}");
+        //Trace.Assert(crcR == crcOriginal);
     }
 
     #region Main
