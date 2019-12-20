@@ -1,3 +1,4 @@
+#define TRACE
 /*
 
  */
@@ -13,54 +14,53 @@ using static System.Math;
 
 public class Solver
 {
-    Dictionary<(int f, int t), long> weights = new Dictionary<(int f, int t), long>();
-    List<List<int>> adj = new List<List<int>>();
-    void Decrease(int f, int t)
-    {
-        if (weights[(t, f)] < weights[(f,t)])
-        {
-            weights[(f,t)] -= weights[(t,f)];
-            weights.Remove((t,f));
-            adj[t].Remove(f);
-        }
-        else
-        {
-            weights[(t,f)] -= weights[(f,t)];
-            weights.Remove((f,t));
-            adj[f].Remove(t);
-        }
-    }
-
-    void Relax(int v)
-    {
-
-    }
-
     public void Solve()
     {
         int vNum = ReadInt();
         int eNum = ReadInt();
-        for (int einx = 0; einx < eNum; vinx++)
+        int[] bal = new int[vNum];
+        for (int i = 0; i < eNum; i++)
         {
             int f = ReadInt()-1;
             int t = ReadInt()-1;
             int w = ReadInt();
-            if (weights.ContainsKey((f, t)))
+            bal[t] += w;
+            bal[f] -= w;
+        }
+
+        var g = new List<List<Tuple<int, int>>>();
+        for (int i = 0; i < vNum; i++)
+            g.Add(new List<Tuple<int, int>>());
+
+        var d = new Dictionary<int, int>();
+        int count = 0;
+        for (int i = 0; i < vNum; i++)
+        {
+            if (bal[i] == 0)
+                continue;
+            if (d.ContainsKey(-bal[i]))
             {
-                weights[(f, t)] = weights.GetValueOrDefault((f, t), 0) + w;
+                if (bal[i] < 0)
+                    g[i].Add(Tuple.Create(d[-bal[i]], Abs(bal[i])) );
+                else
+                    g[d[-bal[i]]].Add(Tuple.Create(i, Abs(bal[i])) );
+                count++;
+                d.Remove(-bal[i]);
             }
             else
             {
-                weights[(f, t)] = w;
-                adj[f].Add(t);
+                d[bal[i]] = i;
             }
-            if (weights.ContainsKey((t, f)))
-                Decrease(t, f);
         }
-        for (int vInx = 0; vInx < vNum; vInx++)
+        Trace.Assert(d.Count() == 0);
+        Write(count);
+        for (int i = 0; i < g.Count(); i++)
         {
-            Relax(vInx);
+            foreach (Tuple<int, int> e in g[i])
+                Write(i+1, e.Item1+1, e.Item2);
         }
+
+
 
     }
 
