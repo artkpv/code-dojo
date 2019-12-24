@@ -2,6 +2,19 @@
 #undef DEBUG
 /*
 
+
+
+wrong answer 2nd lines differ - expected: '763451441322205312208507561197...3303779887610009510217518595697', found: '763451441322205312208507561197...3037798876100095102175185956107'
+3303779887610009510217518595697
+ 3037798876100095102175185956107
+
+   1234 2
+   1313
+
+   7654321 2
+   7676767 x
+   77
+
  */
 using System;
 using System.Collections.Generic;
@@ -13,68 +26,58 @@ using System.Threading;
 using System.Diagnostics;
 using static System.Math;
 
-public static class Ext 
-{
-    public static T GetValueOrDefault<T>(this Dictionary<T, T> d, T k, T def)
-    {
-        if (d.ContainsKey(k))
-            return d[k];
-        else
-            return def;
-    }
-}
-
 public class Solver
 {
+    private void TraceMsg(string msg, byte[] num)
+    {
+        if (num.Length == 200000 && num[0] == 7 && num[1] == 6)
+        {
+            Trace.WriteLine(msg);
+        }
+    }
+
     public void Solve()
     {
-        int n = ReadInt();
-        int m = ReadInt();
-        int[] aArr = ReadIntArray();
-        int[] bArr = ReadIntArray();
-        var aCount = new Dictionary<int, int>();
-        var bCount = new Dictionary<int, int>();
-        for (int i = 0; i < n; i++)
-            aCount[aArr[i]] = aCount.GetValueOrDefault(aArr[i], 0) + 1;
-        for (int i = 0; i < n; i++)
-            bCount[bArr[i]] = bCount.GetValueOrDefault(bArr[i], 0) + 1;
+        int[] n_k = Console.ReadLine().Trim().Split(' ').Select(el => int.Parse(el)).ToArray();
+        int numL = n_k[0];
+        int k = n_k[1];
+        byte[] num = Console.ReadLine().Trim().ToCharArray().Select(ch => (byte)(ch - '0')).ToArray();
+        Trace.Assert(num.Length == numL);
 
-        int[] aCountKeys = aCount.Keys.ToArray();
-        int[] aCountVal = aCount.Values.ToArray();
-        Array.Sort(aCountVal, aCountKeys);
-        int[] bCountKeys = bCount.Keys.ToArray();
-        int[] bCountVal = bCount.Values.ToArray();
-        Array.Sort(bCountVal, bCountKeys);
-
-        int groupNum = 1;
-        while (groupNum < aCountVal.Count() && aCountVal[groupNum - 1] == aCountVal[groupNum])
-            groupNum++;
-        
-        Array.Sort(bCountKeys, 0, groupNum);
-        Array.Sort(aCountKeys, 0, groupNum);
-
-        long ans = long.MaxValue;
-        Func<long, long, long> Diff = (a, b) =>
-            a <= b ? b - a : b + m - a;
-        for (int i = 0; i < groupNum; i++)
+        bool found = true;
+        for (int i = 0; i < k && found; i++)
         {
-            long diff = Diff(aCountKeys[0], bCountKeys[i]);
-            bool found = true;
-            for (int j = 0; j < groupNum; j++)
+            for (int j = i; j + k < numL && found; j += k)
             {
-                if (Diff(aCountKeys[j], bCountKeys[(i+j)%groupNum]) != diff)
+                if (num[j] != num[j+k])
                 {
+                    //TraceMsg($" mismatch {j} {j+k} {num[j]} != {num[j+k]}", num);
                     found = false;
-                    break;
                 }
             }
-            if (found)
-                ans = Min(ans, diff);
         }
-        Debug.WriteLine(groupNum);
-        Debug.WriteLine(string.Join(" " ,aCountKeys));
-        Debug.WriteLine(string.Join(" " ,bCountKeys));
-        Write(ans);
+        if (!found)
+        {
+            int chInx = 0;
+            while (chInx < k && num[chInx] != 9)
+                chInx++;
+            num[chInx-1]++;
+            for (; chInx < k; chInx++)
+            {
+                num[chInx] = 0;
+            }
+            for (int i = 0; i < k; i++)
+            {
+                for (int j = i; j < numL - k; j += k)
+                {
+                    num[j + k] = num[j];
+                }
+            }
+
+        }
+        Console.WriteLine(numL);
+        Console.WriteLine(string.Concat(num));
+        
     }
 
     #region Main
@@ -88,11 +91,11 @@ public class Solver
         Trace.Listeners.Clear();
         Trace.Listeners.Add(new ConsoleTraceListener());
 
-        reader = new StreamReader(Console.OpenStandardInput());
-        writer = new StreamWriter(Console.OpenStandardOutput());
+        //reader = new StreamReader(Console.OpenStandardInput());
+         //writer = new StreamWriter(Console.OpenStandardOutput());
         new Solver().Solve();
-        reader.Close();
-        writer.Close();
+        //reader.Close();
+        //writer.Close();
     }
 
     #endregion
