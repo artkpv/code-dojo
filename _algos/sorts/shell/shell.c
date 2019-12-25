@@ -35,10 +35,10 @@ int main()
         gap /= 3;
     }
 
-    /*for (int i = 0; i < n; i++)*/
-        /*printf("%d ", a[i]);*/
-    /*printf("\n");*/
+    for (int i = 0; i < n; i++)
+        printf("%d ", a[i]);
+    printf("\n");
 
-    printf("Exchanges: %d\n", count);
+    /*printf("Exchanges: %d\n", count);*/
     return 0;
 }
