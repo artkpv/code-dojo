@@ -1,7 +1,7 @@
 #!python3
 
 """
-Ternary Search Tree
+Ternary Search Trie
 """
 
 class Node:
