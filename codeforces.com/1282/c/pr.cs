@@ -1,6 +1,7 @@
 #define TRACE
 #undef DEBUG
 /*
+ * Author: Artyom K. < w1ld [dog] inbox [dot] ru
 6 20 2 5
 1 1 0 1 0 0
 0 8 2 9 11 6
@@ -8,9 +9,14 @@
 
 1 0 0 1 1 0
 0 2 6 8 9 11   
-
-
    
+6 17  2 6
+1 0 0 0 0 1
+3 6 7 7 10 12
+
+2
+
+
 
  */
 using System;
@@ -36,89 +42,55 @@ public class Solver
             int hardT = ReadInt();
             bool[] types = ReadIntArray().Select(el => el == 1).ToArray();
             int[] starts = ReadIntArray();
-            int[] startsInx = new int[prNum];
+            long countA = 0;
+            long countB = 0;
             for (int i = 0; i < prNum; i++)
-                startsInx[i] = i;
-            
-            Array.Sort(starts, startsInx);
-
-            int easyInx = 0;
-            int hardInx = 0;
-            var solved = new HashSet<int>();
-            int max = 0;
-            int time = 0;
-            Debug.WriteLine($" Test prNum={prNum}, timeLimit={timeLimit} easyT={easyT} hardT={hardT} starts[0]={starts[0]}");
-            for (int exitInx = 0; exitInx <= prNum; exitInx++)
             {
-                int exitT = Max(0, exitInx == prNum ? timeLimit : starts[exitInx] - 1);
-                int prevT;
-                if (exitInx - 1 >= 0 )
-                {
-                    prevT = Max(0, starts[exitInx-1] - 1);
-                    if (!solved.Contains(exitInx-1))
-                    {
-                        time -= types[startsInx[exitInx-1]] ? hardT : easyT;
-                        solved.Add(exitInx-1);
-                    }
-                }
+                if (types[i])
+                    countB += 1;
                 else
-                    prevT = 0;
+                    countA += 1;
+            }
+            
+            Array.Sort(starts, types);
 
-                time += (exitT - prevT);
-                Debug.WriteLine($" time={time} exitInx={exitInx} easyInx={easyInx} hardInx={hardInx} sovlednum={solved.Count()}");
-
-                bool haveToSolve = true;
-                while (time > 0 && haveToSolve)
+            long max = 0; 
+            long spent = 0;
+            long count = 0;
+            for (int i = starts[0] == 0 ? 1 : 0; i <= prNum; i++)
+            {
+                if (i > 0)
                 {
-                    if (easyInx < prNum)
+                    if (types[i-1])
                     {
-                        while (easyInx < prNum && (solved.Contains(easyInx) || types[startsInx[easyInx]]))
-                            easyInx++;
-                        if (easyInx < prNum)
-                        {
-                            if (time >= easyT)
-                            {
-                                time -= easyT;
-                                solved.Add(easyInx);
-                                easyInx++;
-                            }
-                            else
-                                haveToSolve = false;
-                        }
-                        // Else try hard ones in the next loop.
-                    }
-                    else if (hardInx < prNum)
-                    {
-                        while (hardInx < prNum && (solved.Contains(hardInx) || !types[startsInx[hardInx]]))
-                            hardInx++;
-                        if (hardInx < prNum)
-                        {
-                            if (time >= hardT)
-                            {
-                                time -= hardT;
-                                solved.Add(hardInx);
-                                easyInx++;
-                            }
-                            else
-                                haveToSolve = false;
-                        }
-                        else
-                            haveToSolve = false;  // As easy ones also exhausted.
+                        spent += hardT;
+                        countB -= 1;
                     }
                     else
-                        haveToSolve = false;
+                    {
+                        spent += easyT;
+                        countA -= 1;
+                    }
+                    count += 1;
                 }
-                
-                if (time >= 0)
+                long has = i == prNum ? timeLimit : starts[i] - 1;
+                has -= spent;
+
+                if (has >= 0)
                 {
-                    Debug.WriteLine($" max check at {exitInx} exitInx, time={time} hardInx={hardInx} easyInx={easyInx}");
-                    max = Max(max, solved.Count());
+                    long total = Min(countA, has / easyT);
+                    total += Min(countB, (has - total * easyT) / hardT);
+                    total += count;
+                    max = Max(max, total);
                 }
             }
+
             Write(max);
         }
         
     }
+    /*
+*/
 
     #region Main
 

@@ -1,11 +1,7 @@
-
 #define TRACE
 #undef DEBUG
 /*
-5 2 3
-10 1 3 9 2
-
-1 2 3 9 10
+Author: w1ld [dog] inbox [dot] ru
 
  */
 using System;
@@ -25,28 +21,25 @@ public class Solver
         int tests = ReadInt();
         for (int test = 0; test < tests; test++)
         {
-            int n = ReadInt();
-            int coins = ReadInt();
-            int k = ReadInt();
-            int[] costs = ReadIntArray();
-            Array.Sort(costs);
-            Trace.Assert(n > 0 && costs.Count() == n);
-
-            int[] count = new int[n];
-            int[] spent = new int[n];
-            int best = 0;
-            for (int i = 0; i < n && costs[i] <= coins; i++)
+            int Anum = ReadInt();
+            int limit = ReadInt();
+            int[] A = ReadIntArray();
+            int i = 1;
+            long sum = A[0];
+            int maxInx = 0;
+            while (i < Anum)
             {
-                spent[i] = costs[i];
-                count[i] = 1;
-                if (i - k >= 0 && spent[i] + spent[i-k] <= coins)
+                sum += A[i];
+                if (A[i] > A[maxInx])
                 {
-                    spent[i] += spent[i-k];
-                    count[i] = count[i-k];
+                    if (sum - A[i] > limit)
+                        break;
+                    maxInx = i;
                 }
-                best = Max(best, count[i]);
+                i += 1;
             }
-            Write(best);
+            Write(i == Anum && sum <= limit ? 0 : maxInx + 1);
+
         }
     }
 

@@ -1,11 +1,7 @@
-
 #define TRACE
 #undef DEBUG
 /*
-5 2 3
-10 1 3 9 2
-
-1 2 3 9 10
+Author: w1ld [dog] inbox [dot] ru
 
  */
 using System;
@@ -25,28 +21,29 @@ public class Solver
         int tests = ReadInt();
         for (int test = 0; test < tests; test++)
         {
-            int n = ReadInt();
-            int coins = ReadInt();
-            int k = ReadInt();
-            int[] costs = ReadIntArray();
-            Array.Sort(costs);
-            Trace.Assert(n > 0 && costs.Count() == n);
+            int Anum = ReadInt();
+            int Bnum = ReadInt();
+            int[] A = ReadIntArray();
+            int[] B = ReadIntArray();
+            int[] Ainxs = new int[Anum+1];
+            for (int i = 0; i < Anum; i++)
+                Ainxs[A[i]] = i;
 
-            int[] count = new int[n];
-            int[] spent = new int[n];
-            int best = 0;
-            for (int i = 0; i < n && costs[i] <= coins; i++)
+            int lastNum = B[0];
+            long seconds = Ainxs[B[0]] * 2 + 1;
+            int taken = 1;
+            for (int i = 1; i < Bnum; i++)
             {
-                spent[i] = costs[i];
-                count[i] = 1;
-                if (i - k >= 0 && spent[i] + spent[i-k] <= coins)
+                if (Ainxs[B[i]] < Ainxs[lastNum])
+                    seconds += 1;
+                else
                 {
-                    spent[i] += spent[i-k];
-                    count[i] = count[i-k];
+                    lastNum = B[i];
+                    seconds += (Ainxs[B[i]] - taken) * 2 + 1;
                 }
-                best = Max(best, count[i]);
+                taken += 1;
             }
-            Write(best);
+            Write(seconds);
         }
     }
 

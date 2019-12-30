@@ -2,10 +2,21 @@
 #define TRACE
 #undef DEBUG
 /*
-5 2 3
-10 1 3 9 2
+Author: w1ld [dog] inbox [dot] ru
 
-1 2 3 9 10
+2 1
+1 
+
+1 2 1
+1 2 2
+1 1 1
+1 1 2
+2 1 1
+2 1 2
+
+5 correct, 1 non-correct
+
+5 / 6 
 
  */
 using System;
@@ -26,27 +37,6 @@ public class Solver
         for (int test = 0; test < tests; test++)
         {
             int n = ReadInt();
-            int coins = ReadInt();
-            int k = ReadInt();
-            int[] costs = ReadIntArray();
-            Array.Sort(costs);
-            Trace.Assert(n > 0 && costs.Count() == n);
-
-            int[] count = new int[n];
-            int[] spent = new int[n];
-            int best = 0;
-            for (int i = 0; i < n && costs[i] <= coins; i++)
-            {
-                spent[i] = costs[i];
-                count[i] = 1;
-                if (i - k >= 0 && spent[i] + spent[i-k] <= coins)
-                {
-                    spent[i] += spent[i-k];
-                    count[i] = count[i-k];
-                }
-                best = Max(best, count[i]);
-            }
-            Write(best);
         }
     }
 

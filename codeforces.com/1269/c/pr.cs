@@ -28,56 +28,49 @@ using static System.Math;
 
 public class Solver
 {
-    private void TraceMsg(string msg, byte[] num)
-    {
-        if (num.Length == 200000 && num[0] == 7 && num[1] == 6)
-        {
-            Trace.WriteLine(msg);
-        }
-    }
-
     public void Solve()
     {
-        int[] n_k = Console.ReadLine().Trim().Split(' ').Select(el => int.Parse(el)).ToArray();
-        int numL = n_k[0];
-        int k = n_k[1];
-        byte[] num = Console.ReadLine().Trim().ToCharArray().Select(ch => (byte)(ch - '0')).ToArray();
+        int numL = ReadInt();
+        int k = ReadInt();
+        byte[] num = ReadToken().Select(c => (byte)(c - '0')).ToArray();
         Trace.Assert(num.Length == numL);
+        byte[] original = new byte[numL];
+        Array.Copy(num, original, numL);
 
-        bool found = true;
-        for (int i = 0; i < k && found; i++)
+        int i;
+        for (i = k-1; i >= 0; i--)
+            for (int j = i; j + k < numL; j += k)
+                num[j + k] = num[j];
+
+        i = 0;
+        while (i < numL && original[i] == num[i])
+            i += 1;
+        if (i == numL || original[i] < num[i])
         {
-            for (int j = i; j + k < numL && found; j += k)
-            {
-                if (num[j] != num[j+k])
-                {
-                    //TraceMsg($" mismatch {j} {j+k} {num[j]} != {num[j+k]}", num);
-                    found = false;
-                }
-            }
+            Write(numL);
+            Write(string.Concat(num));
         }
-        if (!found)
+        else
         {
-            int chInx = 0;
-            while (chInx < k && num[chInx] != 9)
-                chInx++;
-            num[chInx-1]++;
-            for (; chInx < k; chInx++)
+            int p = k-1;
+            while (p >= 0 && num[p] == 9)
+                p -= 1;
+            Trace.Assert(p >= 0);
+            num[p] += 1;
+            bool first = true;
+            while (p < k)
             {
-                num[chInx] = 0;
-            }
-            for (int i = 0; i < k; i++)
-            {
-                for (int j = i; j < numL - k; j += k)
-                {
+                if (first)
+                    first = false;
+                else
+                    num[p] = 0;
+                for (int j = p; j + k < numL; j += k)
                     num[j + k] = num[j];
-                }
+                p += 1;
             }
-
+            Write(numL);
+            Write(string.Concat(num));
         }
-        Console.WriteLine(numL);
-        Console.WriteLine(string.Concat(num));
-        
     }
 
     #region Main
@@ -91,11 +84,11 @@ public class Solver
         Trace.Listeners.Clear();
         Trace.Listeners.Add(new ConsoleTraceListener());
 
-        //reader = new StreamReader(Console.OpenStandardInput());
-         //writer = new StreamWriter(Console.OpenStandardOutput());
+        reader = new StreamReader(Console.OpenStandardInput());
+        writer = new StreamWriter(Console.OpenStandardOutput());
         new Solver().Solve();
-        //reader.Close();
-        //writer.Close();
+        reader.Close();
+        writer.Close();
     }
 
     #endregion
