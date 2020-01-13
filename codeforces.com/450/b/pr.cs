@@ -1,33 +1,7 @@
-
 #define TRACE
-#define DEBUG
+#undef DEBUG
 /*
 Author: w1ld [dog] inbox [dot] ru
-
-2 1
-1 
-
-1 2 1
-1 2 2
-1 1 1
-1 1 2
-2 1 1
-2 1 2
-
-5 correct, 1 non-correct
-
-5 / 6 
-
-
-for each gift
- correct += with this gift * with this gift
-
-Time: n
-
-all = num of pr * ppl
-
-pr = correct / all
-
 
  */
 using System;
@@ -42,44 +16,65 @@ using static System.Math;
 
 public class Solver
 {
-    const long MOD = 998244353;
-
-    // бинарное возведение в степень
-    long bp (long a, long n) {
-        long res = 1;
-        while (n > 0) {
-            if ((n & 1) != 0) res = res * a % MOD;
-            a = a * a % MOD;
-            n >>= 1;
-        }
-        return res;
-    }
-
     public void Solve()
     {
+        // f3 = f2 - f1
+        // f4 = f3 - f2
+        // f5 = f4 - f3
+        // ...
+        // fn = f{n-1} - f{n-2}
+        // fn = f{n-2} - f{n-3} - (f{n-3} - f{n-4}) 
+        // fn = f{n-2} - 2*f{n-3} + f{n-4}
+        // fn = f{n-3} - fn-4 - 2*(f{n-4} - fn-5) + f{n-5} - f(n-6)
+        // fn = f{n-3} - fn-4 - 2*(f{n-4} - fn-5) + f{n-5} - f(n-6)
+        //
+        // f1 
+        // f2 
+        // f3 = f2 - f1
+        // f4 = -f1
+        // f5 = -f2
+        // f6 = -f2 + f1
+        // f7 = f1
+        // f8 = f2
+        // f9 = f2 - f1
+        // ... 
+        // 
+        // n%6
+        // 1 = f1
+        // 2 = f2
+        // ... 
+        //
+        //
+
+        const long MOD = (int)(1e9 + 7);
+
+        long x = ReadInt();
+        long y = ReadInt();
         int n = ReadInt();
-        const int MAX = 1_000_000;
-        int[] counter = new int[MAX+1];
-        long giftsNum = 0;
-        for (int i = 0; i < n; i++)
+        Action<long> MWrite = (a) => Write((a%MOD) < 0 ? (a%MOD)+MOD : a%MOD);
+        switch (n % 6)
         {
-            int[] a = ReadIntArray();
-            giftsNum += a[0];
-            for (int j = 0; j < a[0]; j++)
-            {
-                counter[a[j+1]] += 1;                
-            }
+            case 1:
+                MWrite(x);
+                break;
+            case 2:
+                MWrite(y);
+                break;
+            case 3:
+                MWrite(y - x);
+                break;
+            case 4:
+                MWrite(-x);
+                break;
+            case 5:
+                MWrite(-y);
+                break;
+            case 0:
+                MWrite(-y + x);
+                break;
+            default:
+                throw new Exception();
         }
-
-        long correct = 0;
-        for (int i = 1; i <= MAX; i++)
-            correct += (counter[i] * counter[i]) % MOD;
-
-        long allMod = bp(giftsNum * n, MOD-2);
-        Write((correct * allMod) % MOD);
-
-        Debug.WriteLine($"correct={correct} allMod={allMod} all={giftsNum * n}");
-        
     }
 
     #region Main
