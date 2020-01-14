@@ -44,14 +44,19 @@ public class Solver
 {
     const long MOD = 998244353;
 
+    private Dictionary<(long, long), long> _cache = new Dictionary<(long, long), long>();
+
     // бинарное возведение в степень
-    long bp (long a, long n) {
+    long BP (long a, long n) {
+        //if (_cache.ContainsKey((a, n)))
+            //return _cache[(a, n)];
         long res = 1;
         while (n > 0) {
             if ((n & 1) != 0) res = res * a % MOD;
             a = a * a % MOD;
             n >>= 1;
         }
+        //_cache[(a, n)] = res;
         return res;
     }
 
@@ -60,26 +65,32 @@ public class Solver
         int n = ReadInt();
         const int MAX = 1_000_000;
         int[] counter = new int[MAX+1];
-        long giftsNum = 0;
+        int[][] gifts = new int[n][];
+
         for (int i = 0; i < n; i++)
         {
             int[] a = ReadIntArray();
-            giftsNum += a[0];
+            gifts[i] = new int[a[0]];
             for (int j = 0; j < a[0]; j++)
             {
+                gifts[i][j] = a[j+1];
                 counter[a[j+1]] += 1;                
             }
         }
 
-        long correct = 0;
-        for (int i = 1; i <= MAX; i++)
-            correct += (counter[i] * counter[i]) % MOD;
-
-        long allMod = bp(giftsNum * n, MOD-2);
-        Write((correct * allMod) % MOD);
-
-        Debug.WriteLine($"correct={correct} allMod={allMod} all={giftsNum * n}");
-        
+        long ans = 0;
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < gifts[i].Length; j++)
+            {
+                // Chosen probability.
+                long cp = BP(n, MOD-2) * BP(gifts[i].Length, MOD-2) % MOD; 
+                // Right p.
+                long rp = (long)counter[gifts[i][j]] * BP(n, MOD-2) % MOD;
+                ans = (ans + cp * rp % MOD) % MOD;
+            }
+        }
+        Write(ans);
     }
 
     #region Main
