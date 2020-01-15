@@ -1,11 +1,7 @@
-
 #define TRACE
 #undef DEBUG
 /*
-5 2 3
-10 1 3 9 2
-
-1 2 3 9 10
+Author: w1ld [dog] inbox [dot] ru
 
  */
 using System;
@@ -25,36 +21,14 @@ public class Solver
         int tests = ReadInt();
         for (int test = 0; test < tests; test++)
         {
-            int n = ReadInt();
-            int coins = ReadInt();
-            int k = ReadInt();
-            int[] costs = ReadIntArray();
-            Array.Sort(costs);
-            Trace.Assert(n > 0 && costs.Count() == n);
-
-            int best = 0;
-            int wdSpent = 0; // Spent without discount.
-            for (int i = 0; i < k; i++)
-            {
-                if (i > 0)
-                    wdSpent += costs[i-1];
-
-                if (wdSpent > coins)
-                    break;
-
-                int taken = i;
-                int spent = wdSpent;
-                int j = i;
-                while (j + k <= n && spent + costs[j + k - 1] <= coins)
-                {
-                    spent += costs[j + k - 1];
-                    j += k;
-                    taken += k;
-                }
-                best = Max(best, taken);                                
-            }
-
-            Write(best);
+            long a = ReadInt();
+            string b = ReadToken();
+            int bl = b.Length;
+            long c = (bl-1);
+            if (b.All(el => el == '9'))
+                c += 1;
+            long ans = c * a;
+            Write(ans);
         }
     }
 

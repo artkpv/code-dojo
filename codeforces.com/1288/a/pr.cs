@@ -1,11 +1,7 @@
-
 #define TRACE
 #undef DEBUG
 /*
-5 2 3
-10 1 3 9 2
-
-1 2 3 9 10
+Author: w1ld [dog] inbox [dot] ru
 
  */
 using System;
@@ -25,36 +21,29 @@ public class Solver
         int tests = ReadInt();
         for (int test = 0; test < tests; test++)
         {
-            int n = ReadInt();
-            int coins = ReadInt();
-            int k = ReadInt();
-            int[] costs = ReadIntArray();
-            Array.Sort(costs);
-            Trace.Assert(n > 0 && costs.Count() == n);
+            long n = ReadInt();
+            long d = ReadInt();
 
-            int best = 0;
-            int wdSpent = 0; // Spent without discount.
-            for (int i = 0; i < k; i++)
+            double D = (1 - n) * (1 - n) - 4 * (d - n);
+            if (D < 0)
+                Write("NO");
+            else
             {
-                if (i > 0)
-                    wdSpent += costs[i-1];
-
-                if (wdSpent > coins)
-                    break;
-
-                int taken = i;
-                int spent = wdSpent;
-                int j = i;
-                while (j + k <= n && spent + costs[j + k - 1] <= coins)
-                {
-                    spent += costs[j + k - 1];
-                    j += k;
-                    taken += k;
-                }
-                best = Max(best, taken);                                
+                double x1 = ((n - 1) + D) / 2;
+                double x2 = ((n - 1) - D) / 2;
+                double t = Max(x1, x2);
+                x1 = Min(x1, x2);
+                x2 = t;
+                if (x1 == x2 && x1 % 1 == 0.0)
+                    Write("YES");
+                else if (x2 - x1 >= 1.0)
+                    Write("YES");
+                else if ((int)x2 != (int)x1)
+                    Write("YES");
+                else
+                    Write("NO");
             }
 
-            Write(best);
         }
     }
 

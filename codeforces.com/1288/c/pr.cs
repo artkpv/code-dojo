@@ -1,11 +1,7 @@
-
 #define TRACE
 #undef DEBUG
 /*
-5 2 3
-10 1 3 9 2
-
-1 2 3 9 10
+Author: w1ld [dog] inbox [dot] ru
 
  */
 using System;
@@ -22,40 +18,56 @@ public class Solver
 {
     public void Solve()
     {
-        int tests = ReadInt();
-        for (int test = 0; test < tests; test++)
+        const int MOD = (int)1e9 + 7;
+        int n = ReadInt();
+        int m = ReadInt();
+
+        int[][] le = new int[m+1][];
+        for (int i = 0; i <= m; i++)
         {
-            int n = ReadInt();
-            int coins = ReadInt();
-            int k = ReadInt();
-            int[] costs = ReadIntArray();
-            Array.Sort(costs);
-            Trace.Assert(n > 0 && costs.Count() == n);
-
-            int best = 0;
-            int wdSpent = 0; // Spent without discount.
-            for (int i = 0; i < k; i++)
-            {
-                if (i > 0)
-                    wdSpent += costs[i-1];
-
-                if (wdSpent > coins)
-                    break;
-
-                int taken = i;
-                int spent = wdSpent;
-                int j = i;
-                while (j + k <= n && spent + costs[j + k - 1] <= coins)
-                {
-                    spent += costs[j + k - 1];
-                    j += k;
-                    taken += k;
-                }
-                best = Max(best, taken);                                
-            }
-
-            Write(best);
+            le[i] = new int[n+1];
+            le[i][0] = 1;
+            le[i][1] = 1;
         }
+        for (int j = 1; j <= n; j++)
+        {
+            le[0][j] = 1;
+            le[1][j] = j;
+        }
+        for (int i = 2; i <= m; i++)
+            for (int j = 2; j <= n; j++)
+                le[i][j] = (le[i][j-1] + le[i-1][j]) % MOD; 
+        // le
+        // 2 2 
+        // 0 0 0 
+        // 0 1 2 
+        // 0 1 3 
+
+        int[][] ge = new int[m+1][];
+        for (int i = 0; i <= m; i++)
+        {
+            ge[i] = new int[n+1];
+            ge[i][n] = 1;
+        }
+        for (int j = n; j >= 1; j--)
+            ge[1][j] = (n - j + 1);
+        for (int i = 2; i <= m; i++)
+            for (int j = n-1; j >= 1; j--)
+                ge[i][j] = (ge[i][j+1] + ge[i-1][j]) % MOD;
+
+        // ge
+        // 2 2 
+        // 0 0 1 
+        // 0 2 1 
+        // 0 3 1 
+
+        int ans = 0;
+        for (int j = 1; j <= n; j++)
+            ans = (ans + le[m-1][j] * ge[m][j] % MOD) % MOD;
+
+        // 
+
+        Write(ans);
     }
 
     #region Main
