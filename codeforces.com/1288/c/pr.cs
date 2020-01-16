@@ -1,5 +1,5 @@
 #define TRACE
-#undef DEBUG
+#define DEBUG
 /*
 Author: w1ld [dog] inbox [dot] ru
 
@@ -18,10 +18,8 @@ Idea 2
 
     ordered, not growing, 2m length
 
+*/
 
-
-
- */
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -34,12 +32,27 @@ using static System.Math;
 
 public class Solver
 {
+    private long Factorial(long x1, long x2,  long MOD)
+    {
+        Debug.Assert(x1 >= 0);
+        long y = 1;
+        while (x1 <= x2) 
+        {
+            y = y * x1 % MOD;
+            x1 += 1;
+        }
+        return y;
+    }
+
     public void Solve()
     {
         const int MOD = (int)1e9 + 7;
         int n = ReadInt();
         int m = ReadInt();
 
+        //  1 approach
+        //  Time: ~(n * 2m)
+        //  Space: n*2m
         int[][] le = new int[2*m+1][];
         for (int i = 0; i <= 2*m; i++)
         {
@@ -57,6 +70,16 @@ public class Solver
                 le[i][j] = (le[i][j-1] + le[i-1][j]) % MOD; 
 
         Write(le[2*m][n]);
+
+        // 2 approach
+        // Time: ~ (n + m)
+        // Space: 1
+        
+        //long nom = Factorial(n, n + 2 * m - 1, MOD);
+        //long den = Factorial(1, 2*m, MOD);
+        //if (den > nom)
+            //nom += MOD;
+        //Write( (nom / den) % MOD);  // ERROR. No sense to divide.
     }
 
     private void Print(int[][] tda)
