@@ -3,6 +3,24 @@
 /*
 Author: w1ld [dog] inbox [dot] ru
 
+https://codeforces.com/contest/1288/problem/C
+
+Idea 1
+
+    sum (le[m,i] * ge[m,i]) for i in 1..n
+    where 
+      le[x, y] - num of arrays of len x which has 1 or more y elements and y is the greatest element.
+      ge[x, y] - num of arrays of len x which has 0 or more y elements and y is the lowest element.
+   
+Idea 2
+
+    a1 a2 a3 .. a{m} b{m} b{m-1} b{m-2} .. b2 b1
+
+    ordered, not growing, 2m length
+
+
+
+
  */
 using System;
 using System.Collections.Generic;
@@ -22,8 +40,8 @@ public class Solver
         int n = ReadInt();
         int m = ReadInt();
 
-        int[][] le = new int[m+1][];
-        for (int i = 0; i <= m; i++)
+        int[][] le = new int[2*m+1][];
+        for (int i = 0; i <= 2*m; i++)
         {
             le[i] = new int[n+1];
             le[i][0] = 1;
@@ -34,40 +52,18 @@ public class Solver
             le[0][j] = 1;
             le[1][j] = j;
         }
-        for (int i = 2; i <= m; i++)
+        for (int i = 2; i <= 2*m; i++)
             for (int j = 2; j <= n; j++)
                 le[i][j] = (le[i][j-1] + le[i-1][j]) % MOD; 
-        // le
-        // 2 2 
-        // 0 0 0 
-        // 0 1 2 
-        // 0 1 3 
 
-        int[][] ge = new int[m+1][];
-        for (int i = 0; i <= m; i++)
-        {
-            ge[i] = new int[n+1];
-            ge[i][n] = 1;
-        }
-        for (int j = n; j >= 1; j--)
-            ge[1][j] = (n - j + 1);
-        for (int i = 2; i <= m; i++)
-            for (int j = n-1; j >= 1; j--)
-                ge[i][j] = (ge[i][j+1] + ge[i-1][j]) % MOD;
+        Write(le[2*m][n]);
+    }
 
-        // ge
-        // 2 2 
-        // 0 0 1 
-        // 0 2 1 
-        // 0 3 1 
-
-        int ans = 0;
-        for (int j = 1; j <= n; j++)
-            ans = (ans + le[m-1][j] * ge[m][j] % MOD) % MOD;
-
-        // 
-
-        Write(ans);
+    private void Print(int[][] tda)
+    {
+        Debug.WriteLine("");
+        for (int i = 0; i < tda.Length; i++)
+            Debug.WriteLine(string.Join(" ", tda[i]));
     }
 
     #region Main
