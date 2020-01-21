@@ -3,19 +3,6 @@
  *
  * Author: Artyom K. <w1ld [dog] inbox [dot] ru>
  *
- *
- *
- *  Example. 
- *  01234567890
- *  ABRACADABRA
- *   
- *   v
- *   0 1 2 3 4 5 6 7 8 9 0
- * A 1 1 1 4 1 6 1 _ _ _ _
- * B 0 2 0 0 2 0 2 _ _ _ _
- * C 0 0 0 0 5 0 0 _ _ _ _
- * D 0 0 0 0 0 0 7 _ _ _ _
- * R 0 0 3 0 0 0 0 _ _ _ _
  */
 #include <stdio.h>
 #include <stdlib.h>

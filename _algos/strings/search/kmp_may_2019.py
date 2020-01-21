@@ -1,19 +1,5 @@
 """
 
-  A B A C A
-A 1
-B 0
-C 0
-  ^
-
-ABAAAAAA
-ABACA
-   ^
-   ABACA
-
-  ABACA
-    ABACA
-
 """
 
 def build(p):

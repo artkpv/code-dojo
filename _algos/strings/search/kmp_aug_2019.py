@@ -1,19 +1,6 @@
 #!/bin/python3
 
 import unittest
-"""
-ABRACADABRA
-
-  A B R A C A D A B R A
-A 1 1 1 4 1
-B 0 2 0 0 2
-C 0 0 0 0 5
-D 0 0 0 0 0
-R 0 0 3 0 0
-
-s 0 0 0 1 0
-
-"""
 
 def kmp(t, p):  # t text, p pattern
     if not t:
