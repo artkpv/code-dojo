@@ -4,6 +4,11 @@
  *
  * Author: Artyom K. <w1ld [dog] inbox [dot] ru>
  *
+ * TODO:
+ * - Use VLA (see branch 'bellmanford_c_vla') and make several tests.
+ * - Make queue-based version.
+ * - Make cycle detection on DFA.
+ *
  */
 #include <stdio.h>
 #include <assert.h>
