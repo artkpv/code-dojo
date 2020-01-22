@@ -16,80 +16,13 @@ using static System.Math;
 
 public class Solver
 {
-    long Add(long a, long b) =>
-        checked(a + b);  
-
-    long Mul(long a, long b) => 
-        checked(a * b);  
-
     public void Solve()
     {
-        long x0 = ReadLong();
-        long y0 = ReadLong();
-        long ax = ReadLong();
-        long ay = ReadLong();
-        long bx = ReadLong();
-        long by = ReadLong();
-        long xs = ReadLong();
-        long ys = ReadLong();
-        long t = ReadLong();
-
-        Func<(long x, long y), (long x, long y), long> Dist = (p1, p2) =>
-            Add(Abs(Add(p1.x, -p2.x)), Abs(Add(p1.y, -p2.y)));
-
-        long x = x0;
-        long y = y0;
-        while (true)
-        {
-            long xyD = Dist((x, y), (xs, ys));
-            if (xyD <= t)
-                break;
-            long xNext = Add(Mul(ax, x), bx);
-            long yNext = Add(Mul(ay, y), by);
-            if (Dist((xNext, yNext), (xs, ys)) > xyD)
-                break;
-            x = xNext;
-            y = yNext;
-        }
-        var points = new List<(long, long)>();
-        long zd = long.MaxValue;
-        int zInx = -1;
-        while (true)
-        {
-            long d = Dist((x, y), (xs, ys));
-            if (d > t)
-                break;
-            if (zd >= d)
-            {
-                zd = d;
-                zInx = points.Count();
-            }
-            points.Add((x, y));
-            x = Add(Mul(ax, x), bx);
-            y = Add(Mul(ay, y), by);
-        }
-
-        if (zInx == -1)
-        {
-            Write(0);
-            return;
-        }
-
-        long tt = t - zd;
-        long maxCount = 0;
-        for (int l = zInx; l >= 0; l--)
-        {
-            long count = 0;
-            for (int r = zInx; r < points.Count(); r++)
-            {
-                long time = Add(Dist(points[l], points[r]),
-                    Min(Dist(points[zInx], points[l]), Dist(points[zInx], points[r])));
-                if (time <= tt)
-                    maxCount = Max(maxCount, r - l + 1);
-            }
-        }
-        Write(maxCount);
-        //Debug.WriteLine($"{string.Join(' ', points)} {zInx} {tt}");
+        int a = ReadInt();
+        int b = ReadInt();
+        int s = ReadInt();
+        int dist = Abs(a) + Abs(b);
+        Write(dist > s || s % 2 != dist % 2 ? "No" : "Yes");
     }
 
     #region Main

@@ -3,12 +3,15 @@
 
 class Heap(object):
     """
-    Min heap.
+    Min heap with deletion and changing priority of any element.
     Invariant: top element is the min. For any child >= their parent.
     """
     def __init__(self):
         self._array = [None]  # 1 based
         self._indeces = {}  # item to its heap index
+
+    def size(self):
+        return len(self._array) - 1
 
     def add(self, el):
         """
@@ -117,9 +120,19 @@ if __name__ == '__main__':
     h.add(4)
     h.add(5)
     h.change(1, 6)
-    print(h)
     assert h.get_min() == 2
     h.change(5, 1)
     assert h.get_min() == 1
+
+    h = Heap()
+    n = 1_000
+    for i in range(n):
+        h.add(n-i)
+    while h.size() > 1:
+        prev = h.get_min()
+        h.delete(prev)
+        next_ = h.get_min()
+        h.delete(next_)
+        assert prev < next_
 
     print('tests pass')
