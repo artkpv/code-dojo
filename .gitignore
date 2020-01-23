@@ -3,4 +3,5 @@ bin
 obj
 __pycache__
 *.exe
+*.exe.mdb
 packages
