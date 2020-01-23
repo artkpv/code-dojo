@@ -26,17 +26,11 @@ public class Solver
             int c = ReadInt();
             int n = ReadInt();
 
-            int n2 = (a + c - 2*b + n);
-            if (n2 % 3 != 0)
-            {
-                Write("NO");
-                continue;
-            }
-            n2 /= 3;
-            int n3 = b + n2 - c;
-            int n1 = b + n2 - a;
+            int[] arr = new int[] {a, b, c};
+            Array.Sort(arr);
+            int need = arr[2] - arr[0] + arr[2] - arr[1];
             
-            Write(a + n1 == b + n2 && b + n2 == c + n3 ? "YES" : "NO");
+            Write(n >= need && (n - need) % 3 == 0 ? "YES" : "NO");
         }
     }
 
