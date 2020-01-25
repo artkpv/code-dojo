@@ -20,15 +20,25 @@ public class Solver
     {
         int tests = ReadInt();
         int x = ReadInt();
-        int[] remorder = new int[x];
+        var cntInxT = new SortedDictionary<(int cnt, int i), int>();
+        var inxKey = new (int, int)[x];
         for (int i = 0; i < x; i++)
-            remorder[i] = i;
-        int[] remCount = new int[x];
-
+        {
+            inxKey[i] = (0, i);
+            cntInxT.Add((0, i), 0);
+        }
         for (int q = 0; q < tests; q++)
         {
             int y = ReadInt();
-            remorder[            
+            int inx = y % x;
+            (int cnt, int i) key = inxKey[inx];
+            cntInxT.Remove(key);
+            (int cnt, int i) nKey = (key.cnt + 1, key.i);
+            cntInxT.Add(nKey, 0);
+            inxKey[inx] = nKey;
+            (int cnt, int i) first = cntInxT.First().Key;
+            Write(first.cnt * x + first.i);
+            //Debug.WriteLine($"y={y} t={string.Join(" ", cntInxT.Keys)}");
         }
     }
 

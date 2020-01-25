@@ -3,6 +3,27 @@
 /*
 Author: w1ld [at] inbox [dot] ru
 
+3 1 4 
+1 4 7 
+
+
+c(s_n) =
+ 0 if s_n == s_0
+ 1 + min{ c(s_n-1 changed at some i) , c(s_n-1 shifted) }
+
+sd(i) - shift dist of i-th char. 
+cnt(sd) - count of cells with a sd
+
+col_min = min { n - cnt(sd) + sd, for all possible sd}
+
+Idea 1
+
+for a col // n
+  count sd for each cell  // n
+  find the col_min   // n
+
+Time: n*n; ~ 10^5
+
  */
 using System;
 using System.Collections.Generic;
@@ -16,43 +37,37 @@ using static System.Math;
 
 public class Solver
 {
-    private int NextP(int p, int n, int inc=1)
-    {
-        if (p > n || n <= 1)
-            return 0;
-        while (n % p != 0 && p * p <= n)
-            p += inc;
-        return n % p == 0 ? p : 0;
-    }
-
     public void Solve()
     {
-        int tests = ReadInt();
-        for (int test = 0; test < tests; test++)
-        {
-            int n = ReadInt();
-            int a = NextP(2, n);
-            int b = a != 0 ? NextP(a, n / a, a == 2 ? 1 : 2) : 0;
-            int c = 0;
+        int rows = ReadInt();
+        int cols = ReadInt();
+        int[][] M = new int[rows][];
+        for (int i = 0; i < rows; i++)
+            M[i] = ReadIntArray();
 
-            if (b >= 2) 
+        int[] sd = new int[rows];
+        int ans = 0;
+        for (int i = 0; i < cols; i++)
+        {
+            for (int j = 0; j < rows; j++)
+                sd[j] = 0;
+
+            for (int j = 0; j < rows; j++)
             {
-                if (a == b)
-                {
-                    b *= NextP(b, n / (a * b), b == 2 ? 1 : 2);
-                }
-                if (a * b > 0)
-                    c = n/(a * b);
+                int el = M[j][i];
+                int row = (el - 1) / cols;
+                int d = row <= j ? j - row : j + rows - row;
+                sd[d] += 1;
             }
             
-            if (a >= 2 && b >= 2 && c >= 2 && a != b && b != c && a != c)
+            int colMin = int.MaxValue;
+            for (int j = 0; j < rows; j++)
             {
-                Write("YES");
-                Write(string.Join(" ", a, b, c));
+                colMin = Min(colMin, rows - sd[j] + j);
             }
-            else
-                Write("NO");
+            ans += colMin;
         }
+        Write(ans);
     }
 
     #region Main
