@@ -47,23 +47,29 @@ public class Solver
 
         int[] sd = new int[rows];
         int ans = 0;
-        for (int i = 0; i < cols; i++)
+        for (int col = 0; col < cols; col++)
         {
-            for (int j = 0; j < rows; j++)
-                sd[j] = 0;
+            for (int i = 0; i < rows; i++)
+                sd[i] = 0;
 
-            for (int j = 0; j < rows; j++)
+            for (int i = 0; i < rows; i++)
             {
-                int el = M[j][i];
-                int row = (el - 1) / cols;
-                int d = row <= j ? j - row : j + rows - row; // TODO
-                sd[d] += 1;
+                int el = M[i][col] - 1;
+                if (el % cols == col)
+                {
+                    int row = el / cols;
+                    if (0 <= row && row < rows)
+                    {
+                        int d = i < row ? rows - row + i : i - row;
+                        sd[d] += 1;
+                    }
+                }
             }
             
             int colMin = int.MaxValue;
-            for (int j = 0; j < rows; j++)
+            for (int i = 0; i < rows; i++)
             {
-                colMin = Min(colMin, rows - sd[j] + j);
+                colMin = Min(colMin, rows - sd[i] + i);
             }
             ans += colMin;
         }
