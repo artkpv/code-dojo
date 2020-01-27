@@ -56,7 +56,7 @@ public class Solver
             {
                 int el = M[j][i];
                 int row = (el - 1) / cols;
-                int d = row <= j ? j - row : j + rows - row;
+                int d = row <= j ? j - row : j + rows - row; // TODO
                 sd[d] += 1;
             }
             
