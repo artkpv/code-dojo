@@ -3,10 +3,6 @@
 /*
 Author: w1ld [at] inbox [dot] ru
 
-edcbaedcba
-
-1234512345
-
  */
 using System;
 using System.Collections.Generic;
@@ -23,25 +19,21 @@ public class Solver
     public void Solve()
     {
         int n = ReadInt();
-        string arr = ReadToken();
-        const int R = 'z' - 'a' + 1;
-        var lists = new List<char>();
 
-        var ans = new int[n];
+        var sb = new StringBuilder();
         for (int i = 0; i < n; i++)
         {
-            int j = 0;
-            while (j < lists.Count() && lists[j] > arr[i])
-                j += 1;
-
-            if (j == lists.Count())
-                lists.Add(arr[i]);
-
-            lists[j] = arr[i];
-            ans[i] = j + 1;
+            int start = i * (n / 2);
+            for (int j = 0; j < n/2; j++)
+            {
+                sb.Append(start + j + 1);
+                sb.Append(" ");
+                sb.Append(n*n - start - j);
+                sb.Append(" ");
+            }
+            sb.Append("\n");
         }
-        Write(lists.Count());
-        Write(string.Join(" ", ans));
+        Write(sb.ToString());
     }
 
     #region Main
