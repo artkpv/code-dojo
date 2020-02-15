@@ -25,29 +25,25 @@ public class Solver
             long g = ReadInt();
             long b = ReadInt();
 
-            long gLen = (n / (b + g)) * g + Min(g, n % (b + g));
-            long days = n;
-
-            long left = n - n / 2 - gLen;
-
-            if (left > 0)
+            long gl = (long)Ceiling((double)n / 2);
+            if (gl <= g)
             {
-                days = (long)Ceiling(((double)n) / (b+g)) * (b+g);
+                Write(n);
             }
-
-            while (left > 0)
+            else
             {
-                long d = Min(left, g);
-                days += d;
-                left -= d;
-                if (left > 0)
-                {
-                    days += b;
-                }
+                long days = gl / g * (b + g);
+                if (gl % g == 0)
+                    days -= b;
+                else
+                    days += gl % g;
+                Write(Max(n, days));
+
+                // 1 000 000 
+                //   500 000  gl
+                //
+                // 500 000 + 1 000 000 * (500 000 - 1)
             }
-
-            Write(days);
-
         }
     }
 
