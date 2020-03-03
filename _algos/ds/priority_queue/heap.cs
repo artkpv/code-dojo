@@ -16,6 +16,7 @@ using static System.Math;
 
 namespace Heap
 {
+    //    Heap data structure methods on top of a IList array. For copy & paste in programming competisions.
     public class MinHeaper<T> 
         where T : IComparable
     {
