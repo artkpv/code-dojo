@@ -3,8 +3,18 @@
 /*
 Author: w1ld [at] inbox [dot] ru
 
- */
+3 7 7 8 9 
+5 2 7 5 5 
 
+BF
+
+j = from lowest cnt to highest 
+    while num of categories with j > 1
+        take lowest cost from those categories
+        find best place to increase this cat  <- 
+        increase to that
+        decrease at this
+ */
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -15,57 +25,50 @@ using System.Threading;
 using System.Diagnostics;
 using static System.Math;
 
-namespace EduLesson1Step1
+namespace CF1310a
 {
     public class Solver
     {
         public void Solve()
         {
-            // https://source.dot.net/#System.Private.CoreLib/Array.cs,2230
-            string s = ReadToken();
-            int n = s.Length;
-            int[] ids = new int[n+1];
-            int[] eq = new int[n+1];
-            int[] eqAux = new int[n+1];
-            for (int i = 0; i < n+1; i++)
+            int n = ReadInt();
+            int[] aIn = ReadIntArray();
+            int[] tIn = ReadIntArray();
+            var a_t = new (int a, int t)[n];
+            for (int j = 0; j < n; j++)
             {
-                ids[i] = i;
-                eq[i] = i < n ? s[i] - '$' : 0;
+                a_t[j] = (aIn[j], tIn[j]);                
             }
-            WriteArray(ids);
-            WriteArray(eq);
-            Array.Sort(eq, ids);
+            Array.Sort(a_t);
+            var cnt = new List<(int, int)>();
+            var heaper = new MinHeaper<(int, int)>();
 
-            int k = 0;
-            while ((1 << k) < n)
+            cnt.Add((-a_t[0].t, 0));
+            int i = 1;
+            long cntValue = a_t[0].a;
+            long ans = 0;
+            while (cnt.Any() || i < n)
             {
-                k += 1;
-                WriteArray(ids);
-                WriteArray(eq);
-                Array.Sort(ids, eq, Comparer<int>.Create((x, y) => {
-                    if (eq[x] != eq[y])
-                        return eq[x] - eq[y];
-
-                    int xx = (x + (1 << k)) % (n+1);
-                    int yy = (y + (1 << k)) % (n+1);
-                    return eq[xx] - eq[yy];
-                }));
-                int eqId = 0;
-                eqAux[0] = eqId;
-                for (int i = 1; i < n+1; i++)
+                if (i < n && a_t[i].a == cntValue)
                 {
-                    int previi = (ids[i-1] + (1 << k)) % (n+1);
-                    int ii = (ids[i] + (1 << k)) % (n+1);
-                    if (!(eq[i-1] == eq[i] && eq[previi] == eq[ii]))
-                        eqId += 1;
-                    eqAux[i] = eqId;
+                    heaper.Push(cnt, (-a_t[i].t, i));
+                    i += 1;
                 }
-                int[] t = eq;
-                eq = eqAux;
-                eqAux = t;
-            }
+                else if (cnt.Any())
+                {
+                    (int ti, int inx) = heaper.Pop(cnt);
+                    ti = -ti;
 
-            WriteArray(ids);
+                    ans += (cntValue - a_t[inx].a) * ti;
+                    cntValue += 1;                    
+                }
+                else
+                {
+                    cntValue = a_t[i].a;
+                }
+            }
+            Write(ans);
+
         }
 
         #region Main
@@ -74,6 +77,8 @@ namespace EduLesson1Step1
         protected static TextWriter writer;
         static void Main()
         {
+            Debug.Listeners.Clear();
+            Debug.Listeners.Add(new ConsoleTraceListener());
             Trace.Listeners.Clear();
             Trace.Listeners.Add(new ConsoleTraceListener());
 
@@ -116,5 +121,119 @@ namespace EduLesson1Step1
         }
         private static T[] Init<T>(int size) where T : new() { var ret = new T[size]; for (int i = 0; i < size; i++)ret[i] = new T(); return ret; }
         #endregion
+
+    public class MinHeaper<T> 
+        where T : IComparable
+    {
+        private readonly IComparer<T> comparer;
+
+        public MinHeaper(IComparer<T> comparer=null)
+        {
+            this.comparer = comparer ?? Comparer<T>.Default;
+        }
+
+        public void Heapify(IList<T> arr) 
+        {
+            for (int i = arr.Count()/2; i >= 0; i--)
+                SiftDown(arr, i);                
+        }
+
+        public void Push(IList<T> arr, T el)  
+        {
+            arr.Add(el);
+            SiftUp(arr, arr.Count() - 1);
+        }
+
+        public T Pop(IList<T> arr) 
+        {
+            if (!arr.Any())
+                throw new ArgumentOutOfRangeException("Empty array");
+            T el = arr.First();
+            int n = arr.Count();
+            arr[0] = arr[n-1];
+            arr.RemoveAt(n-1);
+            SiftDown(arr, 0);
+            return el;
+        }
+
+        private void SiftUp(IList<T> arr, int i) 
+        {
+            while (Parent(i) >= 0 && arr[Parent(i)].CompareTo(arr[i]) > 0) 
+            {
+                Exch(arr, Parent(i), i);
+                i = Parent(i);
+            }
+        }
+
+        private int Parent(int i) => (i + 1) / 2 - 1;
+
+        private void SiftDown(IList<T> arr, int i) 
+        {
+            int n = arr.Count();
+            while ((i + 1) * 2 - 1 < n)
+            {
+                int k = (i + 1) * 2 - 1;
+                if (k + 1 < n && arr[k+1].CompareTo(arr[k]) < 0)
+                    k += 1;
+                if (arr[i].CompareTo(arr[k]) <= 0)
+                    break;
+                Exch(arr, i, k);
+                i = k;
+            }
+        }
+
+        private void Exch(IList<T> arr, int i, int j)
+        {
+            T t = arr[i];
+            arr[i] = arr[j];
+            arr[j] = t;
+        }
+    }
+
+
     }
 }
+
+/*
+
+5
+3 7 7 8 9 
+5 2 7 5 5 
+0 1 2 3 4
+
+cnt 5-0 
+i 1
+cntValue 3
+ans 0 
+
+cnt
+i 1
+cntvalue 4
+ans 0
+
+cnt
+i 1
+cntvalue 7
+ans 0
+
+cnt 2-1
+i 2
+cntvalue 7
+ans 0
+
+cnt 2-1 7-2
+i 3
+cntvalue 7
+ans 0
+
+cnt 7-2
+i 3
+cntvalue 8
+ans 0
+
+cnt 5-3 7-2
+
+
+
+
+*/

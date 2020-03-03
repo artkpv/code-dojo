@@ -4,7 +4,6 @@
 Author: w1ld [at] inbox [dot] ru
 
  */
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -15,57 +14,53 @@ using System.Threading;
 using System.Diagnostics;
 using static System.Math;
 
-namespace EduLesson1Step1
+namespace CF1310b
 {
     public class Solver
     {
         public void Solve()
         {
-            // https://source.dot.net/#System.Private.CoreLib/Array.cs,2230
-            string s = ReadToken();
-            int n = s.Length;
-            int[] ids = new int[n+1];
-            int[] eq = new int[n+1];
-            int[] eqAux = new int[n+1];
-            for (int i = 0; i < n+1; i++)
+            int n = ReadInt();
+            int k = ReadInt();
+            int[] arr = ReadIntArray();
+            arr.Sort();
+            int cNum = (1 << (n-1));
+            if (k == 0)
             {
-                ids[i] = i;
-                eq[i] = i < n ? s[i] - '$' : 0;
+                Write(0);
+                return;
             }
-            WriteArray(ids);
-            WriteArray(eq);
-            Array.Sort(eq, ids);
-
-            int k = 0;
-            while ((1 << k) < n)
+            if (cNum == k)
             {
-                k += 1;
-                WriteArray(ids);
-                WriteArray(eq);
-                Array.Sort(ids, eq, Comparer<int>.Create((x, y) => {
-                    if (eq[x] != eq[y])
-                        return eq[x] - eq[y];
+                Write(cNum - 1 + (cNum / 2 - 1) * 2 + 1);
+                // n = 17
+                // cNum = 8
+                // ans = 7 + 6 + 1 = 14
+                // 
+                return;
+            }
 
-                    int xx = (x + (1 << k)) % (n+1);
-                    int yy = (y + (1 << k)) % (n+1);
-                    return eq[xx] - eq[yy];
-                }));
-                int eqId = 0;
-                eqAux[0] = eqId;
-                for (int i = 1; i < n+1; i++)
+            int[] left = new int[cNum];
+            int j = 0;
+            if (k > 0 && arr[0] == 1)
+            {
+                left[0] = 1;
+                j += 1;
+            }
+
+            for (int i = 1; i < cNum; i++)
+            {
+                if (j < k && arr[j] == i)
                 {
-                    int previi = (ids[i-1] + (1 << k)) % (n+1);
-                    int ii = (ids[i] + (1 << k)) % (n+1);
-                    if (!(eq[i-1] == eq[i] && eq[previi] == eq[ii]))
-                        eqId += 1;
-                    eqAux[i] = eqId;
+                    left[i] = left[i-1] + 1;
+                    j += 1;
                 }
-                int[] t = eq;
-                eq = eqAux;
-                eqAux = t;
+                else
+                    left[i] = left[i-1];
             }
 
-            WriteArray(ids);
+            
+
         }
 
         #region Main
@@ -74,6 +69,8 @@ namespace EduLesson1Step1
         protected static TextWriter writer;
         static void Main()
         {
+            Debug.Listeners.Clear();
+            Debug.Listeners.Add(new ConsoleTraceListener());
             Trace.Listeners.Clear();
             Trace.Listeners.Add(new ConsoleTraceListener());
 
