@@ -44,57 +44,51 @@ namespace CF1305b
                 Write(0);
                 return;
             }
-            int count = 0;
-            var sb = new StringBuilder();
-            while (true)
+            int[] closes = new int[n];
+            closes[n-1] = s[n-1] == ')' ? 1 : 0;
+            for (int i = n-2; i >= 0; i--)
             {
-                int[] left = new int[n];
-                int[] right = new int[n];
-                left[0] = s[0] == '(' ? 1 : 0;
-                for (int i = 1; i < n; i++)
-                    left[i] = left[i-1] + (s[i] == '(' ? 1 : 0);
-                right[n-1] = s[n-1] == ')' ? 1 : 0;
-                for (int i = n-2; i >= 0; i--)
-                    right[i] = right[i+1] + (s[i] == ')' ? 1 : 0);
-
-                int center = 0;
-                for (int i = 1; i < n-1; i++)
+                closes[i] = closes[i+1] + (s[i] == ')' ? 1 : 0);
+            }
+            int opens = 0;
+            for (int i = 0; i < n; i++)
+            {
+                if (s[i] == '(')
                 {
-                    if (left[center] + right[center + 1] < left[i] + right[i+1])
-                        center = i;
+                    if (opens + 1 > closes[i])
+                        break;
+                    opens += 1;
                 }
-                int goodC = Min(left[center], right[center+1]);
-                if (goodC == 0)
-                    break;
-                count += 1;
-                var ans1 = new List<int>();
-                int rightC = goodC;
-                for (int i = n-1; i > center && rightC > 0; i--)
-                {
-                    if (s[i] == ')')
-                    {
-                        ans1.Add(i+1);
-                        s[i] = '-';
-                        rightC -= 1;
-                    }
-                }
-                ans1.Reverse();
-                var ans2 = new List<int>();
-                int leftC = goodC;
-                for (int i = 0; i <= center && leftC > 0; i++)
+            }
+            if (opens == 0)
+            {
+                Write(0);
+            }
+            else
+            {
+                Write(1);
+                Write(opens * 2);
+                var ans = new int[opens * 2];
+                int j = 0;
+                for (int i = 0; i < n && j < opens; i++)
                 {
                     if (s[i] == '(')
                     {
-                        ans2.Add(i+1);
-                        s[i] = '-';
-                        leftC -= 1;
+                        ans[j] = i+1;
+                        j += 1;
                     }
                 }
-                sb.AppendLine((goodC * 2).ToString());
-                sb.AppendLine(string.Join(" ", ans2) + " " + string.Join(" ", ans1));
+                j = opens * 2  - 1;
+                for (int i = n-1; i >= 0 && j >= opens; i--)
+                {
+                    if (s[i] == ')')
+                    {
+                        ans[j] = i+1;
+                        j -= 1;
+                    }
+                }
+                WriteArray(ans);
             }
-            Write(count);
-            Write(sb.ToString());
         }
 
         #region Main

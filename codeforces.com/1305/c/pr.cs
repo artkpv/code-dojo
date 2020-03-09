@@ -1,14 +1,9 @@
 #define TRACE
 #undef DEBUG
 /*
-
-   Sorts suffixes for a string.
-https://codeforces.com/edu/course/2/lesson/2/1/practice/contest/269100/problem/A
-
 Author: w1ld [at] inbox [dot] ru
 
  */
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -19,92 +14,28 @@ using System.Threading;
 using System.Diagnostics;
 using static System.Math;
 
-namespace EduLesson1Step1
+namespace CF1305c
 {
     public class Solver
     {
-        string s;
-        int n;
-        int[] sInx; // Suffix index.
-        int[] ec;  // ec[i] - equivalency class for suffix at i-th index.
-        int[] auxSInx;
-        int[] nextEc;
-        int radix = 'z' - 'a' + 2;
-
         public void Solve()
         {
-            s = ReadToken();
-            n = s.Length + 1;
-            sInx = new int[n];
-            ec = new int[n];
-            auxSInx = new int[n];
-            nextEc = new int[n];
-            for (int i = 0; i < n; i++)
+            int n = ReadInt();
+            int m = ReadInt();
+            int[] arr = ReadIntArray();
+            if (n > m)
+                Write(0);
+            else
             {
-                sInx[i] = i;
-                ec[i] = i < s.Length ? s[i] - 'a' + 1 : 0;
-            }
-
-            //WriteArray(sInx);
-            RadixSort();
-
-            int k = 0;
-            while ((1 << k) < n)
-            {
-                //WriteArray(sInx);
+                long prod = 1;
                 for (int i = 0; i < n; i++)
                 {
-                    sInx[i] = (n + sInx[i] - (1 << k)) % n;
+                    for (int j = i+1; j < n; j++)
+                    {
+                        prod = (prod * Abs(arr[i] - arr[j])) % m;
+                    }
                 }
-                RadixSort();
-                nextEc[sInx[0]] = 0;
-                for (int i = 1; i < n; i++)
-                {
-                    int prev = sInx[i-1];
-                    int cur = sInx[i];
-                    int prevA = ec[prev];
-                    int prevB = ec[(prev + (1 << k)) % n];
-                    int a = ec[cur];
-                    int b = ec[(cur + (1 << k)) % n];
-                    if (prevA == a && prevB == b)
-                        nextEc[cur] = nextEc[prev];
-                    else
-                        nextEc[cur] = nextEc[prev] + 1;
-                }
-                int[] t = ec;
-                ec = nextEc;
-                nextEc = t;
-
-                radix = ec[sInx[n-1]] + 1;
-                k += 1;
-            }
-
-            WriteArray(sInx);
-        }
-
-        private void RadixSort()
-        {
-            int[] index = new int[radix + 1];
-            for (int i = 0; i < n; i++)
-            {
-                index[ec[sInx[i]] + 1] += 1;              
-            }
-
-            for (int i = 2; i < radix + 1; i++)
-            {
-                index[i] += index[i - 1];                
-            }
-
-            for (int i = 0; i < n; i++)
-            {
-                auxSInx[i] = sInx[i];                
-            }
-
-            for (int i = 0; i < n; i++)
-            {
-                int pos = index[ec[auxSInx[i]]];
-                index[ec[auxSInx[i]]] += 1;
-                sInx[pos] = auxSInx[i];
+                Write(prod);
             }
         }
 
@@ -114,6 +45,8 @@ namespace EduLesson1Step1
         protected static TextWriter writer;
         static void Main()
         {
+            Debug.Listeners.Clear();
+            Debug.Listeners.Add(new ConsoleTraceListener());
             Trace.Listeners.Clear();
             Trace.Listeners.Add(new ConsoleTraceListener());
 

@@ -23,7 +23,7 @@ namespace EduLesson1Step1
 {
     public class Solver
     {
-        string s;
+        string text;
         int n;
         int[] sInx; // Suffix index.
         int[] ec;  // ec[i] - equivalency class for suffix at i-th index.
@@ -33,8 +33,8 @@ namespace EduLesson1Step1
 
         public void Solve()
         {
-            s = ReadToken();
-            n = s.Length + 1;
+            text = ReadToken();
+            n = text.Length + 1;
             sInx = new int[n];
             ec = new int[n];
             auxSInx = new int[n];
@@ -42,7 +42,7 @@ namespace EduLesson1Step1
             for (int i = 0; i < n; i++)
             {
                 sInx[i] = i;
-                ec[i] = i < s.Length ? s[i] - 'a' + 1 : 0;
+                ec[i] = i < text.Length ? text[i] - 'a' + 1 : 0;
             }
 
             //WriteArray(sInx);
@@ -79,7 +79,23 @@ namespace EduLesson1Step1
                 k += 1;
             }
 
-            WriteArray(sInx);
+            int tests = ReadInt();
+            for (int i = 0; i < tests; i++)
+            {
+                string query = ReadToken();
+                int left = LeftInx(query);
+                if (Compare(left, query) != 0)
+                {
+                    Write(0);
+                }
+                else 
+                {
+                    string next = query.Substring(0, query.Length - 1) 
+                        + ((char)(query[query.Length - 1] + 1)).ToString();
+                    int right = LeftInx(next);
+                    Write(right - left);
+                }
+            }
         }
 
         private void RadixSort()
@@ -106,6 +122,41 @@ namespace EduLesson1Step1
                 index[ec[auxSInx[i]]] += 1;
                 sInx[pos] = auxSInx[i];
             }
+        }
+
+        private int LeftInx(string query)
+        {
+            //Write($"query={query} sa={string.Join(" ", sInx)}");
+            if (query.Length > n - 1)
+                return sInx.Length;
+            int lo = 0;
+            int hi = n-1;
+            //Write($"lo={lo} hi={hi}");
+            while (lo < hi)
+            {
+                int mid = (lo + hi) / 2;
+                int cmp = Compare(mid, query);
+                if (cmp < 0)
+                    lo = mid + 1;
+                else
+                    hi = mid;
+            }
+            return lo;
+        }
+
+        private int Compare(int inx, string query) 
+        {
+            int i = 0;
+            while (i < query.Length && sInx[inx] + i < text.Length)
+            {
+                int cmp = text[sInx[inx] + i].CompareTo(query[i]);
+                if (cmp != 0)
+                    return cmp;
+                i += 1;
+            }
+            if (i == query.Length)
+                return 0;
+            return - 1;
         }
 
         #region Main

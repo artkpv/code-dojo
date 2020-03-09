@@ -33,22 +33,35 @@ for _ in range(V-1):
         leaves.remove(w)
 
 leaves = list(leaves)
-i = 0
+size = V
+def remove(u):
+    p = adj[u][0]
+    adj[u].clear()
+    adj[p].remove(u)
+    if len(adj[p]) == 1:
+        leaves.append(p)
 
+i = 0
 root = None
-p = None
 for query in range(V//2):
+    if root:
+        print("? {} {}".format(1, 2))
+        stdout.flush()
+        p = int(input().strip())
+        continue
+    assert i + 1 < len(leaves)
     print("? {} {}".format(leaves[i], leaves[i+1]))
     stdout.flush()
     p = int(input().strip())
-    if p == leaves[i]:
+    if p == leaves[i] or p == leaves[i+1]:
         root = p
-    elif p == leaves[i+1]:
-        root = p
-    elif i + 3 < len(leaves):
+    else:
+        remove(leaves[i])
+        remove(leaves[i+1])
+        size -= 2
         i += 2
-    elif i + 2 < len(leaves):
-        i += 1
+        if size == 1:
+            root = leaves[i]
 
 print("! {}".format(root or p))
 
