@@ -19,7 +19,7 @@ using System.Threading;
 using System.Diagnostics;
 using static System.Math;
 
-namespace EduLesson1Step1
+namespace Lesson3Step2
 {
     public class Solver
     {
@@ -83,17 +83,15 @@ namespace EduLesson1Step1
             for (int i = 0; i < tests; i++)
             {
                 string query = ReadToken();
-                int left = LeftInx(query);
+                int left = LeftMost(query);
                 if (Compare(left, query) != 0)
                 {
                     Write(0);
                 }
                 else 
                 {
-                    string next = query.Substring(0, query.Length - 1) 
-                        + ((char)(query[query.Length - 1] + 1)).ToString();
-                    int right = LeftInx(next);
-                    Write(right - left);
+                    int right = RightMost(query);
+                    Write(right - left + 1);
                 }
             }
         }
@@ -124,7 +122,7 @@ namespace EduLesson1Step1
             }
         }
 
-        private int LeftInx(string query)
+        private int LeftMost(string query)
         {
             //Write($"query={query} sa={string.Join(" ", sInx)}");
             if (query.Length > n - 1)
@@ -143,6 +141,29 @@ namespace EduLesson1Step1
             }
             return lo;
         }
+
+        private int RightMost(string query)
+        {
+            //Write($"query={query} sa={string.Join(" ", sInx)}");
+            if (query.Length > n - 1)
+                return sInx.Length;
+            int lo = 0;
+            int hi = n-1;
+            //Write($"lo={lo} hi={hi}");
+            while (lo < hi)
+            {
+                int mid = (lo + hi) / 2 + 1;
+                int cmp = Compare(mid, query);
+                if (cmp > 0)
+                    hi = mid + 1;
+                else if (cmp == 0)
+                    lo = mid;
+                else
+                    hi = mid - 1;
+            }
+            return lo;
+        }
+
 
         private int Compare(int inx, string query) 
         {
