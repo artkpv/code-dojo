@@ -24,22 +24,24 @@ namespace Lesson3Step2
     public class Solver
     {
         string text;
-        int n;
-        int[] sInx; // Suffix index.
+        int sLen;
+        int[] sInx; // Sorted suffix index.
+        int[] isInx; // Inverted suffix index (suffix index to sorted suffix index).
         int[] ec;  // ec[i] - equivalency class for suffix at i-th index.
         int[] auxSInx;
         int[] nextEc;
+        int[] lcp;
         int radix = 'z' - 'a' + 2;
 
         public void Solve()
         {
             text = ReadToken();
-            n = text.Length + 1;
-            sInx = new int[n];
-            ec = new int[n];
-            auxSInx = new int[n];
-            nextEc = new int[n];
-            for (int i = 0; i < n; i++)
+            sLen = text.Length + 1;
+            sInx = new int[sLen];
+            ec = new int[sLen];
+            auxSInx = new int[sLen];
+            nextEc = new int[sLen];
+            for (int i = 0; i < sLen; i++)
             {
                 sInx[i] = i;
                 ec[i] = i < text.Length ? text[i] - 'a' + 1 : 0;
@@ -49,23 +51,23 @@ namespace Lesson3Step2
             RadixSort();
 
             int k = 0;
-            while ((1 << k) < n)
+            while ((1 << k) < sLen)
             {
                 //WriteArray(sInx);
-                for (int i = 0; i < n; i++)
+                for (int i = 0; i < sLen; i++)
                 {
-                    sInx[i] = (n + sInx[i] - (1 << k)) % n;
+                    sInx[i] = (sLen + sInx[i] - (1 << k)) % sLen;
                 }
                 RadixSort();
                 nextEc[sInx[0]] = 0;
-                for (int i = 1; i < n; i++)
+                for (int i = 1; i < sLen; i++)
                 {
                     int prev = sInx[i-1];
                     int cur = sInx[i];
                     int prevA = ec[prev];
-                    int prevB = ec[(prev + (1 << k)) % n];
+                    int prevB = ec[(prev + (1 << k)) % sLen];
                     int a = ec[cur];
-                    int b = ec[(cur + (1 << k)) % n];
+                    int b = ec[(cur + (1 << k)) % sLen];
                     if (prevA == a && prevB == b)
                         nextEc[cur] = nextEc[prev];
                     else
@@ -75,31 +77,21 @@ namespace Lesson3Step2
                 ec = nextEc;
                 nextEc = t;
 
-                radix = ec[sInx[n-1]] + 1;
+                radix = ec[sInx[sLen-1]] + 1;
                 k += 1;
             }
 
-            int tests = ReadInt();
-            for (int i = 0; i < tests; i++)
-            {
-                string query = ReadToken();
-                int left = LeftMost(query);
-                if (left >= sInx.Length || Compare(left, query) != 0)
-                {
-                    Write(0);
-                }
-                else 
-                {
-                    int right = RightMost(query);
-                    Write(right - left + 1);
-                }
-            }
+            WriteArray(sInx);
+
+            BuildLCP();
+
+            WriteArray(lcp);
         }
 
         private void RadixSort()
         {
             int[] index = new int[radix + 1];
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < sLen; i++)
             {
                 index[ec[sInx[i]] + 1] += 1;              
             }
@@ -109,12 +101,12 @@ namespace Lesson3Step2
                 index[i] += index[i - 1];                
             }
 
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < sLen; i++)
             {
                 auxSInx[i] = sInx[i];                
             }
 
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < sLen; i++)
             {
                 int pos = index[ec[auxSInx[i]]];
                 index[ec[auxSInx[i]]] += 1;
@@ -122,60 +114,32 @@ namespace Lesson3Step2
             }
         }
 
-        private int LeftMost(string query)
+        private void BuildLCP()
         {
-            //Write($"query={query} sa={string.Join(" ", sInx)}");
-            if (query.Length > n - 1)
-                return sInx.Length;
-            int lo = 0;
-            int hi = n-1;
-            //Write($"lo={lo} hi={hi}");
-            while (lo < hi)
+            lcp = new int[sLen - 1];
+            isInx = new int[sLen];
+            for (int i = 0; i < sLen; i++)
+                isInx[sInx[i]] = i;
+
+            int k = 0;
+            for (int i = 0; i < sLen-1; i++)
             {
-                int mid = (lo + hi) / 2;
-                int cmp = Compare(mid, query);
-                if (cmp < 0)
-                    lo = mid + 1;
-                else
-                    hi = mid;
+                if (isInx[i] == 0)
+                    continue;
+                int j = sInx[isInx[i] - 1];
+                k = GetSameNum(i, j, k);
+                lcp[isInx[i] - 1] = k;
+                k = Max(0, k - 1);
             }
-            return lo;
         }
 
-        private int RightMost(string query)
+        private int GetSameNum(int i, int j, int p)
         {
-            //Write($"query={query} sa={string.Join(" ", sInx)}");
-            if (query.Length > n - 1)
-                return sInx.Length;
-            int lo = 0;
-            int hi = n-1;
-            //Write($"lo={lo} hi={hi}");
-            while (0 <= lo && lo < hi && hi < sInx.Length)
+            while (i + p < text.Length && j + p < text.Length && text[i + p] == text[j + p])
             {
-                int mid = (lo + hi) / 2 + 1;
-                int cmp = Compare(mid, query);
-                if (cmp <= 0)
-                    lo = mid;
-                else // cmp > 0
-                    hi = mid - 1;
+                p += 1;
             }
-            return lo;
-        }
-
-
-        private int Compare(int inx, string query) 
-        {
-            int i = 0;
-            while (i < query.Length && sInx[inx] + i < text.Length)
-            {
-                int cmp = text[sInx[inx] + i].CompareTo(query[i]);
-                if (cmp != 0)
-                    return cmp;
-                i += 1;
-            }
-            if (i == query.Length)
-                return 0;
-            return - 1;
+            return p;
         }
 
         #region Main
