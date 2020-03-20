@@ -40,7 +40,7 @@ namespace CFround_a2
                     dist[i] = new int[cols];
                     for (int j = 0; j < cols; j++)
                     {
-                        dist[i][j] = INF;
+                        dist[i][j] = field[i][j] == '1' ? 0 : INF;
                     }
                 }
 
@@ -84,46 +84,41 @@ namespace CFround_a2
                     }
                 }
 
-                int N = rows*cols;
-                int[] distF = new int[N];
-                int[] distInx = new int[N];
-                for (int i = 0; i < rows; i++)
+                Func<int, bool> atMostK = (k) =>
                 {
-                    //WriteArray(dist[i]);
-                    for (int j = 0; j < cols; j++)
+                    int x2plusY2Max = int.MaxValue;
+                    int x2plusY2Min = int.MinValue;
+                    int x2minusY2Max = int.MaxValue;
+                    int x2minusY2Min = int.MinValue;
+
+                    for (int i = 0; i < rows; i++)
                     {
-                        distF[i * cols + j] = dist[i][j];
-                        distInx[i * cols + j] = i * cols + j;
+                        for (int j = 0; j < cols; j++)
+                        {
+                            if (dist[i][j] > k)
+                            {
+                                x2plusY2Min = Max(x2plusY2Min, i + j - k);
+                                x2plusY2Max = Min(x2plusY2Max, i + j + k);
+                                x2minusY2Min = Max(x2minusY2Min, j - i - k);
+                                x2minusY2Max = Min(x2minusY2Max, j - i + k);
+                            }
+                        }
                     }
-                }
-
-                Array.Sort(distF, distInx);
-
-                int minmax = INF;
-                const int NINF = int.MinValue;
-                for (int i = N - 1; i >= 0; i--)
+                    return x2plusY2Min <= x2plusY2Max && x2minusY2Min <= x2minusY2Max;
+                };
+                
+                int lo = 0;
+                int hi = cols+rows-1;
+                while (lo < hi)
                 {
-                    int fpInx = distInx[i];
-                    int fy = fpInx / cols;
-                    int fx = fpInx % cols;
-                    int lmax = NINF;
-                    int j = N - 1;
-                    while (j >= 0)
-                    {
-                        int pInx = distInx[j];
-                        int y = pInx / cols;
-                        int x = pInx % cols;
-                        int v = Abs(y - fy) + Abs(x - fx);
-                        lmax = Max(lmax, Min(dist[y][x], v));
-                        if (dist[y][x] <= v)
-                            break;
-                        j -= 1;
-                    }
-                    //Write(lmax, fy, fx);
-                    minmax = Min(minmax, lmax);
+                    int mid = (lo + hi) / 2;
+                    //Write($" lo={lo} hi={hi}");
+                    if (atMostK(mid))
+                        hi = mid;
+                    else
+                        lo = mid + 1;
                 }
-
-                Write($"Case #{test+1}: {minmax}");
+                Write($"Case #{test+1}: {lo}");
             }
         }
 
