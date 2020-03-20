@@ -34,55 +34,50 @@ namespace CFround_a2
                 string[] field = new string[rows];
                 int[][] dist = new int[rows][];
                 const int INF = int.MaxValue;
+                var q = new Queue<Tuple<int, int>>();
                 for (int i = 0; i < rows; i++)
                 {
                     field[i] = ReadToken();
                     dist[i] = new int[cols];
                     for (int j = 0; j < cols; j++)
                     {
-                        dist[i][j] = field[i][j] == '1' ? 0 : INF;
-                    }
-                }
-
-                var dir = new int[] { 
-                    0, 0, 1, 1,  // Start rows, start cols, dir rows, dir cols.
-                    0, 1, 1, -1, 
-                    1, 0, -1, 1,
-                    1, 1, -1, -1
-                };
-                Func<int, int, bool> inField = (x, y) =>
-                    0 <= x && x < cols && 0 <= y && y < rows;
-
-                Func<int, int, int> getD = (x, y) =>
-                    inField(x, y) ? dist[y][x] : INF;
-
-                for (int dirI = 0; dirI < 4; dirI++)
-                {
-                    int yStart = Max(0, dir[dirI * 4] * rows - 1);
-                    int xStart = Max(0, dir[dirI * 4 + 1] * cols - 1);
-                    int y = yStart;
-                    int x = xStart;
-                    int yDir = dir[dirI * 4 + 2];
-                    int xDir = dir[dirI * 4 + 3];
-                    
-                    while (inField(x, y))
-                    {
-                        if (field[y][x] == '1')
-                            dist[y][x] = 0;
+                        if (field[i][j] == '1')
+                        {
+                            dist[i][j] = 0;
+                            q.Enqueue(Tuple.Create(i, j));
+                        }
                         else
-                        {
-                            int v = Min(getD(x, y - yDir), getD(x - xDir, y));
-                            dist[y][x] = Min(dist[y][x], v == INF ? INF : v + 1);
-                        }
+                            dist[i][j] = INF;
+                    }
+                }
 
-                        x += xDir;
-                        if (!inField(x, y))
+                var dir = new[] { 
+                    -1, 0,
+                    0, 1,
+                    1, 0,
+                    0, -1
+                };
+
+                while (q.Any())
+                {
+                    Tuple<int, int> v = q.Dequeue();
+                    int i = v.Item1;
+                    int j = v.Item2;
+
+                    for (int dirI = 0; dirI < 4; dirI++)
+                    {
+                        int ii = i + dir[dirI * 2];
+                        int jj = j + dir[dirI * 2 + 1];
+                        if (! (0 <= ii && ii < rows && 0 <= jj && jj < cols))
+                            continue;
+                        if (dist[ii][jj] == INF)
                         {
-                            x = xStart;
-                            y += yDir;
+                            dist[ii][jj] = dist[i][j] + 1;
+                            q.Enqueue(Tuple.Create(ii, jj));
                         }
                     }
                 }
+
 
                 Func<int, bool> atMostK = (k) =>
                 {
