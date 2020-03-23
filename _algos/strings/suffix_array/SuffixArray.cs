@@ -1,4 +1,3 @@
-
 using System;
 using System.Diagnostics;
 
@@ -21,10 +20,10 @@ namespace SuffixArray
             : this(text, (char c) => c - 'a', 'z' - 'a' + 1)
         { }
 
-        public SuffixArray(string text, Func<char, int> charMap, int radix)
+        public SuffixArray(string text, Func<char, int> charMap, int textRadix)
         {
             this.text = text; 
-            this.radix = radix + 1; // Extra for end string.
+            this.radix = textRadix + 1; // Extra for empty suffix.
             N = text.Length + 1;
             ssInx = new int[N];
             ec = new int[N];
@@ -36,12 +35,14 @@ namespace SuffixArray
                 if (i < text.Length)
                 {
                     int map = charMap(text[i]);
-                    Trace.Assert(0 <= map && map < radix);
-                    ec[i] = map + 1; // Extra for end string.
+                    Trace.Assert(
+                        0 <= map && map < radix - 1,
+                        $"Invalid map: map={map} radix={radix} c={text[i]}");
+                    ec[i] = map + 1; // Extra for empty suffix.
                 }
                 else
                 {
-                    ec[i] = 0;  // End string.
+                    ec[i] = 0;  // Empty suffix.
                 }
             }
 
@@ -83,7 +84,9 @@ namespace SuffixArray
             int[] index = new int[radix + 1];
             for (int i = 0; i < N; i++)
             {
-                index[ec[ssInx[i]] + 1] += 1;              
+                int ssInx_i = ssInx[i];
+                int ec_i = ec[ssInx_i];
+                index[ec_i + 1] += 1;              
             }
 
             for (int i = 2; i < radix + 1; i++)

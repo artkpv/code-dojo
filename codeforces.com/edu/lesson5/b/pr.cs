@@ -14,13 +14,13 @@ using System.Threading;
 using System.Diagnostics;
 using static System.Math;
 
-namespace CFlesson5a
+namespace CFlesson5B
 {
     public class SuffixArray
     {
         private string text;
-        private int sLen;
-        private int[] sInx; // Sorted suffix index.
+        private int N;
+        private int[] ssInx; // Sorted suffix index.
         private int[] ec;  // ec[i] - equivalency class for suffix at i-th index.
         private int[] auxSInx;
         private int[] nextEc;
@@ -30,49 +30,51 @@ namespace CFlesson5a
             : this(text, (char c) => c - 'a', 'z' - 'a' + 1)
         { }
 
-        public SuffixArray(string text, Func<char, int> charMap, int radix)
+        public SuffixArray(string text, Func<char, int> charMap, int textRadix)
         {
             this.text = text; 
-            this.radix = radix + 1; // Extra for end string.
-            sLen = text.Length + 1;
-            sInx = new int[sLen];
-            ec = new int[sLen];
-            auxSInx = new int[sLen];
-            nextEc = new int[sLen];
-            for (int i = 0; i < sLen; i++)
+            this.radix = textRadix + 1; // Extra for empty suffix.
+            N = text.Length + 1;
+            ssInx = new int[N];
+            ec = new int[N];
+            auxSInx = new int[N];
+            nextEc = new int[N];
+            for (int i = 0; i < N; i++)
             {
-                sInx[i] = i;
+                ssInx[i] = i;
                 if (i < text.Length)
                 {
                     int map = charMap(text[i]);
-                    Trace.Assert(0 <= map && map < radix);
-                    ec[i] = map + 1; // Extra for end string.
+                    Trace.Assert(
+                        0 <= map && map < radix - 1,
+                        $"Invalid map: map={map} radix={radix} c={text[i]}");
+                    ec[i] = map + 1; // Extra for empty suffix.
                 }
                 else
                 {
-                    ec[i] = 0;  // End string.
+                    ec[i] = 0;  // Empty suffix.
                 }
             }
 
             RadixSort();
 
             int k = 0;
-            while ((1 << k) < sLen)
+            while ((1 << k) < N)
             {
-                for (int i = 0; i < sLen; i++)
+                for (int i = 0; i < N; i++)
                 {
-                    sInx[i] = (sLen + sInx[i] - (1 << k)) % sLen;
+                    ssInx[i] = (N + ssInx[i] - (1 << k)) % N;
                 }
                 RadixSort();
-                nextEc[sInx[0]] = 0;
-                for (int i = 1; i < sLen; i++)
+                nextEc[ssInx[0]] = 0;
+                for (int i = 1; i < N; i++)
                 {
-                    int prev = sInx[i-1];
-                    int cur = sInx[i];
+                    int prev = ssInx[i-1];
+                    int cur = ssInx[i];
                     int prevA = ec[prev];
-                    int prevB = ec[(prev + (1 << k)) % sLen];
+                    int prevB = ec[(prev + (1 << k)) % N];
                     int a = ec[cur];
-                    int b = ec[(cur + (1 << k)) % sLen];
+                    int b = ec[(cur + (1 << k)) % N];
                     if (prevA == a && prevB == b)
                         nextEc[cur] = nextEc[prev];
                     else
@@ -82,7 +84,7 @@ namespace CFlesson5a
                 ec = nextEc;
                 nextEc = t;
 
-                radix = ec[sInx[sLen-1]] + 1;
+                radix = ec[ssInx[N-1]] + 1;
                 k += 1;
             }
         }
@@ -90,9 +92,11 @@ namespace CFlesson5a
         private void RadixSort()
         {
             int[] index = new int[radix + 1];
-            for (int i = 0; i < sLen; i++)
+            for (int i = 0; i < N; i++)
             {
-                index[ec[sInx[i]] + 1] += 1;              
+                int ssInx_i = ssInx[i];
+                int ec_i = ec[ssInx_i];
+                index[ec_i + 1] += 1;              
             }
 
             for (int i = 2; i < radix + 1; i++)
@@ -100,22 +104,22 @@ namespace CFlesson5a
                 index[i] += index[i - 1];                
             }
 
-            for (int i = 0; i < sLen; i++)
+            for (int i = 0; i < N; i++)
             {
-                auxSInx[i] = sInx[i];                
+                auxSInx[i] = ssInx[i];                
             }
 
-            for (int i = 0; i < sLen; i++)
+            for (int i = 0; i < N; i++)
             {
                 int pos = index[ec[auxSInx[i]]];
                 index[ec[auxSInx[i]]] += 1;
-                sInx[pos] = auxSInx[i];
+                ssInx[pos] = auxSInx[i];
             }
         }
 
         public int[] Array 
         {
-            get => sInx;
+            get => ssInx;
         }
 
     }
@@ -179,8 +183,8 @@ namespace CFlesson5a
 
         public void Solve()
         {
-            string sA = ReadToken().Trim();
-            string sB = ReadToken().Trim();
+            string sA = ReadToken()?.Trim();
+            string sB = ReadToken()?.Trim();
             if (string.IsNullOrWhiteSpace(sA) || string.IsNullOrWhiteSpace(sB))
             {
                 Write("");
@@ -209,7 +213,7 @@ namespace CFlesson5a
                 }
             }
 
-            if (maxInx == -1)
+            if (max == 0)
                 Write("");
             else 
                 Write(sC.Substring(maxInx, max));
@@ -237,8 +241,8 @@ namespace CFlesson5a
 
         #region Read / Write
         private static Queue<string> currentLineTokens = new Queue<string>();
-        private static string[] ReadAndSplitLine() { return reader.ReadLine().Split(new[] { ' ', '\t', }, StringSplitOptions.RemoveEmptyEntries); }
-        public static string ReadToken() { while (currentLineTokens.Count == 0)currentLineTokens = new Queue<string>(ReadAndSplitLine()); return currentLineTokens.Dequeue(); }
+        private static string[] ReadAndSplitLine() { return reader.ReadLine()?.Split(new[] { ' ', '\t', }, StringSplitOptions.RemoveEmptyEntries); }
+        public static string ReadToken() { while (currentLineTokens.Count == 0)currentLineTokens = new Queue<string>(ReadAndSplitLine() ?? new[] {""}); return currentLineTokens.Dequeue(); }
         public static int ReadInt() { return int.Parse(ReadToken()); }
         public static long ReadLong() { return long.Parse(ReadToken()); }
         public static double ReadDouble() { return double.Parse(ReadToken(), CultureInfo.InvariantCulture); }
