@@ -3,43 +3,7 @@
 /*
 Author: Artyom K. <www.artkpv.net>
 
-30 ^ 50
-
-N K P
-Take P plates from N stacks of K plates. Max beauty.
-K <= 30, N <= 50
-
-## Idea 1, BF
-O(K^N)
-Test set 1 - 30*30*30 = 27 000
-Test set 2 - 30^50 ~= 3^50 * 10^50 = 9^25 * 10^50 ~= 10^75
-
-
-## Idea 2
-DP[i][j] - max sum for first i stacks when j plates in total.
-
-DP[i][j] = 
-    for t in 0..K:
-        DP[i][j] = Max(DP[i][j], stack[i][t] + DP[i-1][j-t])
-
-Ans = DP[N][K]
-
-N * N * K * K <= 75 000 * 30 = 2 250 000
-
-
-
-2 4 5
-10 10 100 30
-80 50 10 50
-
-
-3 2 3 
-80 80
-15 50
-20 10
-
-*/
-
+ */
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -50,7 +14,7 @@ using System.Threading;
 using System.Diagnostics;
 using static System.Math;
 
-namespace CFroundab
+namespace CF1327b
 {
     public class Solver
     {
@@ -59,44 +23,56 @@ namespace CFroundab
             int tests = ReadInt();
             for (int test = 0; test < tests; test++)
             {
-                int N = ReadInt();
-                int K = ReadInt();
-                int P = ReadInt();
-                int[][] stacks = new int[N][];
-                for (int i = 0; i < N; i++)
-                    stacks[i] = new List<int> {0}.Concat(ReadIntArray()).ToArray();
-                for (int i = 0; i < N; i++)
+                int n = ReadInt();
+                bool[] busy = new bool[n];
+                for (int j = 0; j < n; j++)
                 {
-                    for (int j = 1; j < K+1; j++)
-                    {
-                        stacks[i][j] += stacks[i][j-1];
-                    }
+                    busy[j] = false;
                 }
-
-                long max = long.MinValue;
-                Action<int, long, int> Count = null;
-                Count = (i, sum, taken) => 
+                int i = 0;
+                int miss = -1;
+                for (int pI = 0; pI < n; pI++)
                 {
-                    if (i > N || taken > P)
-                        return;
-                    if (i == N || taken == P)
+                    int[] arr = ReadIntArray();
+                    if (arr[0] == 0)
                     {
-                        if (max < sum)
-                        {
-                            // Write($"Max = {max} i = {i}");
-                            max = sum;
-                        }
+                        if (miss == -1)
+                            miss = pI;
                     }
                     else
                     {
-                        for (int j = 0; j < K+1; j++)
+                        int lo = 1;
+                        int hi = arr.Length - 1;
+                        while (lo < hi)
                         {
-                            Count(i+1, sum + stacks[i][j], taken+j);
+                            int mid = (lo + hi) / 2;
+                            if (arr[mid] < i + 1)
+                                lo = mid + 1;
+                            else
+                                hi = mid;
+                        }
+                        if (arr[lo] >= i + 1)
+                        {
+                            busy[arr[lo]-1] = true;
+                            while (i < n && busy[i])
+                                i += 1;
+                        }
+                        else 
+                        {
+                            if (miss == -1)
+                                miss = pI;
                         }
                     }
-                };
-                Count(0, 0, 0);
-                Write($"Case #{test+1}: {max}");               
+                }
+
+                if (miss == -1)
+                    Write("OPTIMAL");
+                else
+                {
+                    Write("IMPROVE");
+                    Write($"{miss + 1} {i + 1}");
+                }
+                writer.Flush();
             }
         }
 
@@ -152,13 +128,3 @@ namespace CFroundab
         #endregion
     }
 }
-
-/*
-
-   0 10 20 120 150
-   0 80 130 140 190
-
-   0 0 0
-
-
- */
