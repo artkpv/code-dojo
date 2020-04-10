@@ -3,43 +3,7 @@
 /*
 Author: Artyom K. <www.artkpv.net>
 
-30 ^ 50
-
-N K P
-Take P plates from N stacks of K plates. Max beauty.
-K <= 30, N <= 50
-
-## Idea 1, BF
-O(K^N)
-Test set 1 - 30*30*30 = 27 000
-Test set 2 - 30^50 ~= 3^50 * 10^50 = 9^25 * 10^50 ~= 10^75
-
-
-## Idea 2
-DP[i][j] - max sum for first i stacks when j plates in total.
-
-DP[i][j] = 
-    for t in 0..K:
-        DP[i][j] = Max(DP[i][j], stack[i][t] + DP[i-1][j-t])
-
-Ans = DP[N][K]
-
-N * N * K * K <= 75 000 * 30 = 2 250 000
-
-
-
-2 4 5
-10 10 100 30
-80 50 10 50
-
-
-3 2 3 
-80 80
-15 50
-20 10
-
-*/
-
+ */
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -50,7 +14,7 @@ using System.Threading;
 using System.Diagnostics;
 using static System.Math;
 
-namespace CFroundab
+namespace CFqualificationb
 {
     public class Solver
     {
@@ -59,44 +23,23 @@ namespace CFroundab
             int tests = ReadInt();
             for (int test = 0; test < tests; test++)
             {
-                int N = ReadInt();
-                int K = ReadInt();
-                int P = ReadInt();
-                long[][] stacks = new long[N][];
-                for (int i = 0; i < N; i++)
-                    stacks[i] = 
-                        new List<long> {0}.Concat(
-                            ReadIntArray().Select(e => (long)e)
-                        ).ToArray();
-                for (int i = 0; i < N; i++)
+                string S = ReadToken();
+                
+                int d = 0;
+                var sb = new StringBuilder();
+                for (int i = 0; i < S.Length; i++)
                 {
-                    for (int j = 1; j < K+1; j++)
-                    {
-                        stacks[i][j] += stacks[i][j-1];
-                    }
+                    int dNext = S[i] - '0';
+                    if (dNext > d)
+                        sb.Append('(', dNext - d);
+                    else if (dNext < d)
+                        sb.Append(')', d - dNext);
+                    sb.Append(dNext);
+                    d = dNext;
                 }
-
-                long[][] dp = new long[N][];
-                for (int i = 0; i < N; i++)
-                    dp[i] = new long[P+1];
-
-                for (int j = 0; j < P+1; j++)
-                {
-                    dp[0][j] = j < K + 1 ? stacks[0][j] : dp[0][j-1];
-                }
-
-                for (int i = 1; i < N; i++)
-                {
-                    for (int j = 0; j < P+1; j++)
-                    {
-                        for (int t = 0; t < Min(j, K+1); t++)
-                        {
-                            dp[i][j] = Max(dp[i][j], stacks[i][t] + dp[i-1][j-t]);                            
-                        }
-                    }
-                }
-
-                Write($"Case #{test+1}: {dp[N-1][P]}");
+                if (d > 0)
+                    sb.Append(')', d);
+                Write($"Case #{test+1}: {sb.ToString()}");
             }
         }
 
@@ -152,13 +95,3 @@ namespace CFroundab
         #endregion
     }
 }
-
-/*
-
-   0 10 20 120 150
-   0 80 130 140 190
-
-   0 0 0
-
-
- */

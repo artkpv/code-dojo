@@ -3,43 +3,7 @@
 /*
 Author: Artyom K. <www.artkpv.net>
 
-30 ^ 50
-
-N K P
-Take P plates from N stacks of K plates. Max beauty.
-K <= 30, N <= 50
-
-## Idea 1, BF
-O(K^N)
-Test set 1 - 30*30*30 = 27 000
-Test set 2 - 30^50 ~= 3^50 * 10^50 = 9^25 * 10^50 ~= 10^75
-
-
-## Idea 2
-DP[i][j] - max sum for first i stacks when j plates in total.
-
-DP[i][j] = 
-    for t in 0..K:
-        DP[i][j] = Max(DP[i][j], stack[i][t] + DP[i-1][j-t])
-
-Ans = DP[N][K]
-
-N * N * K * K <= 75 000 * 30 = 2 250 000
-
-
-
-2 4 5
-10 10 100 30
-80 50 10 50
-
-
-3 2 3 
-80 80
-15 50
-20 10
-
-*/
-
+ */
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -50,7 +14,7 @@ using System.Threading;
 using System.Diagnostics;
 using static System.Math;
 
-namespace CFroundab
+namespace CFqualificationc
 {
     public class Solver
     {
@@ -60,43 +24,47 @@ namespace CFroundab
             for (int test = 0; test < tests; test++)
             {
                 int N = ReadInt();
-                int K = ReadInt();
-                int P = ReadInt();
-                long[][] stacks = new long[N][];
-                for (int i = 0; i < N; i++)
-                    stacks[i] = 
-                        new List<long> {0}.Concat(
-                            ReadIntArray().Select(e => (long)e)
-                        ).ToArray();
+                var SE = new Tuple<int, int>[N];
+                int[] inx = new int[N];
                 for (int i = 0; i < N; i++)
                 {
-                    for (int j = 1; j < K+1; j++)
+                    SE[i] = Tuple.Create(ReadInt(), ReadInt());
+                    inx[i] = i;
+                }
+                Array.Sort(SE, inx);
+                int? cEnd = SE[0].Item2;
+                int? jEnd = null;
+                char[] ans = new char[N];
+                ans[inx[0]] = 'C';
+                bool possible = true;
+                for (int i = 1; possible && i < N; i++)
+                {
+                    int s = SE[i].Item1;
+                    int e = SE[i].Item2;
+                    if (cEnd.HasValue && cEnd.Value <= s)
+                        cEnd = null;
+                    if (jEnd.HasValue && jEnd.Value <= s)
+                        jEnd = null;
+
+                    if (cEnd.HasValue && jEnd.HasValue)
+                        possible = false;
+                    else if (!cEnd.HasValue)
                     {
-                        stacks[i][j] += stacks[i][j-1];
+                        ans[inx[i]] = 'C';
+                        cEnd = e;
+                    }
+                    else if (!jEnd.HasValue)
+                    {
+                        ans[inx[i]] = 'J';
+                        jEnd = e;
                     }
                 }
-
-                long[][] dp = new long[N][];
-                for (int i = 0; i < N; i++)
-                    dp[i] = new long[P+1];
-
-                for (int j = 0; j < P+1; j++)
+                if (!possible)
+                    Write($"Case #{test+1}: IMPOSSIBLE");
+                else
                 {
-                    dp[0][j] = j < K + 1 ? stacks[0][j] : dp[0][j-1];
+                    Write($"Case #{test+1}: {string.Concat(ans)}");
                 }
-
-                for (int i = 1; i < N; i++)
-                {
-                    for (int j = 0; j < P+1; j++)
-                    {
-                        for (int t = 0; t < Min(j, K+1); t++)
-                        {
-                            dp[i][j] = Max(dp[i][j], stacks[i][t] + dp[i-1][j-t]);                            
-                        }
-                    }
-                }
-
-                Write($"Case #{test+1}: {dp[N-1][P]}");
             }
         }
 
@@ -152,13 +120,3 @@ namespace CFroundab
         #endregion
     }
 }
-
-/*
-
-   0 10 20 120 150
-   0 80 130 140 190
-
-   0 0 0
-
-
- */
