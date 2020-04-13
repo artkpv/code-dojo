@@ -39,7 +39,7 @@ f(b,
 from collections import deque, Counter
 import array
 from itertools import combinations, permutations
-from math import sqrt
+from math import sqrt, ceil
 import unittest
 import heapq
 
@@ -56,30 +56,43 @@ def read_int_array():
 tests = read_int()
 
 for test in range(tests):
-    n, k = read_int_array()
+    N, K = read_int_array()
     arr = read_int_array()
     arr.sort()
-    if n == 1:
+    if N == 1:
         print(0)
         break
     D = []
-    for i in range(n-1):
+    hi = 1
+    for i in range(N-1):
         d = arr[i+1] - arr[i]
         if d > 1:
-            heapq.heappush(D, -d)
+            D.append(d)
+            hi = max(hi, d)
 
-    while k > 0 and D:
-        d = -heapq.heappop(D)
-        dd = d // 2
-        if dd > 1:
-            heapq.heappush(D, -dd)
-        if d % 2 == 1:
-            heapq.heappush(D, -(dd + 1))
-        elif dd > 1:
-            heapq.heappush(D, -dd)
-        k -= 1
+    lo = 1
+    while lo < hi:
+        mid = (lo + hi) // 2
+        k = 0
+        for d in D:
+            k += ceil(d / mid) - 1
+        if k <= K:
+            hi = mid
+        else:
+            lo = mid + 1
 
-    max_ = -heapq.heappop(D) if D else 1
-    print("Case #{}: {}".format(test+1, max_))
+    print("Case #{}: {}".format(test+1, lo))
 
 
+"""
+2
+10 13 15 16 17
+
+3 2 
+
+lo hi mid
+1 3 3
+3 3 
+
+
+"""

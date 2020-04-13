@@ -89,9 +89,9 @@ namespace CFroundab
                 {
                     for (int j = 0; j < P+1; j++)
                     {
-                        for (int t = 0; t < Min(j, K+1); t++)
+                        for (int t = 0; t <= Min(j, K); t++)
                         {
-                            dp[i][j] = Max(dp[i][j], stacks[i][t] + dp[i-1][j-t]);                            
+                            dp[i][j] = Max(dp[i][j], stacks[i][t] + dp[i-1][j-t]);
                         }
                     }
                 }
