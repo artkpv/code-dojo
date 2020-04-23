@@ -21,21 +21,43 @@ namespace CF1343d
         public void Solve()
         {
             int tests = ReadInt();
-            const int MAX = (int)(2*1e5 +1);
-            int[] cnt = new int[MAX];
+            const int MAX = (int)(2*1e6);
+            int[] cnt = new int[MAX*2+1];
+            int[] pref = new int[MAX*2+1];
+            //System.Diagnostics.Trace.WriteLine($"MAX={MAX} cnt len={cnt.Length} pref len={pref.Length} ");
             for (int test = 0; test < tests; test++)
             {
                 int n = ReadInt();
                 int k = ReadInt();
                 int[] arr = ReadIntArray();
                 for (int i = 0; i <= k*2; i++)
+                {
                     cnt[i] = 0;
+                    pref[i] = 0;
+                }
                 for (int i = 0; i < n/2; i++)
                 {
-                    cnt[arr[i] + arr[n-i-1]] += 1;
+                    int l = arr[i];
+                    int r = arr[n-i-1];
+                    int min = Min(l, r) + 1;
+                    int max = Max(l, r) + k;
+                    cnt[l + r] += 1;
+                    pref[min] += 1;
+                    pref[max+1] -= 1;
                 }
-                Array.Sort(cnt, 0, k*2+1);
-                Write(n / 2 - cnt[k*2]);
+                for (int i = 1; i <= k*2; i++)
+                {
+                    pref[i] = pref[i-1] + pref[i];
+                }
+                int ans = int.MaxValue;
+                for (int x = 2; x <= 2*k; x++)
+                {
+                    int a = cnt[x];
+                    int b = pref[x];
+                    int c = n/2 - b;
+                    ans = Min(ans, 2*c + b - a);
+                }
+                Write(ans);
             }
         }
 
