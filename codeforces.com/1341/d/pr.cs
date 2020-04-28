@@ -26,40 +26,44 @@ namespace CF1341d
             0b0111010,
             0b1101011,
             0b1101111,
-            0b1010010,
-            0b1111111,
-            0b1111011,
+            0b1010010, // 7
+            0b1111111, // 8
+            0b1111011, // 9
         };
 
-        int[][] possible = new int[(1<<7)][];
+        const int LEN = 7;
+
+        int[][] possible = new int[(1 << LEN)][];
 
         public Solver()
         {
-            int l = 7;
-            for (int from_ = 0; from_ < (1 << 7); from_++)
+            for (int from_ = 0; from_ < (1 << LEN); from_++)
             {
-                possible[from_] = new int[8];
-                for (int jj = 0; jj < 8; jj++)
+                const int ChangesNumber = 8;
+                possible[from_] = new int[ChangesNumber];
+                for (int jj = 0; jj < ChangesNumber; jj++)
                 {
                     possible[from_][jj] = -1;
                 }
 
-                foreach (int to_ in valid)
+                for (int toInx = 0; toInx < valid.Length; toInx++)
                 {
+                    int to_ = valid[toInx];
                     int count = 0;
-                    for (int i = 0; count >= 0 && i < l; i++)
+                    for (int i = 0; count >= 0 && i < LEN; i++)
                     {
-                        if (((from_ >> i)&1) ==1  && ((to_ >> i) & 1) == 0)
+                        if (((from_ >> i) & 1) == 1 && ((to_ >> i) & 1) == 0)
                             count = -1;
                         else
                         {
-                            if ((((from_ >> i) & 1) & ((to_ >> i)&1)) != 1)
+                            if ((((from_ >> i) & 1) != ((to_ >> i) & 1)))
                                 count += 1;
                         }
                     }
                     if (count >= 0)
                     {
-                        possible[from_][count] = to_;
+                        if (possible[from_][count] == -1 || Array.IndexOf(valid, possible[from_][count]) < toInx)
+                            possible[from_][count] = to_;
                     }
                 }
             }
@@ -68,10 +72,9 @@ namespace CF1341d
         private int ToD(string d)
         {
             int dig = 0;
-            int n = d.Length;
-            for (int i = 0; i < 7; i++)
+            for (int i = 0; i < LEN; i++)
             {
-                dig |= (d[i] == '1' ? (1 << (n - i - 1)) : 0);
+                dig |= (d[i] == '1' ? (1 << (LEN - i - 1)) : 0);
             }
             return dig;
         }
@@ -97,7 +100,7 @@ namespace CF1341d
                 dp[i] = new bool[K + 1];
                 for (int j = 0; j < K + 1; j++)
                 {
-                    for (int p = 0; !dp[i][j] && p <= Min(j, 7); p++)
+                    for (int p = 0; !dp[i][j] && p <= Min(j, LEN); p++)
                     {
                         int d = GetD(D[N - i], p);
                         //System.Diagnostics.Trace.WriteLine($"D[N-i]={D[N-i]} p={p} d={d} dp[i-1][j-p]={dp[i-1][j-p]}");
@@ -117,15 +120,16 @@ namespace CF1341d
                 {
                     int max = -1;
                     int used = 0;
-                    for (int p = 0; p <= Min(7, K); p++)
+                    for (int p = 0; p <= Min(LEN, K); p++)
                     {
                         if (!dp[N - i - 1][K - p])
                             continue;
-                        int d = GetD(D[i], p);
-                        if (max < d)
+                        int digit = GetD(D[i], p);
+                        int digitValue = Array.IndexOf(valid, digit);
+                        if (max < digitValue)
                         {
                             used = p;
-                            max = d;
+                            max = digitValue;
                         }
                     }
                     K -= used;
