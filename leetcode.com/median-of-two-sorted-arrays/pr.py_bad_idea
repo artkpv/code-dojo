@@ -1,0 +1,84 @@
+#!python3
+        
+"""
+1 2 3 
+
+5 6
+
+3
+a_l 2
+a_le 3
+b_l 0
+b_le 0
+
+>3
+
+1 2
+5 6
+
+2
+a_l 1
+a_le 2
+b_l 0
+b_le 0 
+
+"""
+class Solution:
+    
+    def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -> float:
+        if not nums1 or not nums2:
+            nums = nums1 or nums2 or []
+            if not nums:
+                return None
+            mid = len(nums)/2
+            return nums[mid] * 1.0 if len(nums) % 2 == 1 else (nums[mid] + nums[mid-1])*1.0/2.0
+        total = len(nums1) + len(nums2)
+        x = nums1[-1]
+        while True:
+            a_l = bs(nums1, x)
+            a_le = bs(nums1, x+1)
+            b_l = bs(nums2, x)
+            b_le = bs(nums2, x+1)
+            mid = len(nums1 + nums2)//2
+            
+            if a_l + b_l < mid <= a_le + b_le - 1:
+                return x
+            elif a_l + b_l == mid:
+                xx = max(at(a_l-1, nums1), at(b_l-1, nums1))
+                if total % 2 == 1:
+                    return x
+                else:
+                    return (xx + x) / 2.0
+            elif a_le + b_le == mid:
+                xx = max(at(a_le, nums1), at(b_le, nums2))
+                if total % 2 == 1:
+                    return xx
+                else:
+                    return (x + xx)*1.0/2.0
+            elif mid < a_l + b_l:
+                x = max(nums1[a_l//2], nums2[b_l//2])
+            elif a_le + b_le < mid:
+                x = max(nums1[a_le + (len(nums1) - a_le) // 2], 
+                    nums2[b_le + (len(nums1) - b_le)//2])
+            else:
+                raise Error('invalid inequations')
+        raise Error('should have found in the loop')
+                
+            
+                
+                
+            
+def bs(arr, el):
+    assert arr
+    l = 0
+    r = len(arr)-1
+    while l < r:
+        m = (l+r)//2 
+        if arr[m] <= el:
+            r = m
+        else:
+            l = m + 1
+    return l
+
+def at(i, arr):
+    return arr[i] if i < len(arr) else -float('inf')
