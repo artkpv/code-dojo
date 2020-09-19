@@ -1,0 +1,27 @@
+{
+  "template": [
+    {
+      "alias": "cs",
+      "lang": "9",
+      "path": "/home/art/.cf/template.cs",
+      "suffix": [
+        "cs",
+        ""
+      ],
+      "before_script": "mcs $%full%$",
+      "script": "mono $%file%$.exe",
+      "after_script": "rm $%file%$.exe"
+    }
+  ],
+  "default": 0,
+  "gen_after_parse": false,
+  "host": "https://codeforces.com",
+  "proxy": "",
+  "folder_name": {
+    "acmsguru": "acmsguru",
+    "contest": "contest",
+    "group": "group",
+    "gym": "gym",
+    "root": ""
+  }
+}
