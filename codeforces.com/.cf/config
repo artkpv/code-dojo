@@ -11,10 +11,22 @@
       "before_script": "mcs $%full%$",
       "script": "mono $%file%$.exe",
       "after_script": "rm $%file%$.exe"
+    },
+    {
+      "alias": "pypy",
+      "lang": "41",
+      "path": "/home/art/.cf/template.py",
+      "suffix": [
+        "pypy",
+        "py"
+      ],
+      "before_script": "",
+      "script": "pypy3 $%full%$",
+      "after_script": ""
     }
   ],
-  "default": 0,
-  "gen_after_parse": false,
+  "default": 1,
+  "gen_after_parse": true,
   "host": "https://codeforces.com",
   "proxy": "",
   "folder_name": {

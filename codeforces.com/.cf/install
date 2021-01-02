@@ -1,0 +1,9 @@
+#!/bin/bash 
+
+cd ` dirname $0 `
+
+[[ -e ~/.cf ]] || mkdir ~/.cf
+
+ln config ~/.cf/config
+ln template.cs ~/.cf/template.cs
+ln template.py ~/.cf/template.py
