@@ -8,8 +8,12 @@ HHTTHHT -> 2 (HHHHHHT)
 
 
 I1 BF. Min { for each pos count tails on left and heads on right to flip }
+T: N*N
+S: 1
 
 I2 Store num of heads to the right. heads[i] number of H 
+T: N
+S: N
 
 flips = (n - heads[i-1]) + (heads[-1] - heads[i-1])
 '''

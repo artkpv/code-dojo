@@ -21,24 +21,39 @@ namespace PrA
         public void Solve()
         {
             int tests = ReadInt();
-            const string l = "KICK";
-            const string r = "START";
             for (int test = 1; test <= tests; test++)
             {
+                int n = ReadInt();
+                int d = ReadInt();
+                int c = ReadInt();
+                int m = ReadInt();
                 string s = ReadToken();
-                int n = s.Length;
-                int[] ends = new int[n];
-                for(int i = n - r.Length; i >= 0; i--)
+                int i = 0;
+                bool can = true;
+                while (i < n && can) 
                 {
-                    ends[i] = ends[i + 1] + (IsEqual(s, i, r) ? 1 : 0);
+                    if (s[i] == 'D')
+                    {
+                        if (d <= 0)
+                            can = false;
+                        else
+                        {
+                            d -= 1;
+                            c += m;
+                        }
+                    }
+                    else if (s[i] == 'C')
+                    {
+                        if (c <= 0)
+                            can = false;
+                        else
+                        {
+                            c -= 1;
+                        }
+                    }
+                    i += 1;
                 }
-                int ans = 0;
-                for (int i = 0; i <= n - l.Length; i++)
-                {
-                    if (IsEqual(s, i, l))
-                        ans += ends[i];
-                }
-                Write("Case #" + test + ": " + ans);
+                Write("Case #" + test + ": " + (can ? "YES" : "NO"));
             }
         }
 
