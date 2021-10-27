@@ -63,49 +63,42 @@ namespace PrA
                     for (int i = 0; i < n; i++) 
                     {
                         int sum = 0;
-                        //Console.WriteLine("i j sum cost rem");
                         for (int j = i; j < n; j++) 
                         {
+                            //Console.WriteLine($"{i} {j} {sum} {left[i].Count}");
+                            if (j - 1 >= 0)
+                            {
+                                foreach(var key in left[j-1].Keys)
+                                {
+                                    if (!left[j].ContainsKey(key))
+                                        left[j].Add(key, int.MaxValue);
+                                    left[j][key] = Math.Min(left[j][key], left[j-1][key]);
+                                }
+                            }
+                            //Console.WriteLine("Check");
                             if (sum + ban[j] <= k)
                             {
+                                // 1. Check if optimal found.
                                 sum += ban[j];
-                                int rem = k - sum;
-                                int cost = j - i + 1;
-                                if (rem > 0 && i - 1 >= 0 && left[i-1].ContainsKey(rem))
+                                if (i - 2 >= 0 && left[i-2].ContainsKey(k - sum))
                                 {
-                                    rem = 0;
-                                    cost += left[i-1][rem];
+                                    res = Math.Min(res, j - i + 1 + left[i-2][k - sum]);
                                 }
-                                if (rem == 0)
-                                {
-                                    res = Math.Min(res, cost);
-                                }
-                                Console.WriteLine(String.Join(" ", i, j, sum, cost, rem, res));
-                                if (sum > 0 && sum < k)
+                                else if (sum == k)
+                                    res = Math.Min(res, j - i + 1);
+                                // 2. Store for future checks.
+                                if (0 < sum && sum < k)
                                 {
                                     if (!left[j].ContainsKey(sum))
                                         left[j].Add(sum, int.MaxValue);
                                     left[j][sum] = Math.Min(left[j][sum], j - i + 1);
                                 }
                             }
-                            if (j-1 >= 0)
-                            {
-                                foreach (var key in left[j-1].Keys)
-                                {
-                                    if (key == 0)
-                                        continue;
-                                    if (!left[j].ContainsKey(key))
-                                        left[j].Add(key, int.MaxValue);
-                                    if (key == 0)
-                                        continue;
-                                    left[j][key] = Math.Max(left[j][key], left[j-1][key]);
-                                }
-                            }
                         }
                     }
                 }
 
-                Write("Case #" + test + ": " + res);
+                Write("Case #" + test + ": " + (res != int.MaxValue ? res : -1));
             }
         }
 

@@ -24,36 +24,32 @@ namespace PrA
             for (int test = 1; test <= tests; test++)
             {
                 int n = ReadInt();
-                int d = ReadInt();
-                int c = ReadInt();
+                long d = ReadInt();
+                long c = ReadInt();
                 int m = ReadInt();
                 string s = ReadToken();
                 int i = 0;
-                bool can = true;
-                while (i < n && can) 
+                for (; i < n; i++)
                 {
                     if (s[i] == 'D')
                     {
                         if (d <= 0)
-                            can = false;
-                        else
-                        {
-                            d -= 1;
-                            c += m;
-                        }
+                            break;
+                        d -= 1;
+                        c += m;
                     }
-                    else if (s[i] == 'C')
+                    else
                     {
+                        Assert(s[i] == 'C');
                         if (c <= 0)
-                            can = false;
-                        else
-                        {
-                            c -= 1;
-                        }
+                            break;
+                        c -= 1;
                     }
-                    i += 1;
                 }
-                Write("Case #" + test + ": " + (can ? "YES" : "NO"));
+                Assert(i == n || d == 0 || c == 0);
+                while (i < n && s[i] == 'C')
+                    i += 1;
+                Write("Case #" + test + ": " + (i == n ? "YES" : "NO"));
             }
         }
 
@@ -104,7 +100,7 @@ namespace PrA
             for (int i = 0; i < ret.Length; i++) { ret[i] = new int[numberOfRows]; for (int j = 0; j < numberOfRows; j++)ret[i][j] = matrix[j][i]; } return ret;
         }
         public static string[] ReadLines(int quantity) { string[] lines = new string[quantity]; for (int i = 0; i < quantity; i++)lines[i] = reader.ReadLine().Trim(); return lines; }
-        public static void WriteArray<T>(IEnumerable<T> array) { writer.WriteLine(string.Join(" ", array)); }
+        public static void WriteArray<T>(IEnumerable<T> array) { writer.WriteLine(string.Join(" ", array).Trim()); }
         public static void Write(params object[] array) { WriteArray(array); }
         public static void WriteLines<T>(IEnumerable<T> array) { foreach (var a in array)writer.WriteLine(a); }
         private class SDictionary<TKey, TValue> : Dictionary<TKey, TValue>
@@ -116,6 +112,32 @@ namespace PrA
             }
         }
         private static T[] Init<T>(int size) where T : new() { var ret = new T[size]; for (int i = 0; i < size; i++)ret[i] = new T(); return ret; }
+        private static void Assert(bool condition, string message=null){ if (!condition) throw new Exception($"Assertion failed {message}"); }
         #endregion
     }
 }
+
+
+/*
+ *
+   d c m
+12 0 2 2
+CDCCCDCCDCDC
+            i
+YES
+
+
+0 0 0
+D
+i
+NO
+
+0 0 0
+CCCCC
+     i
+YES
+
+
+
+ *
+ */
