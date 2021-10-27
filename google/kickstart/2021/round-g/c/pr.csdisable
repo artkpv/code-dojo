@@ -161,6 +161,7 @@ namespace PrA
             }
         }
         private static T[] Init<T>(int size) where T : new() { var ret = new T[size]; for (int i = 0; i < size; i++)ret[i] = new T(); return ret; }
+        private static void Assert(bool condition, string message=null){ if (!condition) throw new Exception($"Assertion failed {message}"); }
         #endregion
     }
 }
