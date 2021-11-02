@@ -35,13 +35,60 @@ namespace PrA
             int tests = ReadInt();
             for (int test = 1; test <= tests; test++)
             {
-                int k = ReadInt();
-
-                while (k-- > 0)
+                int n  = ReadInt();
+                Assert(n > 0);
+                long[] x1 = new long[n];
+                long[] x2 = new long[n];
+                long[] y1 = new long[n];
+                long[] y2 = new long[n];
+                for(int i = 0; i < n; i++)
                 {
+                    var coordinates = ReadIntArray();
+                    x1[i] = coordinates[0];
+                    x2[i] = coordinates[2];
+                    y1[i] = coordinates[1];
+                    y2[i] = coordinates[3];
                 }
-                Write("Case #" + test + ": " + (can ? "YES" : "NO"));
+                Array.Sort(x1);
+                Array.Sort(x2);
+                Array.Sort(y1);
+                Array.Sort(y2);
+                long minx = Find(x1, x2);
+                long miny = Find(y1, y2);
+                Write($"Case #{test}: {minx} {miny}");
             }
+        }
+
+        long Find(long[] x1, long[] x2)
+        {
+            int n = x1.Length;
+            Assert(n > 0);
+            if (n == 1)
+                return x1[0];
+            long l = x1[0];
+            long r = x1[n-1];
+            long x = l;
+            while (l < r)
+            {
+                x = (x1[r] + x1[l])/2;
+                int a = Num(x2, n, x);  // On left.
+                int b = Num(x1, n, x);  // On right.
+                if (a < b)
+                    l = x;
+                else
+                    r = x;
+            }
+            return x;
+        }
+
+        int Num(long[] arr, int n, long x)
+        {
+            int i = Array.BinarySearch(arr, x);
+            if (i < 0)
+            {
+                i = i;
+            }
+            return i;
         }
 
         private bool IsEqual(string s, int i, string other)
@@ -103,6 +150,7 @@ namespace PrA
             }
         }
         private static T[] Init<T>(int size) where T : new() { var ret = new T[size]; for (int i = 0; i < size; i++)ret[i] = new T(); return ret; }
+        private static void Assert(bool condition, string msg=null) { if (!condition) throw new Exception(msg); }
         #endregion
     }
 }
