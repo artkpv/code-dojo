@@ -23,6 +23,36 @@ x1 y1 x2 y2
 0 3 5 9
 
 
+I2 BS.
+
+For one axis (x or y), for intervals there. For a(x) - number of intervals that ends before x and not at x, b(x) for intervals that start after x and not at x.
+Then x is optimal iif a+b is min?
+
+minimaze a+b
+can be
+
+8 9 0 1 2 3  x
+4 3 3 3 3 4  a+b
+0 0 0 3 3 4  a
+4 3 3 0 0 0  b
+0 6 3 3 6 0  dist to nearest
+ans is 10 or 11
+
+9-10
+8-10
+8-10
+11-12
+11-13
+11-13
+
+
+
+1-2 3-4, x = 3
+1-2 4-5, 3
+1-2 -10-2 ..-2  3-4, x=2, a-b = 1
+1-10 11-12,   10 or 11 but 11
+
+
 
  */
 
@@ -45,8 +75,8 @@ namespace PrA
                 {
                     var coordinates = ReadIntArray();
                     x1[i] = coordinates[0];
-                    x2[i] = coordinates[2];
                     y1[i] = coordinates[1];
+                    x2[i] = coordinates[2];
                     y2[i] = coordinates[3];
                 }
                 Array.Sort(x1);
@@ -59,24 +89,37 @@ namespace PrA
             }
         }
 
-        long Find(long[] x1, long[] x2)
+        long Find(long[] starts, long[] ends)
         {
-            int n = x1.Length;
+            int n = starts.Length;
             Assert(n > 0);
             if (n == 1)
-                return x1[0];
-            long l = x1[0];
-            long r = x1[n-1];
+                return starts[0];
+            int a = 0;
+            int b = n;
+            int x = int.MinValue;
+            for (int i = 0; i < n; i++)
+            {
+                x
+
+            }
+            long l = 0;
+            long r = n-1;
             long x = l;
             while (l < r)
             {
-                x = (x1[r] + x1[l])/2;
-                int a = Num(x2, n, x);  // On left.
-                int b = Num(x1, n, x);  // On right.
-                if (a < b)
-                    l = x;
+                x = (starts[r] + starts[l])/2;
+                int a = Num(ends, n, x); 
+                Assert((a >= n || ends[a] >= x) && (0 == a || ends[a-1] < x));
+                // int d = (a == 0 ? 0 : x - ends[a]) * a;
+                int b = Num(starts, n, x+1);
+                Assert((b >= n || starts[b] > x) && (0 == b || starts[b-1] <= x));
+                // d += (b == n ? 0 : starts[b] - x) * (n - b);
+                if (a <= (n-b)) 
+                    l = a;
                 else
-                    r = x;
+                    r = b;
+
             }
             return x;
         }
@@ -86,7 +129,7 @@ namespace PrA
             int i = Array.BinarySearch(arr, x);
             if (i < 0)
             {
-                i = i;
+                i = ~i;
             }
             return i;
         }
