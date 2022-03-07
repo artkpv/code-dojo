@@ -95,43 +95,46 @@ namespace PrA
             Assert(n > 0);
             if (n == 1)
                 return starts[0];
-            int a = 0;
-            int b = n;
-            int x = int.MinValue;
-            for (int i = 0; i < n; i++)
-            {
-                x
-
-            }
-            long l = 0;
-            long r = n-1;
-            long x = l;
+            long l = starts[0];
+            long r = ends[0];
+            //Console.WriteLine($"{string.Join(' ', starts)}");
+            //Console.WriteLine($"{string.Join(' ', ends)}");
+            long x = r;
             while (l < r)
             {
-                x = (starts[r] + starts[l])/2;
-                int a = Num(ends, n, x); 
-                Assert((a >= n || ends[a] >= x) && (0 == a || ends[a-1] < x));
-                // int d = (a == 0 ? 0 : x - ends[a]) * a;
-                int b = Num(starts, n, x+1);
-                Assert((b >= n || starts[b] > x) && (0 == b || starts[b-1] <= x));
-                // d += (b == n ? 0 : starts[b] - x) * (n - b);
-                if (a <= (n-b)) 
-                    l = a;
-                else
-                    r = b;
-
+                x = (r+l) / 2;
+                int a = n - BSLeft(starts, x+1);
+                int b = BSLeft(ends, x+1);
+                if (a - b > 1)
+                    l = starts[n - a];
+                else if (a - b <= -1)
+                    r = ends[b];
+                else 
+                    break;
             }
-            return x;
+            return l;
         }
 
-        int Num(long[] arr, int n, long x)
+        int BSLeft(long[] arr, long x)
         {
-            int i = Array.BinarySearch(arr, x);
-            if (i < 0)
+            int n = arr.Length;
+            int l = 0;
+            int r = n;
+            if (arr[l] == x)
+                return l;
+            if (arr[n-1] < x)
+                return n;
+            // Invariant: arr[l] <= x < arr[r]
+            while (r - l > 1)
             {
-                i = ~i;
+                //Console.WriteLine($"bsleft: {x} {l} {r}");
+                int m = (l+r) / 2;
+                if (arr[m] < x)
+                    l = m;
+                else
+                    r = m;
             }
-            return i;
+            return r;
         }
 
         private bool IsEqual(string s, int i, string other)
