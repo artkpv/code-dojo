@@ -35,6 +35,7 @@ See
 https://ru.wikipedia.org/wiki/Функция_Эйлера  (Euler's totient function)
 
 """
+import time, threading
 
 def coprime(k, v):
     if v == 1:
@@ -43,7 +44,6 @@ def coprime(k, v):
         return False
     return coprime(v, k % v)
 
-
 def phi(n):
     count = 1  # for 1
     for i in range(2, n):
@@ -51,33 +51,27 @@ def phi(n):
             count += 1
     return count
 
+def solve():
+    n = 3
+    start = time.time()
+    def print_progress():
+        nonlocal n
+        print(f"{n=} in {time.time() - start:.2}s")
+        threading.Timer(2, print_progress).start()
+    print_progress()
+    max_n = 2
+    max_n_div_phi = 2
+    while True:
+        if n == 1_000_000 + 1:
+            break
+        p = phi(n)
+        if max_n_div_phi < (n / p):
+            max_n_div_phi = (n / p)
+            max_n = n
+            print(f'max found: n={n} phi={p} n/phi={n/p}')
+        n += 1
+    print(max_n)
 
 
-max_n = 2
-max_n_div_phi = 2
-
-n = 3
-
-# to print progress:
-import timeit, sys, threading
-start = timeit.default_timer()
-def print_progress():
-    global n
-    time = int(timeit.default_timer() - start)
-    speed = n // time if time > 0 else 0
-    sys.stdout.write("\r n={} in {}s ({} n/s)".format(n, time, speed ))
-    threading.Timer(1, print_progress).start()
-print_progress()
-
-while True:
-    if n == 1_000_000 + 1:
-        break
-    p = phi(n)
-    if max_n_div_phi < (n / p):
-        max_n_div_phi = (n / p)
-        max_n = n
-        print('max found: n=' + str(n) + ' phi=' + str(p) +' n/phi=' + str(n/p))
-    n += 1
-
-print(max_n)
-
+if __name__ == '__main__':
+    solve()
