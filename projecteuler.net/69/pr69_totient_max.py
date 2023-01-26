@@ -18,6 +18,38 @@ It can be seen that n=6 produces a maximum n/φ(n) for n ≤ 10.
 
 Find the value of n ≤ 1,000,000 for which n/φ(n) is a maximum.
 
+=====================
+
+ANSWER: 510510
+
+
+=====================
+
+I1 BF:
+loop n=1..1e6: 
+    argmax_n(n/phi(n))
+For phi use Euclid algo. ~min(a,b)
+Time: ~(n^3). About 1e6*1e6 seconds, 31709 years?
+
+I2 
+Memoize phi(n), i.e. gcd(a,b)
+Space: 1e6 * 1e6 * 3 * 4 / 2**40 = 10TB
+
+I3
+From phi(n*m) = phi(n)*phi(m), multiplicativity
+loop n=1..1e6:
+    argmax_n(n/phi(n))
+phi(a):
+ if memoized return
+ else
+ compute phi for a
+ fill phi(a*b) = phi(a)*phi(b) for b in 1..a-1 if phi(b)
+
+Time: ?
+Space: 1e6*2*4/2**20 ~= 8MB
+
+I4 
+With I3 but use primes to get all non-prime.
 
 ----------------------
 
@@ -35,40 +67,67 @@ See
 https://ru.wikipedia.org/wiki/Функция_Эйлера  (Euler's totient function)
 
 """
-import time, threading
+from time import time
+from threading import Timer
+from itertools import combinations 
+from functools import reduce
+from operator import mul
 
-def coprime(k, v):
-    if v == 1:
-        return True
-    if v == 0:
-        return False
-    return coprime(v, k % v)
+MAXN = 1_000_000
 
-def phi(n):
-    count = 1  # for 1
-    for i in range(2, n):
-        if coprime(n, i):
-            count += 1
-    return count
+def gcd(a, b):
+    a, b = (a,b) if a > b else (b,a)
+    while b != 0:
+        q, r = divmod(a, b)
+        a = b
+        b = r
+    return a
+
+def prod(iter_):
+    r = 0.0 if not iter_ else iter_[0]
+    for e in iter_[1:]:
+        r *= e
+    return r
 
 def solve():
+    mem_phi = [0] * (MAXN+1)
+    mem_phi[1] = 0
+    mem_phi[2] = 1.0
+    primes = [2]
+    def phi(a):
+        if mem_phi[a] == 0:
+            a_primes = []
+            x = a
+            for p in primes:
+                while x % p == 0:
+                    if not a_primes or a_primes[-1] != p:
+                        a_primes.append(p)
+                    x = x // p
+            if x == a:  # Prime.
+                mem_phi[a] = a - 1
+                primes.append(a)
+            else:
+                assert x == 1.0
+                mem_phi[a] = a * reduce(
+                    mul, [(1 - 1.0/p) for p in a_primes], 1.0
+                )
+        return mem_phi[a]
+
     n = 3
-    start = time.time()
+    start = time()
     def print_progress():
         nonlocal n
-        print(f"{n=} in {time.time() - start:.2}s")
-        threading.Timer(2, print_progress).start()
+        print(f"{n=} in {time() - start:n}s")
+        Timer(2, print_progress).start()
     print_progress()
     max_n = 2
-    max_n_div_phi = 2
-    while True:
-        if n == 1_000_000 + 1:
-            break
-        p = phi(n)
-        if max_n_div_phi < (n / p):
-            max_n_div_phi = (n / p)
+    max_ndp = 1
+    while n < 1e6+1:
+        ndp = n*1.0/phi(n)
+        if max_ndp < ndp:
+            max_ndp = ndp
             max_n = n
-            print(f'max found: n={n} phi={p} n/phi={n/p}')
+            print(f'Max: n={n} n/phi={ndp}')
         n += 1
     print(max_n)
 
