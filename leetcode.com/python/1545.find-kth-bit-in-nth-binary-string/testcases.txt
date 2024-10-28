@@ -1,0 +1,11 @@
+input:
+3
+1
+output:
+"0"
+
+input:
+4
+11
+output:
+"1"
