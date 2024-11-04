@@ -1,0 +1,14 @@
+input:
+"leetcode exercises sound delightful"
+output:
+true
+
+input:
+"eetcode"
+output:
+true
+
+input:
+"Leetcode is cool"
+output:
+false

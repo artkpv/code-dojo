@@ -22,7 +22,7 @@ class Solution:
     def longestSquareStreak(self, nums: List[int]) -> int:
         numss = set(nums)
         max_l = -1
-        for x in sorted(numss, reverse=True):
+        for x in numss:
             x_len = -1
             while True:
                 x = x**0.5

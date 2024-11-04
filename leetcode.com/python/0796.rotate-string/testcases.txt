@@ -1,0 +1,11 @@
+input:
+"abcde"
+"cdeab"
+output:
+true
+
+input:
+"abcde"
+"abced"
+output:
+false
